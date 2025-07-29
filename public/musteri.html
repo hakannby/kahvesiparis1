@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Müşteri Sipariş Takip</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e4edfb 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    
+    .container {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      width: 100%;
+      max-width: 600px;
+      overflow: hidden;
+    }
+    
+    header {
+      background: #4a89dc;
+      color: white;
+      padding: 25px 30px;
+      text-align: center;
+      position: relative;
+    }
+    
+    header h1 {
+      font-size: 28px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+    
+    .order-id {
+      background: rgba(255,255,255,0.2);
+      padding: 8px 20px;
+      border-radius: 30px;
+      font-size: 18px;
+      margin-top: 10px;
+      display: inline-block;
+    }
+    
+    .status-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+      gap: 15px;
+    }
+    
+    .status {
+      background: white;
+      border-radius: 12px;
+      padding: 15px 25px;
+      text-align: center;
+      min-width: 160px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    
+    .status i {
+      font-size: 28px;
+      margin-bottom: 10px;
+      display: block;
+    }
+    
+    .status.preparing i { color: #4a89dc; }
+    .status.ready i { color: #27ae60; }
+    
+    .status h3 {
+      font-size: 18px;
+      color: #333;
+      margin-bottom: 5px;
+    }
+    
+    .status p {
+      font-size: 14px;
+      color: #777;
+    }
+    
+    .order-details {
+      padding: 30px;
+    }
+    
+    .order-section {
+      margin-bottom: 30px;
+    }
+    
+    .order-section h2 {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #4a89dc;
+      padding-bottom: 15px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #eee;
+    }
+    
+    .items-list {
+      display: grid;
+      gap: 15px;
+    }
+    
+    .item {
+      display: flex;
+      align-items: center;
+      padding: 15px;
+      background: #f9fbfd;
+      border-radius: 12px;
+      border-left: 4px solid #4a89dc;
+    }
+    
+    .item-image {
+      width: 60px;
+      height: 60px;
+      border-radius: 10px;
+      object-fit: cover;
+      margin-right: 15px;
+      border: 1px solid #e0e6ed;
+    }
+    
+    .item-info {
+      flex: 1;
+    }
+    
+    .item-name {
+      font-weight: 600;
+      font-size: 16px;
+      color: #333;
+      margin-bottom: 5px;
+    }
+    
+    .item-qty {
+      font-size: 14px;
+      color: #777;
+    }
+    
+    .item-price {
+      font-weight: bold;
+      font-size: 16px;
+    }
+    
+    .total-section {
+      background: #f1f8ff;
+      padding: 20px;
+      border-radius: 12px;
+      text-align: right;
+      font-size: 20px;
+      font-weight: bold;
+      margin-top: 20px;
+    }
+    
+    .total-section span {
+      color: #27ae60;
+      font-size: 24px;
+    }
+    
+    .notification {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #27ae60;
+      color: white;
+      padding: 15px 25px;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s ease;
+      z-index: 1000;
+    }
+    
+    .notification.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    
+    @media (max-width: 768px) {
+      .status-container {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .status {
+        width: 100%;
+        max-width: 300px;
+      }
+      
+      .order-details {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1><i class="fas fa-mug-hot"></i> Sipariş Takip</h1>
+      <div class="order-id">Sipariş No: <span id="orderNumber">YÜKLENİYOR...</span></div>
+      
+      <div class="status-container">
+        <div class="status preparing">
+          <i class="fas fa-blender"></i>
+          <h3>Hazırlanıyor</h3>
+          <p id="preparingTime">~5 dakika kaldı</p>
+        </div>
+        <div class="status ready">
+          <i class="fas fa-check-circle"></i>
+          <h3>Hazır</h3>
+          <p id="readyStatus">Almaya hazır</p>
+        </div>
+      </div>
+    </header>
+    
+    <div class="order-details">
+      <div class="order-section">
+        <h2><i class="fas fa-list"></i> Sipariş Detayları</h2>
+        <div class="items-list" id="orderItems">
+          <div class="item">
+            <div class="item-image">
+              <i class="fas fa-sync fa-spin"></i>
+            </div>
+            <div class="item-info">
+              <div class="item-name">Siparişiniz yükleniyor...</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="total-section">
+          Toplam Tutar: <span id="totalAmount">0₺</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="notification" id="notification">
+    <i class="fas fa-bell"></i>
+    <div id="notificationMessage">Sipariş durumu güncellendi!</div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js";
+    import { 
+      getFirestore, 
+      doc, 
+      onSnapshot,
+      getDoc
+    } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCyOAbT9CM76LvWrUYM4ZCl078O7mKmx_o",
+      authDomain: "kahvesiparis1.firebaseapp.com",
+      projectId: "kahvesiparis1",
+      storageBucket: "kahvesiparis1.appspot.com",
+      messagingSenderId: "358382107079",
+      appId: "1:358382107079:web:37ccd0e80b73736a8681e2"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+   
+
+    // DOM elementleri
+    const orderNumberEl = document.getElementById('orderNumber');
+    const orderItemsEl = document.getElementById('orderItems');
+    const totalAmountEl = document.getElementById('totalAmount');
+    const notificationEl = document.getElementById('notification');
+    const notificationMessageEl = document.getElementById('notificationMessage');
+    const preparingTimeEl = document.getElementById('preparingTime');
+    const readyStatusEl = document.getElementById('readyStatus');
+
+    // Debug için konsol bilgisi
+    console.log("Müşteri takip sayfası yüklendi, sipariş dinleniyor...");
+
+
+    listenForOrderChanges();
+   
+
+    // Sipariş değişikliklerini dinle
+    function listenForOrderChanges() {
+  const orderRef = doc(db, "active_orders", "tekSiparis");
+
+  const unsubscribe = onSnapshot(orderRef, async (snapshot) => {
+    if (snapshot.exists()) {
+      const orderData = snapshot.data();
+      updateOrderDisplay(orderData);
+
+      // Durum
+      if (orderData.status === "draft") {
+        preparingTimeEl.textContent = "Sipariş hazırlanıyor...";
+        readyStatusEl.textContent = "Henüz onaylanmadı.";
+      } else if (orderData.status === "preparing") {
+        preparingTimeEl.textContent = "Hazırlanıyor...";
+        readyStatusEl.textContent = "Hazır olunca burada görünecek";
+      } else if (orderData.status === "ready") {
+        preparingTimeEl.textContent = "Hazırlandı";
+        readyStatusEl.textContent = "Almaya hazır!";
+        showNotification("Siparişiniz hazır!");
+      }
+    } else {
+      orderItemsEl.innerHTML = `
+        <div class="item">
+          <div class="item-image">
+            <i class="fas fa-info-circle"></i>
+          </div>
+          <div class="item-info">
+            <div class="item-name">Henüz sipariş eklenmedi</div>
+          </div>
+        </div>`;
+    }
+  });
+}
+
+
+    // Sipariş bilgilerini güncelle
+    function updateOrderDisplay(orderData) {
+      console.log("Sipariş güncelleniyor:", orderData);
+      
+      let itemsHTML = '';
+      let total = 0;
+      
+      if (orderData.items && orderData.items.length > 0) {
+        orderData.items.forEach(item => {
+          const itemTotal = item.qty * item.price;
+          total += itemTotal;
+          
+          itemsHTML += `
+            <div class="item">
+              <img src="${item.image || 'img/placeholder.jpg'}" 
+                alt="${item.product}" 
+                class="item-image"
+                onerror="this.onerror=null; this.src='img/placeholder.jpg'">
+              <div class="item-info">
+                <div class="item-name">${item.product}</div>
+                <div class="item-qty">${item.qty} adet × ${item.price}₺</div>
+              </div>
+              <div class="item-price">${itemTotal}₺</div>
+            </div>
+          `;
+        });
+      } else {
+        itemsHTML = `
+          <div class="item">
+            <div class="item-image">
+              <i class="fas fa-info-circle"></i>
+            </div>
+            <div class="item-info">
+              <div class="item-name">Sipariş detayları yüklenemedi</div>
+            </div>
+          </div>
+        `;
+      }
+      
+      orderItemsEl.innerHTML = itemsHTML;
+      totalAmountEl.textContent = `${total}₺`;
+    }
+
+    // Bildirim göster
+    function showNotification(message) {
+      console.log("Bildirim gösteriliyor:", message);
+      notificationMessageEl.textContent = message;
+      notificationEl.classList.add('show');
+      
+      setTimeout(() => {
+        notificationEl.classList.remove('show');
+      }, 3000);
+    }
+  </script>
+</body>
+</html>

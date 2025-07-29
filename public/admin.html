@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Paneli - Rol Yönetimi</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 40px;
+      max-width: 800px;
+      margin: auto;
+      background-color: #f8f9fa;
+    }
+
+    h2 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 30px;
+    }
+
+    .user-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 15px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .user-email {
+      font-weight: bold;
+      color: #444;
+    }
+
+    select {
+      padding: 8px;
+      font-size: 16px;
+      border-radius: 8px;
+      margin-right: 10px;
+    }
+
+    button {
+      padding: 8px 14px;
+      font-size: 15px;
+      border: none;
+      border-radius: 8px;
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .disabled {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Admin Paneli – Kullanıcı Rolleri</h2>
+<div id="userList"><i>Kullanıcılar yükleniyor...</i></div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-auth.js";
+  import { getFirestore, collection, getDocs, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
+
+  // Firebase konfigürasyonu
+    const firebaseConfig = {
+      apiKey: "AIzaSyCyOAbT9CM76LvWrUYM4ZCl078O7mKmx_o",
+      authDomain: "kahvesiparis1.firebaseapp.com",
+      projectId: "kahvesiparis1",
+      storageBucket: "kahvesiparis1.appspot.com",
+      messagingSenderId: "358382107079",
+      appId: "1:358382107079:web:37ccd0e80b73736a8681e2" // !!! BURAYI GÜNCELLE
+    };
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  const userListDiv = document.getElementById("userList");
+
+  // Giriş yapan kişi admin mi kontrol et
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      alert("Bu sayfayı görmek için önce giriş yapmalısınız.");
+      window.location.href = "index.html";
+      return;
+    }
+
+    const ref = doc(db, "users", user.uid);
+    const snap = await getDoc(ref);
+
+    if (!snap.exists() || snap.data().isAdmin !== true) {
+      alert("Bu sayfaya yalnızca admin erişebilir.");
+      window.location.href = "index.html";
+      return;
+    }
+
+    // Eğer admin ise kullanıcıları listele
+    loadUsers();
+  });
+
+  async function loadUsers() {
+    const snapshot = await getDocs(collection(db, "users"));
+    userListDiv.innerHTML = "";
+
+    snapshot.forEach(docSnap => {
+      const data = docSnap.data();
+      const uid = docSnap.id;
+      const email = data.email;
+      const currentRole = data.role || "";
+
+      const card = document.createElement("div");
+      card.className = "user-card";
+
+      const emailSpan = document.createElement("span");
+      emailSpan.className = "user-email";
+      emailSpan.textContent = email;
+
+      const select = document.createElement("select");
+      ["", "personel", "yonetici"].forEach(role => {
+        const option = document.createElement("option");
+        option.value = role;
+        option.textContent = role || "--seçiniz--";
+        if (role === currentRole) option.selected = true;
+        select.appendChild(option);
+      });
+
+      const button = document.createElement("button");
+      button.textContent = "Kaydet";
+
+      button.onclick = async () => {
+        const newRole = select.value;
+        await updateDoc(doc(db, "users", uid), { role: newRole });
+        alert(`Rol güncellendi: ${email} → ${newRole}`);
+      };
+
+      card.appendChild(emailSpan);
+      const right = document.createElement("div");
+      right.appendChild(select);
+      right.appendChild(button);
+      card.appendChild(right);
+
+      userListDiv.appendChild(card);
+    });
+  }
+</script>
+
+</body>
+</html>

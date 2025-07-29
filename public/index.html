@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Kullanıcı Girişi</title>
+  <style>
+    body {
+      font-family: Arial;
+      max-width: 400px;
+      margin: 80px auto;
+      text-align: center;
+      background-color: #f5f5f5;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    h2 {
+      color: #333;
+      margin-bottom: 25px;
+    }
+    input {
+      margin-bottom: 15px;
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+    button {
+      padding: 12px 25px;
+      margin: 10px;
+      border: none;
+      border-radius: 8px;
+      background-color: #4CAF50;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+  <h2>Giriş Yap veya Kayıt Ol</h2>
+  <input type="email" id="email" placeholder="Email adresiniz">
+  <input type="password" id="password" placeholder="Şifre">
+  <button onclick="login()">Giriş Yap</button>
+  <button onclick="register()">Kayıt Ol</button>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js";
+    import { 
+      getAuth, 
+      signInWithEmailAndPassword, 
+      createUserWithEmailAndPassword 
+    } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-auth.js";
+    import { 
+      getFirestore, 
+      doc, 
+      setDoc, 
+      getDoc 
+    } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
+
+    // FIREBASE CONFIG (APP ID'Yİ GÜNCELLE!)
+    const firebaseConfig = {
+      apiKey: "AIzaSyCyOAbT9CM76LvWrUYM4ZCl078O7mKmx_o",
+      authDomain: "kahvesiparis1.firebaseapp.com",
+      projectId: "kahvesiparis1",
+      storageBucket: "kahvesiparis1.appspot.com",
+      messagingSenderId: "358382107079",
+      appId: "1:358382107079:web:37ccd0e80b73736a8681e2" // !!! BURAYI GÜNCELLE
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // Kayıt işlemi
+    window.register = async () => {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      if (!email || !password) {
+        alert("Lütfen email ve şifre girin!");
+        return;
+      }
+
+      try {
+        const userCred = await createUserWithEmailAndPassword(auth, email, password);
+        const uid = userCred.user.uid;
+
+        await setDoc(doc(db, "users", uid), {
+          email: email,
+          role: null,
+          isAdmin: false
+        });
+
+        alert("Kayıt başarılı! Lütfen giriş yapın.");
+      } catch (err) {
+        alert("Kayıt hatası: " + err.message);
+      }
+    };
+
+    // Giriş işlemi
+    window.login = async () => {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      if (!email || !password) {
+        alert("Lütfen email ve şifre girin!");
+        return;
+      }
+
+      try {
+        const userCred = await signInWithEmailAndPassword(auth, email, password);
+        const uid = userCred.user.uid;
+        const userRef = doc(db, "users", uid);
+        const userSnap = await getDoc(userRef);
+
+        if (!userSnap.exists()) {
+          alert("Kullanıcı kaydı bulunamadı.");
+          return;
+        }
+
+        const userData = userSnap.data();
+        if (!userData.role) {
+          alert("Rol atanmamış. Yöneticiyle iletişime geçin.");
+          return;
+        }
+
+        if (userData.role === "personel") {
+          window.location.href = "siparis.html";
+        } else if (userData.role === "yonetici") {
+          window.location.href = "yonetim.html";
+        } else {
+          alert("Geçersiz rol: " + userData.role);
+        }
+      } catch (err) {
+        alert("Giriş hatası: " + err.message);
+      }
+    };
+  </script>
+</body>
+</html>

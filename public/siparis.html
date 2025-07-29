@@ -1,0 +1,1794 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Personel Paneli - Sipariş Al</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #4a89dc;
+      --primary-light: #5d9cec;
+      --primary-dark: #3b7dd8;
+      --danger: #e74c3c;
+      --success: #27ae60;
+      --dark: #34495e;
+      --light: #f5f7fa;
+      --white: #ffffff;
+      --shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 30px;
+      background: #fafafa;
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      color: #333;
+      position: relative;
+      background: linear-gradient(135deg, #f9f9f9 0%, #f0f2f5 100%);
+    }
+    
+    h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: var(--dark);
+      padding-bottom: 15px;
+      border-bottom: 2px solid #e0e6ed;
+    }
+    
+    /* YENİ KATEGORİ STİLLERİ */
+    .main-categories {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      margin-bottom: 20px;
+      padding: 10px;
+      background: var(--white);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+    }
+    
+    .main-category-btn {
+      padding: 12px 20px;
+      background: var(--white);
+      border: 2px solid var(--primary-light);
+      border-radius: 30px;
+      color: var(--dark);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 6px rgba(74, 137, 220, 0.2);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .main-category-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 12px rgba(74, 137, 220, 0.25);
+    }
+    
+    .main-category-btn.active {
+      background: var(--primary);
+      color: var(--white);
+      border-color: var(--primary);
+      transform: scale(1.05);
+      box-shadow: 0 8px 16px rgba(74, 137, 220, 0.3);
+      z-index: 1;
+    }
+    
+    .main-category-btn i {
+      font-size: 18px;
+    }
+    
+    /* ALT KATEGORİ VE ÜRÜNLER ALANI */
+    .category-content-area {
+      background: var(--white);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+      border: 1px solid #e0e6ed;
+      display: none;
+    }
+    
+    .category-content-area.active {
+      display: block;
+      animation: fadeIn 0.4s ease;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .subcategories {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    
+    .subcategory-btn {
+      padding: 10px 16px;
+      background: var(--light);
+      border: none;
+      border-radius: 20px;
+      color: var(--dark);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    
+    .subcategory-btn:hover {
+      background: #e0e6ed;
+      transform: translateY(-2px);
+    }
+    
+    .subcategory-btn.active {
+      background: var(--primary);
+      color: var(--white);
+      box-shadow: 0 4px 8px rgba(74, 137, 220, 0.2);
+    }
+    
+    .direct-products-title {
+      font-weight: bold;
+      margin: 15px 0 10px 0;
+      color: var(--dark);
+      font-size: 14px;
+      text-align: center;
+      padding: 8px;
+      background: rgba(74, 137, 220, 0.1);
+      border-radius: 8px;
+    }
+    
+    .direct-products {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 12px;
+    }
+    
+    .direct-product {
+      background: var(--white);
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+      font-size: 13px;
+      cursor: pointer;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.08);
+      transition: all 0.2s;
+      border: 1px solid #e0e6ed;
+    }
+    
+    .direct-product:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 10px rgba(0,0,0,0.15);
+      border-color: var(--primary);
+    }
+    
+    .direct-product img {
+      width: 100%;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      border: 1px solid #e0e6ed;
+    }
+    
+    .direct-product .name {
+      font-weight: 600;
+      color: var(--dark);
+      margin-bottom: 3px;
+    }
+    
+    .direct-product .price {
+      color: var(--success);
+      font-weight: 700;
+      font-size: 13px;
+    }
+    
+    /* ÜRÜN SEÇİM ALANI */
+    .coffee-selection {
+      margin-top: 25px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 18px;
+      justify-content: center;
+      background: var(--light);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+    
+    .coffee-option {
+      cursor: pointer;
+      border: 3px solid transparent;
+      border-radius: 14px;
+      padding: 10px;
+      text-align: center;
+      background: white;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+      transition: all 0.3s ease;
+      user-select: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      height: 100%;
+    }
+    
+    .coffee-option:hover {
+      box-shadow: 0 8px 14px rgba(0,0,0,0.2);
+      transform: translateY(-4px);
+    }
+    
+    .coffee-option.selected {
+      border-color: var(--primary);
+      box-shadow: 0 0 15px rgba(74, 137, 220, 0.8);
+      background-color: var(--light);
+    }
+    
+    .coffee-option img {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 12px;
+      margin-bottom: 10px;
+      filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1));
+      background: #f5f5f5;
+      border: 1px solid #e0e6ed;
+    }
+    
+    .coffee-option p {
+      font-weight: 600;
+      color: var(--dark);
+      font-size: 15px;
+      margin: 0;
+      user-select: none;
+    }
+    
+    .coffee-option .price {
+      color: var(--success);
+      font-weight: 700;
+      margin-top: 5px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--dark);
+      user-select: none;
+      background: var(--light);
+      padding: 10px 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    
+    .quantity-container {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      max-width: 180px;
+      margin-bottom: 30px;
+      margin-top: 10px;
+      background: var(--light);
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    
+    .quantity-container button {
+      flex: 1;
+      padding: 12px 0;
+      background-color: var(--primary-dark);
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-weight: 700;
+      font-size: 18px;
+      cursor: pointer;
+      transition: background-color 0.25s ease;
+      user-select: none;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+    }
+    
+    .quantity-container button:hover {
+      background-color: var(--primary);
+      transform: scale(1.05);
+    }
+    
+    #quantity {
+      width: 60px;
+      text-align: center;
+      font-size: 18px;
+      font-weight: 600;
+      border: 2px solid var(--primary-dark);
+      border-radius: 8px;
+      padding: 8px 0;
+      background: white;
+      user-select: none;
+    }
+    
+    .action-buttons {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+    
+    .action-buttons button {
+      flex: 1;
+      padding: 15px 0;
+      border-radius: 30px;
+      color: white;
+      font-weight: 700;
+      font-size: 17px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      user-select: none;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    #addOrderBtn {
+      background-color: var(--primary);
+    }
+    
+    #addOrderBtn:hover {
+      background-color: var(--primary-dark);
+      transform: translateY(-3px);
+    }
+    
+    #confirmBtn {
+      background-color: var(--success);
+    }
+    
+    #confirmBtn:hover {
+      background-color: #219653;
+      transform: translateY(-3px);
+    }
+    
+    #refundBtn {
+      background-color: var(--danger);
+    }
+    
+    #refundBtn:hover {
+      background-color: #c0392b;
+      transform: translateY(-3px);
+    }
+    
+
+    #addNameBtn {
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+#addNameBtn:hover {
+  background: var(--primary-dark) !important;
+  transform: scale(1.05);
+}
+
+
+    h3 {
+      color: var(--dark);
+      margin-bottom: 12px;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 15px;
+      background: var(--light);
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    
+    #orderList, #customerView {
+      min-height: 60px;
+      padding: 18px 20px;
+      border-radius: 12px;
+      background: var(--light);
+      box-shadow: inset 0 0 8px rgba(224, 230, 237, 0.67);
+      font-weight: 600;
+      font-size: 16px;
+      color: var(--dark);
+      margin-bottom: 25px;
+      user-select: text;
+    }
+    
+    #orderList {
+      position: relative;
+    }
+    
+    .order-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px dashed #d5c48b;
+    }
+    
+    .remove-item {
+      color: var(--danger);
+      cursor: pointer;
+      font-weight: bold;
+      padding: 5px 10px;
+      border-radius: 50%;
+      transition: all 0.3s;
+    }
+    
+    .remove-item:hover {
+      background: rgba(231, 76, 60, 0.1);
+      transform: rotate(90deg);
+    }
+    
+    #customerView {
+      border: 2px dashed #c7b36f;
+      min-height: 100px;
+      line-height: 1.4;
+      background: var(--light);
+    }
+    
+    .section {
+      margin-top: 20px;
+      background: var(--light);
+      padding: 15px;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    }
+    
+    .collapsible {
+      background-color: #e0e6ed;
+      cursor: pointer;
+      padding: 14px 20px;
+      border: none;
+      text-align: left;
+      outline: none;
+      font-size: 18px;
+      font-weight: 600;
+      border-radius: 15px;
+      color: var(--dark);
+      user-select: none;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+      margin-bottom: 10px;
+      transition: background-color 0.3s ease;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid #d5dbe4;
+    }
+    
+    .collapsible:hover {
+      background-color: #d5dbe4;
+    }
+    
+    .collapsible.active {
+      background-color: var(--primary-dark);
+      color: white;
+      box-shadow: 0 6px 12px rgba(59, 125, 216, 0.8);
+    }
+    
+    .content {
+      padding: 18px 22px;
+      display: none;
+      border: 2px solid #d5dbe4;
+      border-top: none;
+      border-radius: 0 0 15px 15px;
+      background-color: var(--light);
+      font-size: 15px;
+      color: var(--dark);
+      font-weight: 600;
+      user-select: text;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .modal-content {
+      background: white;
+      padding: 30px;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 28px;
+      cursor: pointer;
+      color: #777;
+      transition: transform 0.2s;
+    }
+    
+    .close-btn:hover {
+      transform: rotate(90deg);
+      color: #333;
+    }
+    
+    .history-item {
+      padding: 15px;
+      border-radius: 10px;
+      background: #f9f9f9;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+      border: 1px solid #eee;
+    }
+    
+    .history-item:hover {
+      background: #f0f7ff;
+      border-color: #c7e0ff;
+    }
+    
+    .history-item.selected {
+      background: #e3f2fd;
+      border-color: #90caf9;
+    }
+    
+    .history-item .order-id {
+      font-weight: bold;
+      color: var(--primary);
+    }
+    
+    .history-item .items {
+      margin: 8px 0;
+      color: #555;
+    }
+    
+    .history-item .total {
+      font-weight: bold;
+      color: var(--success);
+    }
+    
+    .history-item .date {
+      font-size: 14px;
+      color: #777;
+    }
+    
+    .refund-actions {
+      display: flex;
+      gap: 15px;
+      margin-top: 20px;
+    }
+    
+    .refund-actions button {
+      flex: 1;
+      padding: 12px;
+      border-radius: 8px;
+      font-weight: 600;
+    }
+    
+    /* Yeni eklenen stiller */
+    .refund-item {
+      padding: 10px;
+      margin: 5px 0;
+      background: #f9f9f9;
+      border-radius: 8px;
+      border: 1px solid #eee;
+    }
+    
+    .refund-item label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      background: none;
+      padding: 0;
+      box-shadow: none;
+    }
+    
+    .refund-item input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+    
+    /* Arama kutusu stilleri */
+    .search-container {
+      margin: 20px 0;
+      display: flex;
+      gap: 10px;
+    }
+    
+    #productSearch {
+      flex: 1;
+      padding: 12px 15px;
+      border: 2px solid #ddd;
+      border-radius: 30px;
+      font-size: 16px;
+      outline: none;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      transition: all 0.3s;
+    }
+    
+    #productSearch:focus {
+      border-color: var(--primary);
+      box-shadow: 0 2px 12px rgba(74, 137, 220, 0.2);
+    }
+    
+    .search-container button {
+      padding: 0 20px;
+      background: var(--danger);
+      color: white;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s;
+    }
+    
+    .search-container button:hover {
+      background: #c0392b;
+      transform: scale(1.05);
+    }
+    
+    @media (max-width: 768px) {
+      body {
+        padding: 20px 15px;
+        margin: 20px auto;
+      }
+      
+      .main-categories {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .main-category-btn {
+        width: 100%;
+        justify-content: center;
+      }
+      
+      .coffee-selection {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 12px;
+      }
+      
+      .action-buttons {
+        flex-direction: column;
+        gap: 12px;
+      }
+      
+      .direct-products {
+        grid-template-columns: 1fr;
+      }
+    }
+
+
+    .canceled-order {
+    background-color: #ffeeee !important;
+    color: #999;
+  }
+
+  .canceled-order td {
+    text-decoration: line-through;
+  }
+
+  .status-canceled {
+    color: #e74c3c;
+    font-weight: bold;
+  }
+
+  /* Geçmiş siparişler tablosu için stil */
+  .history-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+
+  .history-table th, 
+  .history-table td {
+    padding: 8px 12px;
+    border: 1px solid #e0e0e0;
+    text-align: left;
+  }
+
+  .history-table th {
+    background-color: #f5f5f5;
+    font-weight: 600;
+  }
+
+  .history-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+
+  .history-table tr:hover {
+    background-color: #f0f7ff;
+  }
+
+
+  </style>
+</head>
+<body>
+  <h2><i class="fas fa-coffee"></i> Personel Paneli - Kahve Siparişi</h2>
+  
+  <div class="search-container">
+    <input type="text" id="productSearch" placeholder="Ürün ara..." />
+    <button onclick="clearSearch()">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+
+  <!-- YENİ KATEGORİ YAPISI -->
+  <div class="main-categories" id="mainCategories">
+    <!-- Ana kategoriler buraya dinamik olarak eklenecek -->
+  </div>
+  
+  <div id="categoryContent" class="category-content-area">
+    <!-- Alt kategoriler ve doğrudan ürünler burada gösterilecek -->
+  </div>
+
+  <label>Ürün Seçimi:</label>
+  <div id="kahveListesi" class="coffee-selection" role="list" aria-label="Ürün seçenekleri">
+    <i style="grid-column: 1 / -1; text-align: center; color: var(--primary); font-style: normal;">
+      Kategori seçin veya ürün seçin
+    </i>
+  </div>
+  
+  <div class="form-group">
+    <label for="quantity">Adet:</label>
+    <div class="quantity-container" role="group" aria-label="Adet seçimi">
+      <button type="button" aria-label="Adet azalt" onclick="changeQty(-1)">-</button>
+      <input type="text" id="quantity" value="1" readonly aria-live="polite" aria-atomic="true" />
+      <button type="button" aria-label="Adet artır" onclick="changeQty(1)">+</button>
+    </div>
+  </div>
+
+  <div class="action-buttons">
+    <button id="addOrderBtn" onclick="addToOrder()">
+      <i class="fas fa-plus"></i> Siparişe Ekle
+    </button>
+    <button id="confirmBtn" onclick="confirmOrder()">
+      <i class="fas fa-check"></i> Siparişi Onayla
+    </button>
+    <button id="refundBtn" onclick="openRefundModal()">
+      <i class="fas fa-exchange-alt"></i> İade/Değişim
+    </button>
+  </div>
+
+  <h3><i class="fas fa-shopping-cart"></i> Aktif Sipariş</h3>
+    <button id="addNameBtn" style="margin-left:10px; padding:5px 10px; background:var(--primary); color:white; border:none; border-radius:4px;">
+    <i class="fas fa-user-plus"></i> İsim Ekle
+  </button>
+
+  <div id="orderList" aria-live="polite"><i>Henüz sipariş eklenmedi.</i></div>
+
+  <h3><i class="fas fa-user"></i> Müşteri Görünümü</h3>
+  <div id="customerView" aria-live="polite"><i>Müşteri için sipariş özeti yok.</i></div>
+
+  <div class="section">
+    <button class="collapsible" aria-expanded="false">
+      <span><i class="fas fa-history"></i> Satış Geçmişi (Özet)</span>
+      <i class="fas fa-chevron-down"></i>
+    </button>
+    <div class="content" id="salesSummary">
+  <table class="history-table">
+    <thead>
+      <tr>
+        <th>Tarih</th>
+        <th>Sipariş No</th>
+        <th>Ürünler</th>
+        <th>Toplam</th>
+        <th>Durum</th>
+      </tr>
+    </thead>
+    <tbody id="salesHistoryBody">
+      <!-- Dinamik olarak dolacak -->
+    </tbody>
+  </table>
+</div>
+
+    <button class="collapsible" aria-expanded="false">
+      <span><i class="fas fa-chart-bar"></i> Toplam Satış Adetleri</span>
+      <i class="fas fa-chevron-down"></i>
+    </button>
+    <div class="content" id="salesCounts"></div>
+  </div>
+
+  <!-- İade/Değişim Modal -->
+  <div id="refundModal" class="modal">
+    <div class="modal-content">
+      <!-- Dinamik olarak oluşturulacak -->
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      deleteDoc, 
+      addDoc,
+      serverTimestamp,
+      doc,
+      setDoc, 
+      updateDoc,
+      onSnapshot,
+      getDocs,
+      query,
+      where,
+      orderBy,
+      limit,
+      getDoc
+    } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
+    import { 
+      getAuth, 
+      onAuthStateChanged 
+    } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCyOAbT9CM76LvWrUYM4ZCl078O7mKmx_o",
+      authDomain: "kahvesiparis1.firebaseapp.com",
+      projectId: "kahvesiparis1",
+      storageBucket: "kahvesiparis1.appspot.com",
+      messagingSenderId: "358382107079",
+      appId: "1:358382107079:web:37ccd0e80b73736a8681e2"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    // Global değişkenler
+    let productMenu = {};
+    let productSpecs = {};
+    let selectedProduct = "";
+    let currentOrder = [];
+    let stockData = {};
+    let currentUserEmail = "";
+    let selectedRefundItems = [];
+    let selectedOrderForRefund = null;
+    let currentCustomerName = "";
+
+
+// İsim ekle butonu fonksiyonu
+document.getElementById("addNameBtn").addEventListener("click", function() {
+  const name = prompt("Müşteri ismini giriniz:");
+  if (name) {
+    currentCustomerName = name;
+    updateOrderDisplay();
+    saveActiveOrder();
+  }
+});
+
+
+
+
+
+
+    // Kategori yükleme fonksiyonu
+    async function loadCategories() {
+      const container = document.getElementById('mainCategories');
+      const contentArea = document.getElementById('categoryContent');
+      container.innerHTML = '';
+      contentArea.innerHTML = '';
+      
+      try {
+        const querySnapshot = await getDocs(collection(db, "categories"));
+        const allCats = [];
+        
+        querySnapshot.forEach(doc => {
+          allCats.push({ id: doc.id, ...doc.data() });
+        });
+
+        const mainCategories = allCats.filter(cat => !cat.parent);
+        const subCategories = allCats.filter(cat => cat.parent);
+        
+        // Ana kategorileri oluştur
+        mainCategories.forEach((mainCat, index) => {
+          const btn = document.createElement('button');
+          btn.className = 'main-category-btn';
+          if (index === 0) btn.classList.add('active');
+          btn.dataset.id = mainCat.id;
+          btn.dataset.slug = mainCat.slug;
+          
+          btn.innerHTML = `
+            <i class="fas ${mainCat.icon || 'fa-utensils'}"></i>
+            ${mainCat.name}
+          `;
+          
+          btn.addEventListener('click', () => {
+            // Tüm butonlardan active classını kaldır
+            document.querySelectorAll('.main-category-btn').forEach(b => {
+              b.classList.remove('active');
+            });
+            
+            // Tıklanan butonu aktif yap
+            btn.classList.add('active');
+            
+            // İlgili içeriği göster
+            showCategoryContent(mainCat, subCategories);
+          });
+          
+          container.appendChild(btn);
+          
+          // İlk kategoriyi otomatik aç
+          if (index === 0) {
+            showCategoryContent(mainCat, subCategories);
+          }
+        });
+
+      } catch (error) {
+        console.error("Kategoriler yüklenemedi:", error);
+      }
+    }
+    
+    // Kategori içeriğini göster
+    function showCategoryContent(mainCat, allSubCategories) {
+      const contentArea = document.getElementById('categoryContent');
+      const subCategories = allSubCategories.filter(subCat => subCat.parent === mainCat.id);
+      
+      // Doğrudan ürünleri bul
+      const directProducts = [];
+      for (const category in productMenu) {
+        if (category === mainCat.slug) {
+          directProducts.push(...productMenu[category]);
+        }
+      }
+      
+      // İçerik oluştur
+      let contentHTML = '';
+      
+      // Alt kategoriler varsa göster
+      if (subCategories.length > 0) {
+        contentHTML += `
+          <div class="subcategories">
+            ${subCategories.map(subCat => `
+              <button class="subcategory-btn" data-slug="${subCat.slug}">
+                ${subCat.name}
+              </button>
+            `).join('')}
+          </div>
+        `;
+      }
+      
+      // Doğrudan ürünler varsa göster
+      if (directProducts.length > 0) {
+        contentHTML += `
+          <div class="direct-products-title">Doğrudan Ürünler</div>
+          <div class="direct-products">
+            ${directProducts.map(product => `
+              <div class="direct-product" data-name="${product.ad}">
+                <img src="${product.resim}" alt="${product.ad}" 
+                     onerror="this.onerror=null; this.src='img/placeholder.jpg'">
+                <div class="name">${product.ad}</div>
+                <div class="price">${product.price}₺</div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+      
+      // İçeriği güncelle ve göster
+      contentArea.innerHTML = contentHTML;
+      contentArea.classList.add('active');
+      
+      // Alt kategori butonlarına event ekle
+      contentArea.querySelectorAll('.subcategory-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          selectSubCategory(this.dataset.slug);
+        });
+      });
+      
+      // Doğrudan ürünlere event ekle
+      contentArea.querySelectorAll('.direct-product').forEach(product => {
+        product.addEventListener('click', function() {
+          selectDirectProduct(this.dataset.name);
+        });
+      });
+      
+      // İlk alt kategoriyi otomatik seç
+      if (subCategories.length > 0) {
+        const firstSubBtn = contentArea.querySelector('.subcategory-btn');
+        if (firstSubBtn) {
+          selectSubCategory(firstSubBtn.dataset.slug);
+        }
+      } else if (directProducts.length > 0) {
+        // Alt kategori yok ama doğrudan ürünler varsa
+        listProducts(mainCat.slug);
+      }
+    }
+
+    // Alt kategori seçimi
+    function selectSubCategory(slug) {
+      // Tüm alt kategori butonlarını aktif olmaktan çıkar
+      document.querySelectorAll('.subcategory-btn').forEach(btn => {
+        btn.classList.remove("active");
+      });
+      
+      // Seçilen butonu aktif yap
+      const activeBtn = document.querySelector(`.subcategory-btn[data-slug="${slug}"]`);
+      if (activeBtn) {
+        activeBtn.classList.add("active");
+      }
+      
+      // Ürünleri listele
+      listProducts(slug);
+    }
+
+    // Ürünleri listele
+    function listProducts(category) {
+      const productListDiv = document.getElementById("kahveListesi");
+      productListDiv.innerHTML = "";
+      selectedProduct = "";
+      
+      if (!productMenu[category]) {
+        productListDiv.innerHTML = "<i style='grid-column:1/-1;text-align:center;color:var(--primary);'>Bu kategoride ürün bulunamadı.</i>";
+        return;
+      }
+      
+      // Tüm ürün seçeneklerini kaldır
+      document.querySelectorAll(".coffee-option").forEach(opt => {
+        opt.classList.remove("selected");
+        opt.setAttribute("aria-pressed", "false");
+      });
+      
+      productMenu[category].forEach(product => {
+        const div = createProductElement(product);
+        productListDiv.appendChild(div);
+      });
+    }
+
+    // Ürün elemanı oluşturma fonksiyonu
+    function createProductElement(product) {
+      const div = document.createElement("div");
+      div.className = "coffee-option";
+      div.dataset.name = product.ad;
+      div.tabIndex = 0;
+      div.setAttribute("role", "button");
+      div.setAttribute("aria-pressed", "false");
+      
+      div.innerHTML = `
+        <img src="${product.resim}" 
+             alt="${product.ad}" 
+             onerror="this.onerror=null; this.src='img/placeholder.jpg'" />
+        <p>${product.ad}</p>
+        <div class="price">${product.price}₺</div>
+      `;
+      
+      div.addEventListener("click", () => selectProduct(div, product.ad));
+      div.addEventListener("keydown", e => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          selectProduct(div, product.ad);
+        }
+      });
+      
+      return div;
+    }
+
+    // Ürün seçimi
+    function selectProduct(div, productName) {
+      document.querySelectorAll(".coffee-option").forEach(opt => {
+        opt.classList.remove("selected");
+        opt.setAttribute("aria-pressed", "false");
+      });
+      div.classList.add("selected");
+      div.setAttribute("aria-pressed", "true");
+      selectedProduct = productName;
+    }
+
+    // Doğrudan ana kategori ürünü seçildiğinde
+    function selectDirectProduct(productName) {
+      // Ürün seçimini güncelle
+      selectedProduct = productName;
+      
+      // Tüm ürün seçeneklerini kaldır
+      document.querySelectorAll(".coffee-option").forEach(opt => {
+        opt.classList.remove("selected");
+        opt.setAttribute("aria-pressed", "false");
+      });
+      
+      // Sadece bu ürünü göster
+      const productListDiv = document.getElementById("kahveListesi");
+      productListDiv.innerHTML = "";
+      
+      // Ürünü bul ve göster
+      for (const category in productMenu) {
+        const product = productMenu[category].find(p => p.ad === productName);
+        if (product) {
+          const div = createProductElement(product);
+          div.classList.add("selected");
+          div.setAttribute("aria-pressed", "true");
+          productListDiv.appendChild(div);
+          break;
+        }
+      }
+    }
+
+    // Adet değiştirme
+    function changeQty(delta) {
+      const qtyInput = document.getElementById("quantity");
+      let current = parseInt(qtyInput.value) || 1;
+      current += delta;
+      if (current < 1) current = 1;
+      qtyInput.value = current;
+    }
+
+    // Siparişe ekleme
+    function addToOrder() {
+      const qty = parseInt(document.getElementById("quantity").value);
+      if (!selectedProduct || isNaN(qty) || qty <= 0) {
+        alert("Lütfen bir ürün seçin ve adet belirtin.");
+        return;
+      }
+
+      // Ürün zaten sepette mi kontrol et
+      const existingIndex = currentOrder.findIndex(item => item.product === selectedProduct);
+      
+      if (existingIndex !== -1) {
+        // Ürün zaten varsa adetini güncelle
+        currentOrder[existingIndex].qty += qty;
+      } else {
+        // Yeni ürün ekle
+        currentOrder.push({ 
+          product: selectedProduct, 
+          qty,
+          price: productSpecs[selectedProduct]?.price || 0 ,
+          image: productSpecs[selectedProduct]?.image || "" 
+        });
+      }
+      
+      updateOrderDisplay();
+      selectedProduct = "";
+      document.querySelectorAll(".coffee-option").forEach(opt => {
+        opt.classList.remove("selected");
+        opt.setAttribute("aria-pressed", "false");
+      });
+      document.getElementById("quantity").value = 1;
+
+      saveActiveOrder();
+    }
+
+    // Siparişi güncelle
+    function updateOrderDisplay() {
+      const listDiv = document.getElementById("orderList");
+      const customerView = document.getElementById("customerView");
+
+      if (currentOrder.length === 0) {
+        listDiv.innerHTML = "<i>Henüz sipariş eklenmedi.</i>";
+        customerView.innerHTML = "<i>Müşteri için sipariş özeti yok.</i>";
+        return;
+      }
+
+       if (currentCustomerName) {
+    htmlList = `<div class="order-item">
+                  <div>Müşteri: ${currentCustomerName}</div>
+                </div>` + htmlList;
+  }
+
+
+      let totalPrice = 0;
+      let htmlList = "";
+
+      currentOrder.forEach((item, index) => {
+        const price = item.price || 0;
+        totalPrice += item.qty * price;
+
+        htmlList += `
+          <div class="order-item">
+            <div>${item.qty} x ${item.product} (${price}₺)</div>
+            <div class="remove-item" onclick="removeFromOrder(${index})">
+              <i class="fas fa-times"></i>
+            </div>
+          </div>
+        `;
+      });
+
+      listDiv.innerHTML = htmlList;
+      customerView.innerHTML = `
+        <div>${htmlList.replace(/class="order-item"/g, 'class="order-item" style="border:none; padding:5px 0;"')}</div>
+        <hr style="margin: 15px 0;">
+        <div style="text-align: right; font-size: 18px;">
+          <strong>Toplam: ${totalPrice}₺</strong>
+        </div>
+      `;
+    }
+
+    // Siparişten kaldırma
+    function removeFromOrder(index) {
+      currentOrder.splice(index, 1);
+      updateOrderDisplay();
+      saveActiveOrder(); 
+    }
+
+
+     async function printTickets(orderId, items, customerName) {
+  try {
+    for (const item of items) {
+      await addDoc(collection(db, "tickets"), {
+        orderId,
+        product: item.product,
+        customerName,
+        timestamp: serverTimestamp(),
+        price: item.price,
+        qty: item.qty
+      });
+    }
+  } catch (error) {
+    console.error("Fiş oluşturma hatası:", error);
+  }
+}
+
+
+
+
+
+
+
+
+    async function saveActiveOrder() {
+      if (currentOrder.length === 0) return;
+
+      const activeOrder = {
+        items: currentOrder,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+        total: calculateTotal(),
+        status: "draft"
+      };
+
+      // Firestore'da sabit bir belge adıyla (tekSiparis) belge oluştur
+      const orderRef = doc(db, "active_orders", "tekSiparis");
+      await setDoc(orderRef, activeOrder);
+      window.activeOrderId = "tekSiparis";
+    }
+
+    function calculateTotal() {
+      return currentOrder.reduce((sum, item) => sum + (item.qty * item.price), 0);
+    }
+
+    // Ürün arama fonksiyonu
+    function searchProducts() {
+      const searchTerm = document.getElementById('productSearch').value.toLowerCase();
+      if (!searchTerm.trim()) {
+        // Arama boşsa, varsayılan duruma dön
+        const activeMainBtn = document.querySelector('.main-category-btn.active');
+        if (activeMainBtn) {
+          const mainCatId = activeMainBtn.dataset.id;
+          const mainCatSlug = activeMainBtn.dataset.slug;
+          const mainCat = { id: mainCatId, slug: mainCatSlug };
+          showCategoryContent(mainCat, []); // Alt kategorileri geçiyoruz
+        }
+        return;
+      }
+
+      const productListDiv = document.getElementById("kahveListesi");
+      productListDiv.innerHTML = "";
+
+      // Tüm ürünlerde arama yap
+      let foundProducts = [];
+      for (const category in productMenu) {
+        const categoryProducts = productMenu[category].filter(product => 
+          product.ad.toLowerCase().includes(searchTerm)
+        );
+        foundProducts.push(...categoryProducts);
+      }
+
+      if (foundProducts.length === 0) {
+        productListDiv.innerHTML = "<i style='grid-column:1/-1;text-align:center;color:var(--primary);'>Aranan ürün bulunamadı.</i>";
+        return;
+      }
+
+      // Bulunan ürünleri göster
+      foundProducts.forEach(product => {
+        const div = createProductElement(product);
+        productListDiv.appendChild(div);
+      });
+    }
+
+    function clearSearch() {
+      document.getElementById('productSearch').value = '';
+      searchProducts();
+    }
+
+    // Satış geçmişi güncelleme
+   // Satış geçmişini güncelleyen fonksiyonu bulun ve şu şekilde değiştirin:
+async function updateSalesDisplays() {
+  const salesHistoryBody = document.getElementById("salesHistoryBody");
+  
+  try {
+    // İade ve iptal bilgilerini yükle
+    const refundsSnapshot = await getDocs(collection(db, "refunds"));
+    const canceledSnapshot = await getDocs(
+      query(collection(db, "sales"), where("canceled", "==", true))
+    );
+
+    const refundedOrderIds = refundsSnapshot.docs.map(doc => doc.data().orderId);
+    const canceledOrderIds = canceledSnapshot.docs.map(doc => doc.id);
+
+    const q = query(collection(db, "sales"), 
+             orderBy("timestamp", "desc"), 
+             limit(50));
+    
+    const querySnapshot = await getDocs(q);
+    
+    if (querySnapshot.empty) {
+      salesHistoryBody.innerHTML = `<tr><td colspan="5">Henüz sipariş yok</td></tr>`;
+      return;
+    }
+
+    let tbodyContent = "";
+    
+    querySnapshot.forEach(doc => {
+      const data = doc.data();
+      const isRefunded = refundedOrderIds.includes(doc.id);
+      const isCanceled = canceledOrderIds.includes(doc.id);
+      
+      // Tarih formatlama
+      let date = "Tarih bilgisi yok";
+      if (data.timestamp && typeof data.timestamp.toDate === 'function') {
+        date = data.timestamp.toDate().toLocaleString("tr-TR");
+      } else if (typeof data.timestamp === "string") {
+        date = new Date(data.timestamp).toLocaleString("tr-TR");
+      }
+      
+      // Ürün listesi
+      const products = data.items.map(i => `${i.qty}x ${i.product}`).join(', ');
+      
+      // Durum bilgisi
+      let status = "Tamamlandı";
+      let statusClass = "";
+      if (isRefunded) {
+        status = "İade Edildi";
+        statusClass = "status-canceled";
+      } else if (isCanceled) {
+        status = "İptal Edildi";
+        statusClass = "status-canceled";
+      }
+      
+      // Satır stili
+      const rowClass = isRefunded || isCanceled ? "canceled-order" : "";
+      
+      tbodyContent += `
+        <tr class="${rowClass}">
+          <td>${date}</td>
+          <td>${doc.id.substring(0, 6)}</td>
+          <td>${products}</td>
+          <td>${data.total}₺</td>
+          <td class="${statusClass}">${status}</td>
+        </tr>
+      `;
+    });
+    
+    salesHistoryBody.innerHTML = tbodyContent;
+    
+  } catch (error) {
+    console.error("Satış geçmişi yüklenirken hata:", error);
+    salesHistoryBody.innerHTML = `<tr><td colspan="5">Hata: ${error.message}</td></tr>`;
+  }
+}
+
+// Realtime güncelleme için listener ekleyin
+onSnapshot(collection(db, "sales"), () => {
+  updateSalesDisplays();
+});
+
+onSnapshot(collection(db, "refunds"), () => {
+  updateSalesDisplays();
+});
+
+    // Ürünleri yükle
+    async function loadProducts() {
+      productMenu = {};
+      productSpecs = {};
+
+      const snapshot = await getDocs(collection(db, "products"));
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        if (data.category) {
+          if (!productMenu[data.category]) {
+            productMenu[data.category] = [];
+          }
+
+          const imagePath = data.image || `img/${data.name.toLowerCase().replace(/\s/g, '')}.jpg`;
+
+          productMenu[data.category].push({
+            ad: data.name,
+            resim: imagePath,
+            price: data.price
+          });
+
+          productSpecs[data.name] = {
+            ...data.ingredients,
+            price: data.price,
+            image: imagePath 
+          };
+        }
+      });
+    }
+
+    // Stokları yükle
+    async function loadStocks() {
+      try {
+        const querySnapshot = await getDocs(collection(db, "stocks"));
+        stockData = {};
+        querySnapshot.forEach(doc => {
+          stockData[doc.data().name] = doc.data().quantity;
+        });
+      } catch (error) {
+        console.error("Stok yüklenirken hata:", error);
+      }
+    }
+
+    // Stok bilgisi al
+    async function getStockDoc(itemName) {
+      const q = query(collection(db, "stocks"), where("name", "==", itemName));
+      const querySnapshot = await getDocs(q);
+      return querySnapshot.docs[0]?.data();
+    }
+
+    // Stok güncelle
+    async function updateStock(itemName, newQuantity) {
+      const q = query(collection(db, "stocks"), where("name", "==", itemName));
+      const querySnapshot = await getDocs(q);
+
+      if (!querySnapshot.empty) {
+        const docRef = querySnapshot.docs[0].ref;
+        await updateDoc(docRef, {
+          quantity: newQuantity,
+          updatedAt: serverTimestamp()
+        });
+        return true;
+      }
+      return false;
+    }
+
+    // Siparişi onayla
+    async function confirmOrder() {
+  if (currentOrder.length === 0) {
+    alert("Siparişte ürün yok.");
+    return;
+  }
+
+  const requiredStocks = {};
+  let totalPrice = 0;
+
+  for (let item of currentOrder) {
+    const spec = productSpecs[item.product];
+    if (!spec) continue;
+
+    totalPrice += item.qty * spec.price;
+
+    for (const [ingredient, amount] of Object.entries(spec)) {
+      if (ingredient === 'price') continue;
+      requiredStocks[ingredient] = (requiredStocks[ingredient] || 0) + (item.qty * amount);
+    }
+  }
+
+  try {
+    for (const [name, required] of Object.entries(requiredStocks)) {
+      const available = stockData[name] || 0;
+      if (available < required) {
+        throw new Error(`Yeterli ${name} stoğu yok! Gereken: ${required}, Mevcut: ${available}`);
+      }
+    }
+
+    if (!confirm(`Toplam Tutar: ${totalPrice}₺\nOnaylıyor musunuz?`)) return;
+
+    // Siparişi Firestore'a ekle ve referansını al
+    const newOrderRef = await addDoc(collection(db, "sales"), {
+      items: currentOrder,
+      total: totalPrice,
+      timestamp: serverTimestamp(),
+      user: currentUserEmail
+    });
+
+    // İsim varsa biletleri yazdır (DÜZELTME BURADA!)
+    if (currentCustomerName) {
+      await printTickets(newOrderRef.id, currentOrder, currentCustomerName);
+    }
+
+    // Stokları güncelle
+    for (const [name, required] of Object.entries(requiredStocks)) {
+      const newStock = (stockData[name] || 0) - required;
+      await updateStock(name, newStock);
+      stockData[name] = newStock;
+    }
+
+    // Aktif siparişi sil
+    await deleteDoc(doc(db, "active_orders", "tekSiparis"));
+    window.activeOrderId = null;
+
+    alert("Sipariş başarıyla tamamlandı.");
+    currentOrder = [];
+    updateOrderDisplay();
+    updateSalesDisplays();
+
+  } catch (error) {
+    console.error("Sipariş hatası:", error);
+    alert(error.message);
+  }
+
+  currentCustomerName = ""; // İsmi sıfırla
+}
+
+    // İade modalını aç
+    async function openRefundModal() {
+      selectedRefundItems = [];
+      selectedOrderForRefund = null;
+      
+      const modalContent = `
+        <div class="modal-header">
+          <h3>İade/Değişim</h3>
+          <button class="close-btn" onclick="closeModal('refundModal')">&times;</button>
+        </div>
+        <h4>Son 10 Sipariş</h4>
+        <div id="lastOrdersList" style="max-height: 300px; overflow-y: auto; margin: 15px 0;"></div>
+        <div id="orderItemsContainer" style="display:none; margin-top:20px;">
+          <h4>İade Edilecek Ürünleri Seçin:</h4>
+          <div id="selectedOrderItems"></div>
+          <div class="refund-actions" style="margin-top:15px;">
+            <button class="btn-danger" onclick="processRefund()">
+              <i class="fas fa-undo"></i> İade Yap
+            </button>
+          </div>
+        </div>
+      `;
+      
+      document.querySelector('#refundModal .modal-content').innerHTML = modalContent;
+      document.getElementById('refundModal').style.display = 'flex';
+      
+      await loadLastOrders();
+    }
+
+    // Modalı kapat
+    function closeModal(modalId) {
+      document.getElementById(modalId).style.display = 'none';
+    }
+
+    // Son siparişleri yükle
+    async function loadLastOrders() {
+  try {
+    const refundsSnapshot = await getDocs(collection(db, "refunds"));
+    const refundedOrderIds = refundsSnapshot.docs.map(doc => doc.data().orderId);
+    
+    const q = query(collection(db, "sales"),    
+             orderBy("timestamp", "desc"), 
+             limit(10));
+    
+    const querySnapshot = await getDocs(q);
+    const container = document.getElementById('lastOrdersList');
+    container.innerHTML = '';
+    
+    querySnapshot.forEach(doc => {
+      if (refundedOrderIds.includes(doc.id)) return;
+      
+      const data = doc.data();
+      let date = "Tarih bilgisi yok";
+      if (data.timestamp && typeof data.timestamp.toDate === 'function') {
+        date = data.timestamp.toDate().toLocaleString("tr-TR");
+      } else if (typeof data.timestamp === "string") {
+        date = new Date(data.timestamp).toLocaleString("tr-TR");
+      }
+      
+      const item = document.createElement('div');
+      item.className = 'history-item';
+      item.dataset.id = doc.id;
+      item.innerHTML = `
+        <div class="order-id">Sipariş #${doc.id.slice(0, 6)}</div>
+        <div class="items">${data.items.map(i => `${i.qty}x ${i.product}`).join(', ')}</div>
+        <div class="total">${data.total}₺</div>
+        <div class="date">${date}</div>
+      `;
+      
+      // DÜZELTME: Ok fonksiyonu yerine normal fonksiyon kullanıyoruz
+      item.addEventListener('click', function() {
+        document.querySelectorAll('.history-item').forEach(el => {
+          el.classList.remove('selected');
+        });
+        this.classList.add('selected');
+        selectedOrderForRefund = { id: doc.id, ...data };
+        selectOrderForRefund(doc.id, data);
+      });
+      
+      container.appendChild(item);
+    });
+  } catch (error) {
+    console.error("Son siparişler yüklenirken hata:", error);
+  }
+}
+
+    // Sipariş seçildiğinde ürünleri listele
+    function selectOrderForRefund(orderId, orderData) {
+      document.getElementById('orderItemsContainer').style.display = 'block';
+      
+      let itemsHTML = '';
+      orderData.items.forEach((item, index) => {
+        itemsHTML += `
+          <div class="refund-item">
+            <label>
+              <input type="checkbox" class="refund-item-checkbox" 
+                     data-index="${index}" data-product="${item.product}" 
+                     data-qty="${item.qty}" data-price="${item.price}">
+              ${item.qty}x ${item.product} (${item.price}₺)
+            </label>
+          </div>
+        `;
+      });
+      
+      document.getElementById('selectedOrderItems').innerHTML = itemsHTML;
+      
+      // Checkbox event listener'ları ekle
+      document.querySelectorAll('.refund-item-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+          const itemData = {
+            index: parseInt(this.dataset.index),
+            product: this.dataset.product,
+            qty: parseInt(this.dataset.qty),
+            price: parseFloat(this.dataset.price)
+          };
+          
+          if (this.checked) {
+            selectedRefundItems.push(itemData);
+          } else {
+            selectedRefundItems = selectedRefundItems.filter(
+              item => item.index !== itemData.index
+            );
+          }
+        });
+      });
+    }
+
+    // İade işlemi
+    async function processRefund() {
+      if (selectedRefundItems.length === 0) {
+        alert('Lütfen iade edilecek ürünleri seçin');
+        return;
+      }
+
+      if (!selectedOrderForRefund) {
+        alert('Sipariş seçilmedi');
+        return;
+      }
+
+      // Stok geri ekleme onayı
+      const restock = confirm("İade edilen ürünlerin malzemeleri stoğa geri eklensin mi?");
+      
+      try {
+        if (restock) {
+          for (const item of selectedRefundItems) {
+            const spec = productSpecs[item.product];
+            if (!spec) continue;
+            
+            for (const [ingredient, amount] of Object.entries(spec)) {
+              if (ingredient === 'price') continue;
+              
+              const stockAmount = item.qty * amount;
+              const currentStock = stockData[ingredient] || 0;
+              const newStock = currentStock + stockAmount;
+              
+              await updateStock(ingredient, newStock);
+              stockData[ingredient] = newStock;
+            }
+          }
+        }
+        
+        // İade kaydı oluştur
+        await addDoc(collection(db, "refunds"), {
+          orderId: selectedOrderForRefund.id,
+          items: selectedRefundItems,
+          restocked: restock,
+          timestamp: serverTimestamp(),
+          user: currentUserEmail
+        });
+
+        alert('İade işlemi başarıyla tamamlandı');
+        closeModal('refundModal');
+        updateSalesDisplays();
+      } catch (error) {
+        console.error('İade işlemi sırasında hata:', error);
+        alert('İade işlemi sırasında bir hata oluştu: ' + error.message);
+      }
+    }
+
+    // Değişim işlemi
+    function processExchange() {
+      alert('Değişim işlemi için önce iade yapın, sonra yeni sipariş alın.');
+      closeModal('refundModal');
+    }
+
+    // Collapsible bölümler
+    document.querySelectorAll(".collapsible").forEach(btn => {
+      btn.addEventListener("click", function() {
+        this.classList.toggle("active");
+        const content = this.nextElementSibling;
+        const expanded = content.style.display === "block";
+        content.style.display = expanded ? "none" : "block";
+        this.setAttribute("aria-expanded", !expanded);
+        
+        const icon = this.querySelector('.fa-chevron-down');
+        if (icon) {
+          icon.classList.toggle('fa-chevron-down', expanded);
+          icon.classList.toggle('fa-chevron-up', !expanded);
+        }
+      });
+    });
+
+    // Sayfa yüklendiğinde
+    document.addEventListener("DOMContentLoaded", () => {
+      // Arama input'una event listener ekle
+      document.getElementById('productSearch').addEventListener('input', searchProducts);
+      
+      // Kullanıcı giriş kontrolü
+      onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+          alert("Lütfen önce giriş yapınız.");
+          window.location.href = "index.html";
+          return;
+        }
+        
+        currentUserEmail = user.email;
+        
+        // Önce ürünleri yükle, sonra kategorileri yükle
+        try {
+          await loadProducts();
+          await loadCategories();
+          await loadStocks();
+          updateSalesDisplays();
+        } catch (error) {
+          console.error("Veri yükleme hatası:", error);
+        }
+        
+        // Realtime güncellemeler için listener'lar
+        onSnapshot(collection(db, "categories"), loadCategories);
+        onSnapshot(collection(db, "products"), async () => {
+          await loadProducts();
+          await loadCategories();
+        });
+        onSnapshot(collection(db, "stocks"), loadStocks);
+        onSnapshot(collection(db, "sales"), updateSalesDisplays);
+      });
+    });
+
+    // Global fonksiyonlar
+    window.changeQty = changeQty;
+    window.addToOrder = addToOrder;
+    window.removeFromOrder = removeFromOrder;
+    window.confirmOrder = confirmOrder;
+    window.openRefundModal = openRefundModal;
+    window.closeModal = closeModal;
+    window.processRefund = processRefund;
+    window.processExchange = processExchange; 
+    window.clearSearch = clearSearch;
+  </script>
+</body>
+</html>
