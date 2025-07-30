@@ -364,10 +364,12 @@
     </button>
   </div>
 
-  <div class="tabs">
-    <div class="tab active" data-tab="accounting">ÖN MUHASEBE</div>
-    <div class="tab" data-tab="expenseArchive">Gider Arşiv</div>
-  </div>
+  <!-- TABS KISMI -->
+<div class="tabs">
+  <div class="tab active" data-tab="accounting">ÖN MUHASEBE</div>
+  <div class="tab" data-tab="dekont">DEKONT</div> <!-- Yeni ana sekme -->
+  <div class="tab" data-tab="cari">CARİ</div> <!-- Yeni ana sekme -->
+</div>
 
   <!-- ÖN MUHASEBE -->
   <div class="tab-content active" id="accounting">
@@ -457,71 +459,57 @@
     </div>
   </div>
 
-  <!-- Gider Arşiv -->
-  <div class="tab-content" id="expenseArchive">
-    <div class="section">
-      <h2>Gider Arşiv</h2>
-      
-      <div class="tabs" style="margin-bottom: 20px;">
-        <div class="tab active" data-subtab="dekont">Dekont</div>
-        <div class="tab" data-subtab="cari">Cari</div>
+<!-- Gider Arşiv Sekmesi -->
+<div class="tab-content" id="dekont">
+  <div class="section">
+    <h2>Dekont Giderleri</h2>
+        <table id="dekontTable">
+          <thead>
+            <tr>
+              <th>Fatura Adı</th>
+              <th>Açıklama</th>
+              <th>Birim Fiyat (₺)</th>
+              <th>Adet</th>
+              <th>Toplam (₺)</th>
+              <th>KDV Tutarı (₺)</th>
+              <th>Toplam (KDV Dahil) (₺)</th>
+              <th>Ödenen (₺)</th>
+              <th>Tarih</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Veriler buraya yüklenecek -->
+          </tbody>
+        </table>
       </div>
-      
-      <!-- Dekont Tablosu -->
-      <div class="subtab-content active" id="dekontTab">
-        <div class="section">
-          <h3>Dekont Giderleri</h3>
-          <table id="dekontTable">
-            <thead>
-              <tr>
-                <th>Fatura Adı</th>
-                <th>Açıklama</th>
-                <th>Birim Fiyat (₺)</th>
-                <th>Adet</th>
-                <th>Toplam (₺)</th>
-                <th>KDV Tutarı (₺)</th>
-                <th>Toplam (KDV Dahil) (₺)</th>
-                <th>Ödenen (₺)</th>
-                <th>Tarih</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td colspan="9" style="text-align:center;">Dekont gideri bulunamadı</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-      
-      <!-- Cari Tablosu -->
-      <div class="subtab-content" id="cariTab">
-        <div class="section">
-          <h3>Cari Giderleri</h3>
-          <table id="cariTable">
-            <thead>
-              <tr>
-                <th>Fatura Adı</th>
-                <th>Açıklama</th>
-                <th>Birim Fiyat (₺)</th>
-                <th>Adet</th>
-                <th>Toplam (₺)</th>
-                <th>KDV Tutarı (₺)</th>
-                <th>Toplam (KDV Dahil) (₺)</th>
-                <th>Ödenecek (₺)</th>
-                <th>Tarih</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td colspan="9" style="text-align:center;">Cari gideri bulunamadı</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+    </div>
+    
+    <!-- Cari Tablosu -->
+    <div class="tab-content" id="cari">
+  <div class="section">
+    <h2>Cari Giderleri</h2>
+        <table id="cariTable">
+          <thead>
+            <tr>
+              <th>Fatura Adı</th>
+              <th>Açıklama</th>
+              <th>Birim Fiyat (₺)</th>
+              <th>Adet</th>
+              <th>Toplam (₺)</th>
+              <th>KDV Tutarı (₺)</th>
+              <th>Toplam (KDV Dahil) (₺)</th>
+              <th>Ödenecek (₺)</th>
+              <th>Tarih</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Veriler buraya yüklenecek -->
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
+</div>
 
   <!-- Stok Gideri Ekle Modal -->
   <div id="stockExpenseModal" class="modal">
@@ -598,32 +586,44 @@
     // Sayfa yüklendiğinde çalışacak fonksiyon
     document.addEventListener('DOMContentLoaded', function() {
       // Tab kontrolü
-      document.querySelectorAll('.tab').forEach(tab => {
-        tab.addEventListener('click', () => {
-          document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-          document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-          tab.classList.add('active');
-          document.getElementById(tab.dataset.tab).classList.add('active');
-          
-          if (tab.dataset.tab === 'accounting') {
-            loadStockExpenses();
-          }
-          if (tab.dataset.tab === 'expenseArchive') {
-            // Varsayılan olarak Dekont tablosunu yükle
-            loadDekontExpenses();
-          }
-        });
-      });
+   // Tab kontrolünü güncelle
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    // Tüm sekmeleri pasif yap
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    
+    // Tıklanan sekmeyi aktif yap
+    tab.classList.add('active');
+    document.getElementById(tab.dataset.tab).classList.add('active');
+    
+    // Sekmeye özel verileri yükle
+    if (tab.dataset.tab === 'accounting') {
+      loadStockExpenses();
+      loadOtherExpenses();
+    } 
+    else if (tab.dataset.tab === 'dekont') {
+      loadDekontExpenses();
+    } 
+    else if (tab.dataset.tab === 'cari') {
+      loadCariExpenses();
+    }
+  });
+});
 
-      // Gider Arşiv sekmesi içindeki alt sekmeler
-document.querySelectorAll('#expenseArchive .tab[data-subtab]').forEach(tab => {
+// Eski kodları kaldır:
+// - Gider arşiv alt sekmeleriyle ilgili tüm kodlar (data-subtab)
+
+// Gider Arşiv sekmesi içindeki alt sekmeler
+/*document.querySelectorAll('#expenseArchive .tab[data-subtab]').forEach(tab => {
   tab.addEventListener('click', function() {
     // Aktif tabı değiştir
     document.querySelectorAll('#expenseArchive .tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('#expenseArchive .subtab-content').forEach(c => c.classList.remove('active'));
     
     this.classList.add('active');
-    document.getElementById(this.dataset.subtab + 'Tab').classList.add('active');
+    const subtabId = this.dataset.subtab + 'Tab';
+    document.getElementById(subtabId).classList.add('active');
     
     // Tabloları yükle
     if (this.dataset.subtab === 'dekont') {
@@ -632,7 +632,7 @@ document.querySelectorAll('#expenseArchive .tab[data-subtab]').forEach(tab => {
       loadCariExpenses();
     }
   });
-});
+});*/
 
       // Kullanıcı oturum kontrolü
       auth.onAuthStateChanged(async (user) => {
@@ -669,6 +669,11 @@ document.querySelectorAll('#expenseArchive .tab[data-subtab]').forEach(tab => {
       // ÖN MUHASEBE sekmesini yükle
       await loadStockExpenses();
       await loadOtherExpenses(); 
+
+      if (document.getElementById('expenseArchive').classList.contains('active')) {
+    await loadDekontExpenses();
+  }
+
     }
 
     // Modal işlemleri
@@ -910,103 +915,108 @@ function updateOtherExpensesTable(snapshot) {
       }
     }
 
-    // Dekont giderlerini yükle
-    async function loadDekontExpenses() {
-      try {
-        const querySnapshot = await db.collection(EXPENSES_COLLECTION)
-          .where("type", "==", "stock")
-          .where("paidAmount", ">", 0)
-          .orderBy("paidAmount", "desc")
-          .orderBy("date", "desc")
-          .get();
+   // Dekont tablosu yükleme fonksiyonu (yeniden düzenlendi)
+async function loadDekontExpenses() {
+  try {
+    const querySnapshot = await db.collection(EXPENSES_COLLECTION)
+      .where("type", "==", "stock")
+      .where("paidAmount", ">", 0)
+      .orderBy("paidAmount", "desc")
+      .orderBy("date", "desc")
+      .get();
 
-        updateDekontTable(querySnapshot);
-      } catch (error) {
-        console.error("Dekont giderleri yüklenirken hata:", error);
-        const tbody = document.querySelector("#dekontTable tbody");
-        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;color:red;">Hata: ${error.message}</td></tr>`;
-      }
-    }
+    updateDekontTable(querySnapshot);
+  } catch (error) {
+    console.error("Dekont giderleri yüklenirken hata:", error);
+    const tbody = document.querySelector("#dekontTable tbody");
+    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;color:red;">Hata: ${error.message}</td></tr>`;
+  }
+}
 
     function updateDekontTable(snapshot) {
-      const tbody = document.querySelector("#dekontTable tbody");
-      if (snapshot.empty) {
-        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;">Dekont gideri bulunamadı</td></tr>`;
-        return;
-      }
+  const tbody = document.querySelector("#dekontTable tbody");
+  if (!tbody) return; // Tablo bulunamazsa işlemi durdur
+  
+  if (snapshot.empty) {
+    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;">Dekont gideri bulunamadı</td></tr>`;
+    return;
+  }
 
-      let tbodyContent = "";
-      snapshot.forEach(doc => {
-        const data = doc.data();
-        const date = formatFirestoreDate(data.date);
-        const taxAmount = (data.total * data.taxRate) / 100;
+  let tbodyContent = "";
+  snapshot.forEach(doc => {
+    const data = doc.data();
+    const date = formatFirestoreDate(data.date);
+    const taxAmount = (data.total * data.taxRate) / 100;
 
-        tbodyContent += `
-          <tr>
-            <td>${data.invoiceName}</td>
-            <td>${data.description}</td>
-            <td>${data.unitPrice.toFixed(2)}</td>
-            <td>${data.quantity}</td>
-            <td>${data.total.toFixed(2)}</td>
-            <td>${taxAmount.toFixed(2)}</td>
-            <td>${data.totalWithTax.toFixed(2)}</td>
-            <td class="paid-cell">${data.paidAmount.toFixed(2)}</td>
-            <td>${date}</td>
-          </tr>
-        `;
-      });
+    tbodyContent += `
+      <tr>
+        <td>${data.invoiceName}</td>
+        <td>${data.description}</td>
+        <td>${data.unitPrice.toFixed(2)}</td>
+        <td>${data.quantity}</td>
+        <td>${data.total.toFixed(2)}</td>
+        <td>${taxAmount.toFixed(2)}</td>
+        <td>${data.totalWithTax.toFixed(2)}</td>
+        <td class="paid-cell">${data.paidAmount.toFixed(2)}</td>
+        <td>${date}</td>
+      </tr>
+    `;
+  });
 
-      tbody.innerHTML = tbodyContent;
-    }
+  tbody.innerHTML = tbodyContent;
+}
 
     // Cari giderlerini yükle
-    async function loadCariExpenses() {
-      try {
-        const querySnapshot = await db.collection(EXPENSES_COLLECTION)
-          .where("type", "==", "stock")
-          .where("payableAmount", ">", 0)
-          .orderBy("payableAmount", "desc")
-          .orderBy("date", "desc")
-          .get();
+    // Cari tablosu yükleme fonksiyonu (yeniden düzenlendi)
+async function loadCariExpenses() {
+  try {
+    const querySnapshot = await db.collection(EXPENSES_COLLECTION)
+      .where("type", "==", "stock")
+      .where("payableAmount", ">", 0)
+      .orderBy("payableAmount", "desc")
+      .orderBy("date", "desc")
+      .get();
 
-        updateCariTable(querySnapshot);
-      } catch (error) {
-        console.error("Cari giderleri yüklenirken hata:", error);
-        const tbody = document.querySelector("#cariTable tbody");
-        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;color:red;">Hata: ${error.message}</td></tr>`;
-      }
-    }
+    updateCariTable(querySnapshot);
+  } catch (error) {
+    console.error("Cari giderleri yüklenirken hata:", error);
+    const tbody = document.querySelector("#cariTable tbody");
+    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;color:red;">Hata: ${error.message}</td></tr>`;
+  }
+}
 
     function updateCariTable(snapshot) {
-      const tbody = document.querySelector("#cariTable tbody");
-      if (snapshot.empty) {
-        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;">Cari gideri bulunamadı</td></tr>`;
-        return;
-      }
+  const tbody = document.querySelector("#cariTable tbody");
+  if (!tbody) return; // Tablo bulunamazsa işlemi durdur
+  
+  if (snapshot.empty) {
+    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;">Cari gideri bulunamadı</td></tr>`;
+    return;
+  }
 
-      let tbodyContent = "";
-      snapshot.forEach(doc => {
-        const data = doc.data();
-        const date = formatFirestoreDate(data.date);
-        const taxAmount = (data.total * data.taxRate) / 100;
+  let tbodyContent = "";
+  snapshot.forEach(doc => {
+    const data = doc.data();
+    const date = formatFirestoreDate(data.date);
+    const taxAmount = (data.total * data.taxRate) / 100;
 
-        tbodyContent += `
-          <tr>
-            <td>${data.invoiceName}</td>
-            <td>${data.description}</td>
-            <td>${data.unitPrice.toFixed(2)}</td>
-            <td>${data.quantity}</td>
-            <td>${data.total.toFixed(2)}</td>
-            <td>${taxAmount.toFixed(2)}</td>
-            <td>${data.totalWithTax.toFixed(2)}</td>
-            <td class="payable-cell">${data.payableAmount.toFixed(2)}</td>
-            <td>${date}</td>
-          </tr>
-        `;
-      });
+    tbodyContent += `
+      <tr>
+        <td>${data.invoiceName}</td>
+        <td>${data.description}</td>
+        <td>${data.unitPrice.toFixed(2)}</td>
+        <td>${data.quantity}</td>
+        <td>${data.total.toFixed(2)}</td>
+        <td>${taxAmount.toFixed(2)}</td>
+        <td>${data.totalWithTax.toFixed(2)}</td>
+        <td class="payable-cell">${data.payableAmount.toFixed(2)}</td>
+        <td>${date}</td>
+      </tr>
+    `;
+  });
 
-      tbody.innerHTML = tbodyContent;
-    }
+  tbody.innerHTML = tbodyContent;
+}
 
     // Yardımcı fonksiyonlar
     function showMessage(elementId, message, type) {
