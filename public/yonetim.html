@@ -916,6 +916,22 @@
       <label>Bitiş Tarihi:</label>
       <input type="date" id="orderReportEndDate">
     </div>
+    
+    <div class="form-group">
+      <label>Rapor İçeriği:</label>
+      <div style="margin-top: 10px;">
+        <label style="display: block; margin-bottom: 8px;">
+          <input type="checkbox" id="reportOptionSales" value="sales" checked> Ürün Satış Adetleri
+        </label>
+        <label style="display: block; margin-bottom: 8px;">
+          <input type="checkbox" id="reportOptionRevenue" value="revenue" checked> Ciro
+        </label>
+        <label style="display: block; margin-bottom: 8px;">
+          <input type="checkbox" id="reportOptionDetails" value="details"> Tüm Sipariş Detayı
+        </label>
+      </div>
+    </div>
+    
     <button class="btn-success" onclick="generateOrderReport()">
       <i class="fas fa-file-export"></i> Rapor Oluştur
     </button>
@@ -2409,6 +2425,11 @@ async function generateOrderReport() {
   const endDate = document.getElementById('orderReportEndDate').value;
   const messageDiv = document.getElementById('orderReportMessage');
 
+  // Seçenekleri al
+  const includeSales = document.getElementById('reportOptionSales').checked;
+  const includeRevenue = document.getElementById('reportOptionRevenue').checked;
+  const includeDetails = document.getElementById('reportOptionDetails').checked;
+
   if (!startDate || !endDate) {
     showMessage(messageDiv, 'Lütfen tarih aralığı seçin', 'error');
     return;
@@ -2440,63 +2461,170 @@ async function generateOrderReport() {
     doc.setFontSize(16);
     doc.text(`SİPARİŞ RAPORU (${startDate} - ${endDate})`, 105, 20, { align: 'center' });
 
-    // Günlere göre gruplandırma ve toplam ciro hesaplama
-    const dailyData = {};
+    let currentY = 30; // PDF'deki mevcut y pozisyonu
     let totalRevenue = 0;
+    const allProductsSales = {}; // Tüm ürün satışları
 
+    // Günlere göre gruplandırma
+    const dailyData = {};
+    
     querySnapshot.forEach(doc => {
       const data = doc.data();
       const dateStr = data.timestamp.toDate().toLocaleDateString('tr-TR');
       const total = data.total || 0;
-      
+      totalRevenue += total;
+
       if (!dailyData[dateStr]) {
         dailyData[dateStr] = {
           orders: [],
-          revenue: 0
+          revenue: 0,
+          products: {} // Günlük ürün satışları
         };
       }
       
       dailyData[dateStr].orders.push(data);
       dailyData[dateStr].revenue += total;
-      totalRevenue += total;
+
+      // Ürün satışlarını say
+      if (data.items) {
+        data.items.forEach(item => {
+          const productName = item.product;
+          const qty = item.qty || 1;
+          
+          // Günlük
+          if (!dailyData[dateStr].products[productName]) {
+            dailyData[dateStr].products[productName] = 0;
+          }
+          dailyData[dateStr].products[productName] += qty;
+          
+          // Toplam
+          if (!allProductsSales[productName]) {
+            allProductsSales[productName] = 0;
+          }
+          allProductsSales[productName] += qty;
+        });
+      }
     });
 
-    // Her gün için bir tablo oluştur
-    let currentY = 30;
-    Object.entries(dailyData).forEach(([date, dayData]) => {
-      // Gün başlığı
-      doc.setFontSize(12);
+    // 1. Ürün Satış Adetleri Raporu
+    if (includeSales) {
+      doc.setFontSize(14);
       doc.setFont("times", "bold");
-      doc.text(`${date} - Toplam Ciro: ${dayData.revenue.toFixed(2)}₺`, 14, currentY);
+      doc.text("ÜRÜN SATIŞ ADETLERİ", 14, currentY);
       currentY += 10;
 
-      // Tablo verileri
-      const tableData = dayData.orders.map(order => {
-        const products = order.items?.map(item => `${item.qty}x ${item.product}`).join(', ') || '';
-        return [
-          order.user || 'Müşteri Yok',
-          products,
-          `${order.total.toFixed(2)}₺`,
-          formatFirestoreDate(order.timestamp)
-        ];
+      // Günlük satışlar
+      Object.entries(dailyData).forEach(([date, dayData]) => {
+        doc.setFontSize(12);
+        doc.text(`${date} Tarihli Ürün Satışları`, 14, currentY);
+        currentY += 8;
+
+        // Ürünleri satış miktarına göre sırala (çoktan aza)
+        const sortedProducts = Object.entries(dayData.products)
+          .sort((a, b) => b[1] - a[1]);
+
+        // Tablo verileri
+        const tableData = sortedProducts.map(([product, qty]) => [product, `${qty} adet`]);
+
+        doc.autoTable({
+          startY: currentY,
+          head: [['Ürün Adı', 'Adet']],
+          body: tableData,
+          styles: { font: "times", fontSize: 10 },
+          headStyles: { fontStyle: 'bold' }
+        });
+
+        currentY = doc.lastAutoTable.finalY + 5;
       });
 
-      // Tablo oluştur
+      // Toplam satışlar
+      doc.setFontSize(12);
+      doc.text("TOPLAM ÜRÜN SATIŞLARI", 14, currentY);
+      currentY += 8;
+
+      // Tüm ürünleri satış miktarına göre sırala
+      const sortedAllProducts = Object.entries(allProductsSales)
+        .sort((a, b) => b[1] - a[1]);
+      
+      const totalTableData = sortedAllProducts.map(([product, qty]) => [product, `${qty} adet`]);
+
       doc.autoTable({
         startY: currentY,
-        head: [['Müşteri', 'Ürünler', 'Tutar', 'Tarih']],
-        body: tableData,
-        styles: { font: "times", fontSize: 8 },
+        head: [['Ürün Adı', 'Toplam Adet']],
+        body: totalTableData,
+        styles: { font: "times", fontSize: 10 },
         headStyles: { fontStyle: 'bold' }
       });
 
       currentY = doc.lastAutoTable.finalY + 10;
-    });
+    }
 
-    // Toplam ciro
-    doc.setFontSize(12);
-    doc.setFont("times", "bold");
-    doc.text(`TOPLAM CİRO: ${totalRevenue.toFixed(2)}₺`, 105, currentY, { align: 'center' });
+    // 2. Ciro Raporu
+    if (includeRevenue) {
+      doc.setFontSize(14);
+      doc.setFont("times", "bold");
+      doc.text("CİRO RAPORU", 14, currentY);
+      currentY += 10;
+
+      // Günlük ciro
+      const revenueTableData = Object.entries(dailyData).map(([date, dayData]) => {
+        return [date, `${dayData.revenue.toFixed(2)}₺`];
+      });
+
+      // Toplam ciro satırı
+      revenueTableData.push(['TOPLAM', `${totalRevenue.toFixed(2)}₺`]);
+
+      doc.autoTable({
+        startY: currentY,
+        head: [['Tarih', 'Ciro']],
+        body: revenueTableData,
+        styles: { font: "times", fontSize: 10 },
+        headStyles: { fontStyle: 'bold' },
+        // Son satırı (toplam) kalın yap
+        didDrawCell: function(data) {
+          if (data.row.index === revenueTableData.length - 1) {
+            doc.setFont("times", "bold");
+          }
+        }
+      });
+
+      currentY = doc.lastAutoTable.finalY + 10;
+    }
+
+    // 3. Tüm Sipariş Detayı
+    if (includeDetails) {
+      doc.setFontSize(14);
+      doc.setFont("times", "bold");
+      doc.text("TÜM SİPARİŞ DETAYI", 14, currentY);
+      currentY += 10;
+
+      // Her gün için bir tablo oluştur
+      Object.entries(dailyData).forEach(([date, dayData]) => {
+        doc.setFontSize(12);
+        doc.text(`${date} - Toplam Ciro: ${dayData.revenue.toFixed(2)}₺`, 14, currentY);
+        currentY += 8;
+
+        const tableData = dayData.orders.map(order => {
+          const products = order.items?.map(item => `${item.qty}x ${item.product}`).join(', ') || '';
+          return [
+            order.user || 'Müşteri Yok',
+            products,
+            `${order.total.toFixed(2)}₺`,
+            formatFirestoreDate(order.timestamp)
+          ];
+        });
+
+        doc.autoTable({
+          startY: currentY,
+          head: [['Müşteri', 'Ürünler', 'Tutar', 'Tarih']],
+          body: tableData,
+          styles: { font: "times", fontSize: 8 },
+          headStyles: { fontStyle: 'bold' }
+        });
+
+        currentY = doc.lastAutoTable.finalY + 10;
+      });
+    }
 
     doc.save(`siparis_raporu_${startDate}_${endDate}.pdf`);
     showMessage(messageDiv, '✔️ Rapor hazır!', 'success');
