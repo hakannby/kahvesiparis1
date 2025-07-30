@@ -4,10 +4,14 @@
   <meta charset="UTF-8">
   <title>Ekonomi Paneli</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.css">
   
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 
   <style>
     :root {
@@ -17,6 +21,7 @@
       --warning: #f39c12;
       --dark: #2c3e50;
       --light: #f8f9fa;
+      --purple: #9b59b6;
     }
     
     * {
@@ -160,6 +165,14 @@
     
     .btn-warning:hover {
       background-color: #e67e22;
+    }
+
+    .btn-purple {
+      background-color: var(--purple);
+    }
+    
+    .btn-purple:hover {
+      background-color: #8e44ad;
     }
     
     .logout-btn {
@@ -310,6 +323,99 @@
       font-weight: bold;
     }
     
+    /* YENİ STİLLER */
+    .dashboard-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      text-align: center;
+    }
+    
+    .card-title {
+      font-size: 16px;
+      color: #666;
+      margin-bottom: 10px;
+    }
+    
+    .card-value {
+      font-size: 28px;
+      font-weight: bold;
+      color: var(--dark);
+    }
+    
+    .card-total {
+      color: var(--dark);
+    }
+    
+    .card-paid {
+      color: var(--success);
+    }
+    
+    .card-payable {
+      color: var(--danger);
+    }
+    
+    .card-other {
+      color: var(--purple);
+    }
+    
+    .chart-container {
+      height: 300px;
+      margin: 20px 0;
+    }
+    
+    .filters {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    
+    .filter-group {
+      flex: 1;
+      min-width: 200px;
+    }
+    
+    .filter-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    
+    .export-btn {
+      margin-left: auto;
+    }
+    
+    .paid-cell {
+      color: #27ae60;
+      font-weight: bold;
+    }
+    .payable-cell {
+      color: #e74c3c;
+      font-weight: bold;
+    }
+
+    #stockExpensesTable th, 
+    #stockExpensesTable td {
+      padding: 10px;
+      font-size: 14px;
+    }
+    
     @media (max-width: 992px) {
       .flex-container {
         flex-direction: column;
@@ -334,26 +440,7 @@
         padding: 10px;
       }
     }
-
-    .paid-cell {
-      color: #27ae60;
-      font-weight: bold;
-    }
-    .payable-cell {
-      color: #e74c3c;
-      font-weight: bold;
-    }
-
-    #stockExpensesTable th, 
-    #stockExpensesTable td {
-      padding: 10px;
-      font-size: 14px;
-    }
-    
   </style>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 </head>
 
 <body>
@@ -365,22 +452,85 @@
   </div>
 
   <!-- TABS KISMI -->
-<div class="tabs">
-  <div class="tab active" data-tab="accounting">ÖN MUHASEBE</div>
-  <div class="tab" data-tab="dekont">DEKONT</div> <!-- Yeni ana sekme -->
-  <div class="tab" data-tab="cari">CARİ</div> <!-- Yeni ana sekme -->
-</div>
+  <div class="tabs">
+    <div class="tab active" data-tab="dashboard">DASHBOARD</div>
+    <div class="tab" data-tab="accounting">ÖN MUHASEBE</div>
+    <div class="tab" data-tab="dekont">DEKONT</div>
+    <div class="tab" data-tab="cari">CARİ</div>
+  </div>
 
-  <!-- ÖN MUHASEBE -->
-  <div class="tab-content active" id="accounting">
+  <!-- DASHBOARD SEKMESİ -->
+  <div class="tab-content active" id="dashboard">
+    <div class="section">
+      <h2>Finansal Özet</h2>
+      
+      <!-- Özet Kartları -->
+      <div class="dashboard-cards">
+        <div class="card">
+          <div class="card-title">Toplam Gider</div>
+          <div class="card-value card-total">0.00 ₺</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Ödenen Tutar</div>
+          <div class="card-value card-paid">0.00 ₺</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Ödenecek Tutar</div>
+          <div class="card-value card-payable">0.00 ₺</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Diğer Giderler</div>
+          <div class="card-value card-other">0.00 ₺</div>
+        </div>
+      </div>
+      
+      <!-- Grafikler -->
+      <h3>Gider Dağılımı</h3>
+      <div class="chart-container">
+        <canvas id="expenseChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- ÖN MUHASEBE SEKMESİ -->
+  <div class="tab-content" id="accounting">
     <div class="section">
       <h2>ÖN MUHASEBE</h2>
-        <!-- Stok Giderleri Bölümü -->
+      
+      <!-- Stok Giderleri Bölümü -->
       <div class="section">
         <div class="section-title">
           <h3>Stok Giderleri</h3>
-          <button class="btn-primary" onclick="openAddStockExpenseModal()">
-            <i class="fas fa-plus"></i> Stok Gideri Ekle
+          <div>
+            <button class="btn-primary" onclick="openAddStockExpenseModal()">
+              <i class="fas fa-plus"></i> Stok Gideri Ekle
+            </button>
+          </div>
+        </div>
+        
+        <!-- Filtreleme Bölümü -->
+        <div class="filters">
+          <div class="filter-group">
+            <label>Başlangıç Tarihi</label>
+            <input type="date" id="startDate">
+          </div>
+          <div class="filter-group">
+            <label>Bitiş Tarihi</label>
+            <input type="date" id="endDate">
+          </div>
+          <div class="filter-group">
+            <label>Min. Tutar (₺)</label>
+            <input type="number" id="minAmount" min="0" placeholder="Min. tutar">
+          </div>
+          <div class="filter-group">
+            <label>Max. Tutar (₺)</label>
+            <input type="number" id="maxAmount" min="0" placeholder="Max. tutar">
+          </div>
+          <button class="filter-btn" onclick="applyFilters()">
+            <i class="fas fa-filter"></i> Filtrele
+          </button>
+          <button class="btn-purple export-btn" onclick="exportToPDF('stockExpensesTable', 'Stok_Giderleri')">
+            <i class="fas fa-file-pdf"></i> PDF İndir
           </button>
         </div>
         
@@ -394,13 +544,15 @@
               <th>Toplam (₺)</th>
               <th>KDV Tutarı (₺)</th>
               <th>KDV'li Toplam (₺)</th>
+              <th>Ödenen (₺)</th>
+              <th>Ödenecek (₺)</th>
               <th>Tarih</th>
               <th>İşlemler</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td colspan="9" style="text-align:center;">Stok gideri bulunamadı</td>
+              <td colspan="11" style="text-align:center;">Stok gideri bulunamadı</td>
             </tr>
           </tbody>
         </table>
@@ -408,109 +560,125 @@
 
       <!-- Diğer Giderler Bölümü -->
       <div class="section">
-  <div class="section-title">
-    <h3>Diğer Giderler</h3>
-    <button class="btn-primary" onclick="openAddOtherExpenseModal()">
-      <i class="fas fa-plus"></i> Gider İşlemi Ekle
-    </button>
+        <div class="section-title">
+          <h3>Diğer Giderler</h3>
+          <div>
+            <button class="btn-primary" onclick="openAddOtherExpenseModal()">
+              <i class="fas fa-plus"></i> Gider İşlemi Ekle
+            </button>
+            <button class="btn-purple export-btn" onclick="exportToPDF('otherExpensesTable', 'Diger_Giderler')">
+              <i class="fas fa-file-pdf"></i> PDF
+            </button>
+          </div>
+        </div>
+        
+        <table id="otherExpensesTable">
+          <thead>
+            <tr>
+              <th>Açıklama</th>
+              <th>Tutar (₺)</th>
+              <th>Tarih</th>
+              <th>İşlemler</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td colspan="4" style="text-align:center;">Gider bulunamadı</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- DEKONT SEKMESİ -->
+  <div class="tab-content" id="dekont">
+    <div class="section">
+      <h2>Dekont Giderleri</h2>
+      <div class="filters">
+        <div class="filter-group">
+          <label>Başlangıç Tarihi</label>
+          <input type="date" id="dekontStartDate">
+        </div>
+        <div class="filter-group">
+          <label>Bitiş Tarihi</label>
+          <input type="date" id="dekontEndDate">
+        </div>
+        <button class="filter-btn" onclick="applyDekontFilters()">
+          <i class="fas fa-filter"></i> Filtrele
+        </button>
+        <button class="btn-purple export-btn" onclick="exportToPDF('dekontTable', 'Dekont_Giderleri')">
+          <i class="fas fa-file-pdf"></i> PDF İndir
+        </button>
+      </div>
+      <table id="dekontTable">
+        <thead>
+          <tr>
+            <th>Fatura Adı</th>
+            <th>Açıklama</th>
+            <th>Birim Fiyat (₺)</th>
+            <th>Adet</th>
+            <th>Toplam (₺)</th>
+            <th>KDV Tutarı (₺)</th>
+            <th>Toplam (KDV Dahil) (₺)</th>
+            <th>Ödenen (₺)</th>
+            <th>Tarih</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td colspan="9" style="text-align:center;">Dekont gideri bulunamadı</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
   
-  <table id="otherExpensesTable">
-    <thead>
-      <tr>
-        <th>Açıklama</th>
-        <th>Tutar (₺)</th>
-        <th>Tarih</th>
-        <th>İşlemler</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td colspan="4" style="text-align:center;">Gider bulunamadı</td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-
-<!-- Diğer Giderler Modal -->
-<div id="otherExpenseModal" class="modal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h3>Diğer Gider Ekle</h3>
-      <button class="close-btn" onclick="closeModal('otherExpenseModal')">&times;</button>
-    </div>
-    <div class="form-group">
-      <label>Gider Açıklaması:</label>
-      <textarea id="otherExpenseDescription" rows="3" placeholder="Gider açıklaması giriniz"></textarea>
-    </div>
-    <div class="form-group">
-      <label>Tutar (₺):</label>
-      <input type="number" id="otherExpenseAmount" min="0" step="0.01" placeholder="Tutar">
-    </div>
-    <button class="btn-success" onclick="saveOtherExpense()">
-      <i class="fas fa-save"></i> Kaydet
-    </button>
-    <div id="otherExpenseMessage" class="message"></div>
-  </div>
-</div>
-
-
-
-    </div>
-  </div>
-
-<!-- Gider Arşiv Sekmesi -->
-<div class="tab-content" id="dekont">
-  <div class="section">
-    <h2>Dekont Giderleri</h2>
-        <table id="dekontTable">
-          <thead>
-            <tr>
-              <th>Fatura Adı</th>
-              <th>Açıklama</th>
-              <th>Birim Fiyat (₺)</th>
-              <th>Adet</th>
-              <th>Toplam (₺)</th>
-              <th>KDV Tutarı (₺)</th>
-              <th>Toplam (KDV Dahil) (₺)</th>
-              <th>Ödenen (₺)</th>
-              <th>Tarih</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- Veriler buraya yüklenecek -->
-          </tbody>
-        </table>
+  <!-- CARI SEKMESİ -->
+  <div class="tab-content" id="cari">
+    <div class="section">
+      <h2>Cari Giderleri</h2>
+      <div class="filters">
+        <div class="filter-group">
+          <label>Başlangıç Tarihi</label>
+          <input type="date" id="cariStartDate">
+        </div>
+        <div class="filter-group">
+          <label>Bitiş Tarihi</label>
+          <input type="date" id="cariEndDate">
+        </div>
+        <button class="filter-btn" onclick="applyCariFilters()">
+          <i class="fas fa-filter"></i> Filtrele
+        </button>
+        <button class="btn-purple export-btn" onclick="exportToPDF('cariTable', 'Cari_Giderleri')">
+          <i class="fas fa-file-pdf"></i> PDF İndir
+        </button>
       </div>
-    </div>
-    
-    <!-- Cari Tablosu -->
-    <div class="tab-content" id="cari">
-  <div class="section">
-    <h2>Cari Giderleri</h2>
-        <table id="cariTable">
-          <thead>
-            <tr>
-              <th>Fatura Adı</th>
-              <th>Açıklama</th>
-              <th>Birim Fiyat (₺)</th>
-              <th>Adet</th>
-              <th>Toplam (₺)</th>
-              <th>KDV Tutarı (₺)</th>
-              <th>Toplam (KDV Dahil) (₺)</th>
-              <th>Ödenecek (₺)</th>
-              <th>Tarih</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- Veriler buraya yüklenecek -->
-          </tbody>
-        </table>
-      </div>
+      <table id="cariTable">
+        <thead>
+          <tr>
+            <th>Fatura Adı</th>
+            <th>Açıklama</th>
+            <th>Birim Fiyat (₺)</th>
+            <th>Adet</th>
+            <th>Toplam (₺)</th>
+            <th>KDV Tutarı (₺)</th>
+            <th>Toplam (KDV Dahil) (₺)</th>
+            <th>Ödenecek (₺)</th>
+            <th>Tarih</th>
+            <th>Ödeme</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td colspan="10" style="text-align:center;">Cari gideri bulunamadı</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
-</div>
 
+  <!-- MODALLAR -->
   <!-- Stok Gideri Ekle Modal -->
   <div id="stockExpenseModal" class="modal">
     <div class="modal-content">
@@ -553,6 +721,54 @@
     </div>
   </div>
 
+  <!-- Diğer Giderler Modal -->
+  <div id="otherExpenseModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Diğer Gider Ekle</h3>
+        <button class="close-btn" onclick="closeModal('otherExpenseModal')">&times;</button>
+      </div>
+      <div class="form-group">
+        <label>Gider Açıklaması:</label>
+        <textarea id="otherExpenseDescription" rows="3" placeholder="Gider açıklaması giriniz"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Tutar (₺):</label>
+        <input type="number" id="otherExpenseAmount" min="0" step="0.01" placeholder="Tutar">
+      </div>
+      <button class="btn-success" onclick="saveOtherExpense()">
+        <i class="fas fa-save"></i> Kaydet
+      </button>
+      <div id="otherExpenseMessage" class="message"></div>
+    </div>
+  </div>
+
+  <!-- Ödeme Yap Modal -->
+  <div id="paymentModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Ödeme Yap</h3>
+        <button class="close-btn" onclick="closeModal('paymentModal')">&times;</button>
+      </div>
+      <div class="form-group">
+        <label>Fatura Adı:</label>
+        <input type="text" id="paymentInvoiceName" readonly>
+      </div>
+      <div class="form-group">
+        <label>Kalan Tutar (₺):</label>
+        <input type="number" id="paymentRemaining" readonly>
+      </div>
+      <div class="form-group">
+        <label>Ödenen Tutar (₺):</label>
+        <input type="number" id="paymentAmount" min="0" step="0.01" placeholder="Ödeme tutarı">
+      </div>
+      <button class="btn-success" onclick="savePayment()">
+        <i class="fas fa-money-bill-wave"></i> Ödemeyi Kaydet
+      </button>
+      <div id="paymentMessage" class="message"></div>
+    </div>
+  </div>
+
   <script>
     // Firebase konfigürasyonu
     const firebaseConfig = {
@@ -571,6 +787,8 @@
 
     // Global değişkenler
     let currentUser = null;
+    let expenseChart = null;
+    let currentPaymentExpense = null;
     const EXPENSES_COLLECTION = "expenses";
 
     // Tarih formatlama fonksiyonu
@@ -586,53 +804,32 @@
     // Sayfa yüklendiğinde çalışacak fonksiyon
     document.addEventListener('DOMContentLoaded', function() {
       // Tab kontrolü
-   // Tab kontrolünü güncelle
-document.querySelectorAll('.tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    // Tüm sekmeleri pasif yap
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-    
-    // Tıklanan sekmeyi aktif yap
-    tab.classList.add('active');
-    document.getElementById(tab.dataset.tab).classList.add('active');
-    
-    // Sekmeye özel verileri yükle
-    if (tab.dataset.tab === 'accounting') {
-      loadStockExpenses();
-      loadOtherExpenses();
-    } 
-    else if (tab.dataset.tab === 'dekont') {
-      loadDekontExpenses();
-    } 
-    else if (tab.dataset.tab === 'cari') {
-      loadCariExpenses();
-    }
-  });
-});
-
-// Eski kodları kaldır:
-// - Gider arşiv alt sekmeleriyle ilgili tüm kodlar (data-subtab)
-
-// Gider Arşiv sekmesi içindeki alt sekmeler
-/*document.querySelectorAll('#expenseArchive .tab[data-subtab]').forEach(tab => {
-  tab.addEventListener('click', function() {
-    // Aktif tabı değiştir
-    document.querySelectorAll('#expenseArchive .tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('#expenseArchive .subtab-content').forEach(c => c.classList.remove('active'));
-    
-    this.classList.add('active');
-    const subtabId = this.dataset.subtab + 'Tab';
-    document.getElementById(subtabId).classList.add('active');
-    
-    // Tabloları yükle
-    if (this.dataset.subtab === 'dekont') {
-      loadDekontExpenses();
-    } else if (this.dataset.subtab === 'cari') {
-      loadCariExpenses();
-    }
-  });
-});*/
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          // Tüm sekmeleri pasif yap
+          document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+          document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+          
+          // Tıklanan sekmeyi aktif yap
+          tab.classList.add('active');
+          document.getElementById(tab.dataset.tab).classList.add('active');
+          
+          // Sekmeye özel verileri yükle
+          if (tab.dataset.tab === 'dashboard') {
+            loadDashboard();
+          } 
+          else if (tab.dataset.tab === 'accounting') {
+            loadStockExpenses();
+            loadOtherExpenses();
+          } 
+          else if (tab.dataset.tab === 'dekont') {
+            loadDekontExpenses();
+          } 
+          else if (tab.dataset.tab === 'cari') {
+            loadCariExpenses();
+          }
+        });
+      });
 
       // Kullanıcı oturum kontrolü
       auth.onAuthStateChanged(async (user) => {
@@ -655,8 +852,8 @@ document.querySelectorAll('.tab').forEach(tab => {
             return;
           }
 
-          // Sayfa başlatma
-          initPage();
+          // Dashboard'u yükle
+          loadDashboard();
         } catch (error) {
           console.error("Yetki kontrol hatası:", error);
           alert("Yetki kontrolü sırasında hata oluştu");
@@ -665,119 +862,182 @@ document.querySelectorAll('.tab').forEach(tab => {
       });
     });
 
-    async function initPage() {
-      // ÖN MUHASEBE sekmesini yükle
-      await loadStockExpenses();
-      await loadOtherExpenses(); 
-
-      if (document.getElementById('expenseArchive').classList.contains('active')) {
-    await loadDekontExpenses();
-  }
-
+    // Dashboard yükleme
+    async function loadDashboard() {
+      try {
+        const stockExpenses = await db.collection(EXPENSES_COLLECTION)
+          .where("type", "==", "stock")
+          .get();
+        
+        const otherExpenses = await db.collection(EXPENSES_COLLECTION)
+          .where("type", "==", "other")
+          .get();
+        
+        updateDashboard(stockExpenses, otherExpenses);
+      } catch (error) {
+        console.error("Dashboard yüklenirken hata:", error);
+      }
     }
 
-    // Modal işlemleri
-    function closeModal(modalId) {
-      document.getElementById(modalId).style.display = 'none';
+    // Dashboard güncelleme
+    function updateDashboard(stockSnapshot, otherSnapshot) {
+      let totalExpense = 0;
+      let paidAmount = 0;
+      let payableAmount = 0;
+      let otherExpense = 0;
+      
+      // Stok giderlerini işle
+      stockSnapshot.forEach(doc => {
+        const data = doc.data();
+        totalExpense += data.totalWithTax || 0;
+        paidAmount += data.paidAmount || 0;
+        payableAmount += data.payableAmount || 0;
+      });
+      
+      // Diğer giderleri işle
+      otherSnapshot.forEach(doc => {
+        const data = doc.data();
+        otherExpense += data.amount || 0;
+        totalExpense += data.amount || 0;
+      });
+      
+      // Kartları güncelle
+      document.querySelector('.card-total').textContent = totalExpense.toFixed(2) + ' ₺';
+      document.querySelector('.card-paid').textContent = paidAmount.toFixed(2) + ' ₺';
+      document.querySelector('.card-payable').textContent = payableAmount.toFixed(2) + ' ₺';
+      document.querySelector('.card-other').textContent = otherExpense.toFixed(2) + ' ₺';
+      
+      // Grafiği oluştur
+      createExpenseChart(paidAmount, payableAmount, otherExpense);
     }
 
+    // Gider grafiği oluştur
+    function createExpenseChart(paid, payable, other) {
+      const ctx = document.getElementById('expenseChart').getContext('2d');
+      
+      // Eski grafik varsa yok et
+      if (expenseChart) {
+        expenseChart.destroy();
+      }
+      
+      expenseChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Ödenen', 'Ödenecek', 'Diğer Giderler'],
+          datasets: [{
+            data: [paid, payable, other],
+            backgroundColor: [
+              '#27ae60',
+              '#e74c3c',
+              '#9b59b6'
+            ],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+            },
+            title: {
+              display: true,
+              text: 'Gider Dağılımı'
+            }
+          }
+        }
+      });
+    }
 
-
-
-    //diğer giderler kısmı js kodu
     // Diğer gider modalını aç
-function openAddOtherExpenseModal() {
-  document.getElementById('otherExpenseDescription').value = '';
-  document.getElementById('otherExpenseAmount').value = '';
-  document.getElementById('otherExpenseMessage').style.display = 'none';
-  document.getElementById('otherExpenseModal').style.display = 'flex';
-}
+    function openAddOtherExpenseModal() {
+      document.getElementById('otherExpenseDescription').value = '';
+      document.getElementById('otherExpenseAmount').value = '';
+      document.getElementById('otherExpenseMessage').style.display = 'none';
+      document.getElementById('otherExpenseModal').style.display = 'flex';
+    }
 
-// Diğer gideri kaydet
-async function saveOtherExpense() {
-  const description = document.getElementById('otherExpenseDescription').value.trim();
-  const amount = parseFloat(document.getElementById('otherExpenseAmount').value);
-  const messageDiv = document.getElementById('otherExpenseMessage');
+    // Diğer gideri kaydet
+    async function saveOtherExpense() {
+      const description = document.getElementById('otherExpenseDescription').value.trim();
+      const amount = parseFloat(document.getElementById('otherExpenseAmount').value);
+      const messageDiv = document.getElementById('otherExpenseMessage');
 
-  // Validasyon
-  if (!description) {
-    showMessage(messageDiv, "Gider açıklaması boş olamaz", 'error');
-    return;
-  }
-  if (isNaN(amount)){
-    showMessage(messageDiv, "Geçerli bir tutar girin", 'error');
-    return;
-  }
+      // Validasyon
+      if (!description) {
+        showMessage(messageDiv, "Gider açıklaması boş olamaz", 'error');
+        return;
+      }
+      if (isNaN(amount)){
+        showMessage(messageDiv, "Geçerli bir tutar girin", 'error');
+        return;
+      }
 
-  try {
-    // Firestore'a kaydet
-    await db.collection(EXPENSES_COLLECTION).add({
-      type: "other",
-      description: description,
-      amount: amount,
-      date: firebase.firestore.FieldValue.serverTimestamp()
-    });
+      try {
+        // Firestore'a kaydet
+        await db.collection(EXPENSES_COLLECTION).add({
+          type: "other",
+          description: description,
+          amount: amount,
+          date: firebase.firestore.FieldValue.serverTimestamp()
+        });
 
-    showMessage(messageDiv, "✔️ Gider başarıyla eklendi", 'success');
-    closeModal('otherExpenseModal');
-    await loadOtherExpenses(); // Tabloyu güncelle
-  } catch (err) {
-    console.error("Gider ekleme hatası:", err);
-    showMessage(messageDiv, "❌ Hata: " + err.message, 'error');
-  }
-}
+        showMessage(messageDiv, "✔️ Gider başarıyla eklendi", 'success');
+        closeModal('otherExpenseModal');
+        await loadOtherExpenses(); // Tabloyu güncelle
+        await loadDashboard(); // Dashboard'u güncelle
+      } catch (err) {
+        console.error("Gider ekleme hatası:", err);
+        showMessage(messageDiv, "❌ Hata: " + err.message, 'error');
+      }
+    }
 
-// Diğer giderleri yükle
-async function loadOtherExpenses() {
-  try {
-    const querySnapshot = await db.collection(EXPENSES_COLLECTION)
-      .where("type", "==", "other")
-      .orderBy("date", "desc")
-      .get();
+    // Diğer giderleri yükle
+    async function loadOtherExpenses() {
+      try {
+        const querySnapshot = await db.collection(EXPENSES_COLLECTION)
+          .where("type", "==", "other")
+          .orderBy("date", "desc")
+          .get();
 
-    updateOtherExpensesTable(querySnapshot);
-  } catch (error) {
-    console.error("Diğer giderler yüklenirken hata:", error);
-    const tbody = document.querySelector("#otherExpensesTable tbody");
-    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:red;">Hata: ${error.message}</td></tr>`;
-  }
-}
+        updateOtherExpensesTable(querySnapshot);
+      } catch (error) {
+        console.error("Diğer giderler yüklenirken hata:", error);
+        const tbody = document.querySelector("#otherExpensesTable tbody");
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:red;">Hata: ${error.message}</td></tr>`;
+      }
+    }
 
-// Diğer giderler tablosunu güncelle
-function updateOtherExpensesTable(snapshot) {
-  const tbody = document.querySelector("#otherExpensesTable tbody");
-  if (snapshot.empty) {
-    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;">Gider bulunamadı</td></tr>`;
-    return;
-  }
+    // Diğer giderler tablosunu güncelle
+    function updateOtherExpensesTable(snapshot) {
+      const tbody = document.querySelector("#otherExpensesTable tbody");
+      if (snapshot.empty) {
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;">Gider bulunamadı</td></tr>`;
+        return;
+      }
 
-  let tbodyContent = "";
-  snapshot.forEach(doc => {
-    const data = doc.data();
-    const date = formatFirestoreDate(data.date);
+      let tbodyContent = "";
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const date = formatFirestoreDate(data.date);
 
-    tbodyContent += `
-      <tr>
-        <td>${data.description}</td>
-        <td>${data.amount.toFixed(2)}</td>
-        <td>${date}</td>
-        <td>
-          <button class="btn-danger action-btn" onclick="deleteExpense('${doc.id}')">
-            <i class="fas fa-trash"></i> Sil
-          </button>
-        </td>
-      </tr>
-    `;
-  });
+        tbodyContent += `
+          <tr>
+            <td>${data.description}</td>
+            <td>${data.amount.toFixed(2)}</td>
+            <td>${date}</td>
+            <td>
+              <button class="btn-danger action-btn" onclick="deleteExpense('${doc.id}')">
+                <i class="fas fa-trash"></i> Sil
+              </button>
+            </td>
+          </tr>
+        `;
+      });
 
-  tbody.innerHTML = tbodyContent;
-}
-
-
-
-
-
-
+      tbody.innerHTML = tbodyContent;
+    }
 
     function openAddStockExpenseModal() {
       document.getElementById('expenseInvoiceName').value = '';
@@ -844,6 +1104,7 @@ function updateOtherExpensesTable(snapshot) {
         showMessage(messageDiv, "✔️ Stok gideri başarıyla eklendi", 'success');
         closeModal('stockExpenseModal');
         await loadStockExpenses(); // Tabloyu güncelle
+        await loadDashboard(); // Dashboard'u güncelle
       } catch (err) {
         console.error("Stok gideri ekleme hatası:", err);
         showMessage(messageDiv, "❌ Hata: " + err.message, 'error');
@@ -862,7 +1123,7 @@ function updateOtherExpensesTable(snapshot) {
       } catch (error) {
         console.error("Stok giderleri yüklenirken hata:", error);
         const tbody = document.querySelector("#stockExpensesTable tbody");
-        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;color:red;">Hata: ${error.message}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="11" style="text-align:center;color:red;">Hata: ${error.message}</td></tr>`;
       }
     }
 
@@ -870,7 +1131,7 @@ function updateOtherExpensesTable(snapshot) {
     function updateStockExpensesTable(snapshot) {
       const tbody = document.querySelector("#stockExpensesTable tbody");
       if (snapshot.empty) {
-        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;">Stok gideri bulunamadı</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="11" style="text-align:center;">Stok gideri bulunamadı</td></tr>`;
         return;
       }
 
@@ -878,7 +1139,6 @@ function updateOtherExpensesTable(snapshot) {
       snapshot.forEach(doc => {
         const data = doc.data();
         const date = formatFirestoreDate(data.date);
-        // KDV tutarını hesapla: (toplam fiyat * KDV oranı) / 100
         const taxAmount = (data.total * data.taxRate) / 100;
 
         tbodyContent += `
@@ -890,6 +1150,8 @@ function updateOtherExpensesTable(snapshot) {
             <td>${data.total.toFixed(2)}</td>
             <td>${taxAmount.toFixed(2)}</td>
             <td>${data.totalWithTax.toFixed(2)}</td>
+            <td>${data.paidAmount.toFixed(2)}</td>
+            <td>${data.payableAmount.toFixed(2)}</td>
             <td>${date}</td>
             <td>
               <button class="btn-danger action-btn" onclick="deleteExpense('${doc.id}')">
@@ -903,120 +1165,202 @@ function updateOtherExpensesTable(snapshot) {
       tbody.innerHTML = tbodyContent;
     }
 
+    // Filtre uygula
+    function applyFilters() {
+      // Filtreleme mantığı buraya eklenecek
+      alert("Filtreleme özelliği aktif edilecek!");
+    }
+
+    // PDF olarak dışa aktar
+    function exportToPDF(tableId, fileName) {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      
+      doc.autoTable({
+        html: `#${tableId}`,
+        theme: 'grid',
+        headStyles: {
+          fillColor: [41, 128, 185],
+          textColor: 255
+        }
+      });
+      
+      doc.save(`${fileName}_${new Date().toLocaleDateString('tr-TR')}.pdf`);
+    }
+
+    // Dekont tablosu yükleme fonksiyonu - DÜZELTİLMİŞ SÜRÜM
+    async function loadDekontExpenses() {
+      try {
+        const querySnapshot = await db.collection(EXPENSES_COLLECTION)
+          .where("type", "==", "stock")
+          .where("paidAmount", ">", 0)
+          .orderBy("paidAmount", "desc") // Firestore kuralına uygun
+          .orderBy("date", "desc")
+          .get();
+
+        updateDekontTable(querySnapshot);
+      } catch (error) {
+        console.error("Dekont giderleri yüklenirken hata:", error);
+        const tbody = document.querySelector("#dekontTable tbody");
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;color:red;">Hata: ${error.message}</td></tr>`;
+      }
+    }
+
+    function updateDekontTable(snapshot) {
+      const tbody = document.querySelector("#dekontTable tbody");
+      if (!tbody) return;
+      
+      if (snapshot.empty) {
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;">Dekont gideri bulunamadı</td></tr>`;
+        return;
+      }
+
+      let tbodyContent = "";
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const date = formatFirestoreDate(data.date);
+        const taxAmount = (data.total * data.taxRate) / 100;
+
+        tbodyContent += `
+          <tr>
+            <td>${data.invoiceName}</td>
+            <td>${data.description}</td>
+            <td>${data.unitPrice.toFixed(2)}</td>
+            <td>${data.quantity}</td>
+            <td>${data.total.toFixed(2)}</td>
+            <td>${taxAmount.toFixed(2)}</td>
+            <td>${data.totalWithTax.toFixed(2)}</td>
+            <td class="paid-cell">${data.paidAmount.toFixed(2)}</td>
+            <td>${date}</td>
+          </tr>
+        `;
+      });
+
+      tbody.innerHTML = tbodyContent;
+    }
+
+    // Cari giderlerini yükle
+    async function loadCariExpenses() {
+      try {
+        const querySnapshot = await db.collection(EXPENSES_COLLECTION)
+          .where("type", "==", "stock")
+          .where("payableAmount", ">", 0)
+          .orderBy("payableAmount", "desc") // Firestore kuralına uygun
+          .orderBy("date", "desc")
+          .get();
+
+        updateCariTable(querySnapshot);
+      } catch (error) {
+        console.error("Cari giderleri yüklenirken hata:", error);
+        const tbody = document.querySelector("#cariTable tbody");
+        tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;color:red;">Hata: ${error.message}</td></tr>`;
+      }
+    }
+
+    function updateCariTable(snapshot) {
+      const tbody = document.querySelector("#cariTable tbody");
+      if (!tbody) return;
+      
+      if (snapshot.empty) {
+        tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;">Cari gideri bulunamadı</td></tr>`;
+        return;
+      }
+
+      let tbodyContent = "";
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const date = formatFirestoreDate(data.date);
+        const taxAmount = (data.total * data.taxRate) / 100;
+
+        tbodyContent += `
+          <tr>
+            <td>${data.invoiceName}</td>
+            <td>${data.description}</td>
+            <td>${data.unitPrice.toFixed(2)}</td>
+            <td>${data.quantity}</td>
+            <td>${data.total.toFixed(2)}</td>
+            <td>${taxAmount.toFixed(2)}</td>
+            <td>${data.totalWithTax.toFixed(2)}</td>
+            <td class="payable-cell">${data.payableAmount.toFixed(2)}</td>
+            <td>${date}</td>
+            <td>
+              <button class="btn-success action-btn" onclick="openPaymentModal('${doc.id}')">
+                <i class="fas fa-money-bill-wave"></i> Ödeme Yap
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+
+      tbody.innerHTML = tbodyContent;
+    }
+
+    // Ödeme yapma modali
+    function openPaymentModal(expenseId) {
+      db.collection(EXPENSES_COLLECTION).doc(expenseId).get().then(doc => {
+        if (doc.exists) {
+          const data = doc.data();
+          document.getElementById('paymentInvoiceName').value = data.invoiceName;
+          document.getElementById('paymentRemaining').value = data.payableAmount.toFixed(2);
+          document.getElementById('paymentAmount').value = '';
+          
+          currentPaymentExpense = {
+            id: expenseId,
+            payable: data.payableAmount
+          };
+          
+          document.getElementById('paymentModal').style.display = 'flex';
+        }
+      });
+    }
+
+    // Ödeme kaydet
+    async function savePayment() {
+      const amount = parseFloat(document.getElementById('paymentAmount').value);
+      const messageDiv = document.getElementById('paymentMessage');
+      
+      if (isNaN(amount) || amount <= 0) {
+        showMessage(messageDiv, "Geçerli bir ödeme tutarı girin", 'error');
+        return;
+      }
+      
+      if (amount > currentPaymentExpense.payable) {
+        showMessage(messageDiv, "Ödeme tutarı kalan borcu aşıyor", 'error');
+        return;
+      }
+      
+      try {
+        const expenseRef = db.collection(EXPENSES_COLLECTION).doc(currentPaymentExpense.id);
+        await expenseRef.update({
+          paidAmount: firebase.firestore.FieldValue.increment(amount),
+          payableAmount: firebase.firestore.FieldValue.increment(-amount)
+        });
+        
+        showMessage(messageDiv, "✔️ Ödeme başarıyla kaydedildi", 'success');
+        setTimeout(() => {
+          closeModal('paymentModal');
+          loadCariExpenses();
+          loadDekontExpenses();
+          loadDashboard();
+        }, 1500);
+      } catch (err) {
+        console.error("Ödeme kaydetme hatası:", err);
+        showMessage(messageDiv, "❌ Hata: " + err.message, 'error');
+      }
+    }
+
     // Gider silme
     async function deleteExpense(expenseId) {
       if (!confirm("Bu gideri silmek istediğinize emin misiniz?")) return;
       try {
         await db.collection(EXPENSES_COLLECTION).doc(expenseId).delete();
         await loadStockExpenses();
+        await loadDashboard();
       } catch (err) {
         console.error("Gider silme hatası:", err);
         alert("Gider silinemedi: " + err.message);
       }
     }
-
-   // Dekont tablosu yükleme fonksiyonu (yeniden düzenlendi)
-async function loadDekontExpenses() {
-  try {
-    const querySnapshot = await db.collection(EXPENSES_COLLECTION)
-      .where("type", "==", "stock")
-      .where("paidAmount", ">", 0)
-      .orderBy("paidAmount", "desc")
-      .orderBy("date", "desc")
-      .get();
-
-    updateDekontTable(querySnapshot);
-  } catch (error) {
-    console.error("Dekont giderleri yüklenirken hata:", error);
-    const tbody = document.querySelector("#dekontTable tbody");
-    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;color:red;">Hata: ${error.message}</td></tr>`;
-  }
-}
-
-    function updateDekontTable(snapshot) {
-  const tbody = document.querySelector("#dekontTable tbody");
-  if (!tbody) return; // Tablo bulunamazsa işlemi durdur
-  
-  if (snapshot.empty) {
-    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;">Dekont gideri bulunamadı</td></tr>`;
-    return;
-  }
-
-  let tbodyContent = "";
-  snapshot.forEach(doc => {
-    const data = doc.data();
-    const date = formatFirestoreDate(data.date);
-    const taxAmount = (data.total * data.taxRate) / 100;
-
-    tbodyContent += `
-      <tr>
-        <td>${data.invoiceName}</td>
-        <td>${data.description}</td>
-        <td>${data.unitPrice.toFixed(2)}</td>
-        <td>${data.quantity}</td>
-        <td>${data.total.toFixed(2)}</td>
-        <td>${taxAmount.toFixed(2)}</td>
-        <td>${data.totalWithTax.toFixed(2)}</td>
-        <td class="paid-cell">${data.paidAmount.toFixed(2)}</td>
-        <td>${date}</td>
-      </tr>
-    `;
-  });
-
-  tbody.innerHTML = tbodyContent;
-}
-
-    // Cari giderlerini yükle
-    // Cari tablosu yükleme fonksiyonu (yeniden düzenlendi)
-async function loadCariExpenses() {
-  try {
-    const querySnapshot = await db.collection(EXPENSES_COLLECTION)
-      .where("type", "==", "stock")
-      .where("payableAmount", ">", 0)
-      .orderBy("payableAmount", "desc")
-      .orderBy("date", "desc")
-      .get();
-
-    updateCariTable(querySnapshot);
-  } catch (error) {
-    console.error("Cari giderleri yüklenirken hata:", error);
-    const tbody = document.querySelector("#cariTable tbody");
-    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;color:red;">Hata: ${error.message}</td></tr>`;
-  }
-}
-
-    function updateCariTable(snapshot) {
-  const tbody = document.querySelector("#cariTable tbody");
-  if (!tbody) return; // Tablo bulunamazsa işlemi durdur
-  
-  if (snapshot.empty) {
-    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;">Cari gideri bulunamadı</td></tr>`;
-    return;
-  }
-
-  let tbodyContent = "";
-  snapshot.forEach(doc => {
-    const data = doc.data();
-    const date = formatFirestoreDate(data.date);
-    const taxAmount = (data.total * data.taxRate) / 100;
-
-    tbodyContent += `
-      <tr>
-        <td>${data.invoiceName}</td>
-        <td>${data.description}</td>
-        <td>${data.unitPrice.toFixed(2)}</td>
-        <td>${data.quantity}</td>
-        <td>${data.total.toFixed(2)}</td>
-        <td>${taxAmount.toFixed(2)}</td>
-        <td>${data.totalWithTax.toFixed(2)}</td>
-        <td class="payable-cell">${data.payableAmount.toFixed(2)}</td>
-        <td>${date}</td>
-      </tr>
-    `;
-  });
-
-  tbody.innerHTML = tbodyContent;
-}
 
     // Yardımcı fonksiyonlar
     function showMessage(elementId, message, type) {
@@ -1034,14 +1378,23 @@ async function loadCariExpenses() {
       }
     }
 
+    function closeModal(modalId) {
+      document.getElementById(modalId).style.display = 'none';
+    }
+
     // Global fonksiyonlar
     window.openAddStockExpenseModal = openAddStockExpenseModal;
     window.saveStockExpense = saveStockExpense;
     window.deleteExpense = deleteExpense;
     window.closeModal = closeModal;
     window.openAddOtherExpenseModal = openAddOtherExpenseModal;
-    window.saveOtherExpense = saveOtherExpense; 
-
+    window.saveOtherExpense = saveOtherExpense;
+    window.applyFilters = applyFilters;
+    window.exportToPDF = exportToPDF;
+    window.openPaymentModal = openPaymentModal;
+    window.savePayment = savePayment;
+    window.applyDekontFilters = loadDekontExpenses;
+    window.applyCariFilters = loadCariExpenses;
 
   </script>
 </body>
