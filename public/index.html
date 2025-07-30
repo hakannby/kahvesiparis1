@@ -132,9 +132,14 @@
 
         if (userData.role === "personel") {
           window.location.href = "siparis.html";
-        } else if (userData.role === "yonetici") {
+        } 
+        else if (userData.role === "yonetici") {
           window.location.href = "yonetim.html";
-        } else {
+        } 
+        else if (userData.role === "ortak") {
+          window.location.href = "ekonomi.html";
+      }
+        else {
           alert("Geçersiz rol: " + userData.role);
         }
       } catch (err) {

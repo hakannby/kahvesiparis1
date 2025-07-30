@@ -125,7 +125,7 @@
       emailSpan.textContent = email;
 
       const select = document.createElement("select");
-      ["", "personel", "yonetici"].forEach(role => {
+      ["", "personel", "yonetici", "ortak"].forEach(role => {
         const option = document.createElement("option");
         option.value = role;
         option.textContent = role || "--seçiniz--";

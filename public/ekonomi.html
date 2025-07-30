@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Ekonomi Paneli</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+  <style>
+    :root {
+      --primary: #3498db;
+      --danger: #e74c3c;
+      --success: #27ae60;
+      --warning: #f39c12;
+      --dark: #2c3e50;
+      --light: #f8f9fa;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 25px;
+      background-color: #f0f2f5;
+      color: #333;
+      max-width: 1400px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+    
+    h1, h2, h3, h4 {
+      color: var(--dark);
+      margin-bottom: 20px;
+    }
+    
+    h1, h2 {
+      text-align: center;
+    }
+    
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid #ddd;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    
+    .section {
+      background: #fff;
+      padding: 25px;
+      margin-bottom: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      border: 1px solid #eaeaea;
+    }
+    
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .flex-container {
+      display: flex;
+      gap: 30px;
+      margin-top: 20px;
+    }
+    
+    .flex-container > div {
+      flex: 1;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #555;
+    }
+    
+    input, select, textarea {
+      width: 100%;
+      padding: 12px 15px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: all 0.3s;
+    }
+    
+    input:focus, select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+      outline: none;
+    }
+    
+    button {
+      padding: 12px 20px;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .btn-primary {
+      background-color: var(--primary);
+    }
+    
+    .btn-primary:hover {
+      background-color: #2980b9;
+    }
+    
+    .btn-success {
+      background-color: var(--success);
+    }
+    
+    .btn-success:hover {
+      background-color: #219653;
+    }
+    
+    .btn-danger {
+      background-color: var(--danger);
+    }
+    
+    .btn-danger:hover {
+      background-color: #c0392b;
+    }
+    
+    .btn-warning {
+      background-color: var(--warning);
+    }
+    
+    .btn-warning:hover {
+      background-color: #e67e22;
+    }
+    
+    .logout-btn {
+      background-color: var(--danger);
+      padding: 10px 20px;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+      font-size: 15px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    
+    th, td {
+      border: 1px solid #e0e0e0;
+      padding: 12px 15px;
+      text-align: left;
+    }
+    
+    th {
+      background-color: #f2f6fc;
+      font-weight: 600;
+      color: var(--dark);
+      position: sticky;
+      top: 0;
+    }
+    
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+    
+    tr:hover {
+      background-color: #f0f7ff;
+    }
+    
+    .action-cell {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .action-btn {
+      padding: 6px 10px;
+      font-size: 14px;
+    }
+    
+    .message {
+      margin-top: 15px;
+      font-weight: 500;
+      padding: 12px;
+      border-radius: 8px;
+      display: none;
+    }
+    
+    .error {
+      color: var(--danger);
+      background-color: #fdeded;
+    }
+    
+    .success {
+      color: var(--success);
+      background-color: #edf7f0;
+    }
+    
+    .warning {
+      color: var(--warning);
+      background-color: #fef5e7;
+    }
+    
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #ddd;
+      padding-bottom: 10px;
+    }
+    
+    .tab {
+      padding: 10px 20px;
+      cursor: pointer;
+      border-radius: 6px;
+      background: #f1f1f1;
+      transition: all 0.3s;
+    }
+    
+    .tab.active {
+      background: var(--primary);
+      color: white;
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .modal-content {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 600px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #777;
+    }
+    
+    .status-low {
+      color: var(--danger);
+      font-weight: bold;
+    }
+    
+    .status-ok {
+      color: var(--success);
+      font-weight: bold;
+    }
+    
+    @media (max-width: 992px) {
+      .flex-container {
+        flex-direction: column;
+        gap: 20px;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      body {
+        padding: 15px;
+      }
+      
+      .section {
+        padding: 20px;
+      }
+      
+      table {
+        font-size: 14px;
+      }
+      
+      th, td {
+        padding: 10px;
+      }
+    }
+
+    .paid-cell {
+      color: #27ae60;
+      font-weight: bold;
+    }
+    .payable-cell {
+      color: #e74c3c;
+      font-weight: bold;
+    }
+
+    #stockExpensesTable th, 
+    #stockExpensesTable td {
+      padding: 10px;
+      font-size: 14px;
+    }
+    
+  </style>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+</head>
+
+<body>
+  <div class="panel-header">
+    <h1>Ekonomi Paneli</h1>
+    <button class="logout-btn" onclick="window.location.href='index.html'">
+      <i class="fas fa-sign-out-alt"></i> Çıkış Yap
+    </button>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="accounting">ÖN MUHASEBE</div>
+    <div class="tab" data-tab="expenseArchive">Gider Arşiv</div>
+  </div>
+
+  <!-- ÖN MUHASEBE -->
+  <div class="tab-content active" id="accounting">
+    <div class="section">
+      <h2>ÖN MUHASEBE</h2>
+        <!-- Stok Giderleri Bölümü -->
+      <div class="section">
+        <div class="section-title">
+          <h3>Stok Giderleri</h3>
+          <button class="btn-primary" onclick="openAddStockExpenseModal()">
+            <i class="fas fa-plus"></i> Stok Gideri Ekle
+          </button>
+        </div>
+        
+        <table id="stockExpensesTable">
+          <thead>
+            <tr>
+              <th>Fatura Adı</th>
+              <th>Açıklama</th>
+              <th>Birim Fiyat (₺)</th>
+              <th>Adet</th>
+              <th>Toplam (₺)</th>
+              <th>KDV Tutarı (₺)</th>
+              <th>KDV'li Toplam (₺)</th>
+              <th>Tarih</th>
+              <th>İşlemler</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td colspan="9" style="text-align:center;">Stok gideri bulunamadı</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Diğer Giderler Bölümü -->
+      <div class="section">
+  <div class="section-title">
+    <h3>Diğer Giderler</h3>
+    <button class="btn-primary" onclick="openAddOtherExpenseModal()">
+      <i class="fas fa-plus"></i> Gider İşlemi Ekle
+    </button>
+  </div>
+  
+  <table id="otherExpensesTable">
+    <thead>
+      <tr>
+        <th>Açıklama</th>
+        <th>Tutar (₺)</th>
+        <th>Tarih</th>
+        <th>İşlemler</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td colspan="4" style="text-align:center;">Gider bulunamadı</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Diğer Giderler Modal -->
+<div id="otherExpenseModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Diğer Gider Ekle</h3>
+      <button class="close-btn" onclick="closeModal('otherExpenseModal')">&times;</button>
+    </div>
+    <div class="form-group">
+      <label>Gider Açıklaması:</label>
+      <textarea id="otherExpenseDescription" rows="3" placeholder="Gider açıklaması giriniz"></textarea>
+    </div>
+    <div class="form-group">
+      <label>Tutar (₺):</label>
+      <input type="number" id="otherExpenseAmount" min="0" step="0.01" placeholder="Tutar">
+    </div>
+    <button class="btn-success" onclick="saveOtherExpense()">
+      <i class="fas fa-save"></i> Kaydet
+    </button>
+    <div id="otherExpenseMessage" class="message"></div>
+  </div>
+</div>
+
+
+
+    </div>
+  </div>
+
+  <!-- Gider Arşiv -->
+  <div class="tab-content" id="expenseArchive">
+    <div class="section">
+      <h2>Gider Arşiv</h2>
+      
+      <div class="tabs" style="margin-bottom: 20px;">
+        <div class="tab active" data-subtab="dekont">Dekont</div>
+        <div class="tab" data-subtab="cari">Cari</div>
+      </div>
+      
+      <!-- Dekont Tablosu -->
+      <div class="subtab-content active" id="dekontTab">
+        <div class="section">
+          <h3>Dekont Giderleri</h3>
+          <table id="dekontTable">
+            <thead>
+              <tr>
+                <th>Fatura Adı</th>
+                <th>Açıklama</th>
+                <th>Birim Fiyat (₺)</th>
+                <th>Adet</th>
+                <th>Toplam (₺)</th>
+                <th>KDV Tutarı (₺)</th>
+                <th>Toplam (KDV Dahil) (₺)</th>
+                <th>Ödenen (₺)</th>
+                <th>Tarih</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td colspan="9" style="text-align:center;">Dekont gideri bulunamadı</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      <!-- Cari Tablosu -->
+      <div class="subtab-content" id="cariTab">
+        <div class="section">
+          <h3>Cari Giderleri</h3>
+          <table id="cariTable">
+            <thead>
+              <tr>
+                <th>Fatura Adı</th>
+                <th>Açıklama</th>
+                <th>Birim Fiyat (₺)</th>
+                <th>Adet</th>
+                <th>Toplam (₺)</th>
+                <th>KDV Tutarı (₺)</th>
+                <th>Toplam (KDV Dahil) (₺)</th>
+                <th>Ödenecek (₺)</th>
+                <th>Tarih</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td colspan="9" style="text-align:center;">Cari gideri bulunamadı</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stok Gideri Ekle Modal -->
+  <div id="stockExpenseModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Stok Gideri Ekle</h3>
+        <button class="close-btn" onclick="closeModal('stockExpenseModal')">&times;</button>
+      </div>
+      <div class="form-group">
+        <label>Fatura Adı:</label>
+        <input type="text" id="expenseInvoiceName" placeholder="Fatura adı girin">
+      </div>
+      <div class="form-group">
+        <label>Açıklama:</label>
+        <textarea id="expenseDescription" rows="2" placeholder="Açıklama girin"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Birim Fiyat (₺):</label>
+        <input type="number" id="expenseUnitPrice" min="0" step="0.01" placeholder="Birim fiyat">
+      </div>
+      <div class="form-group">
+        <label>Satın Alınan Adet:</label>
+        <input type="number" id="expenseQuantity" min="1" placeholder="Adet">
+      </div>
+      <div class="form-group">
+        <label>KDV Oranı (%):</label>
+        <input type="number" id="expenseTaxRate" min="0" max="100" value="18" placeholder="KDV oranı">
+      </div>
+      <div class="form-group">
+        <label>Ödenen (₺):</label>
+        <input type="number" id="expensePaid" min="0" step="0.01" placeholder="Ödenen tutar">
+      </div>
+      <div class="form-group">
+        <label>Ödenecek (₺):</label>
+        <input type="number" id="expensePayable" min="0" step="0.01" placeholder="Ödenecek tutar">
+      </div>
+      <button class="btn-success" onclick="saveStockExpense()">
+        <i class="fas fa-save"></i> Kaydet
+      </button>
+      <div id="stockExpenseMessage" class="message"></div>
+    </div>
+  </div>
+
+  <script>
+    // Firebase konfigürasyonu
+    const firebaseConfig = {
+      apiKey: "AIzaSyCyOAbT9CM76LvWrUYM4ZCl078O7mKmx_o",
+      authDomain: "kahvesiparis1.firebaseapp.com",
+      projectId: "kahvesiparis1",
+      storageBucket: "kahvesiparis1.appspot.com",
+      messagingSenderId: "358382107079",
+      appId: "1:358382107079:web:37ccd0e80b73736a8681e2"
+    };
+
+    // Firebase başlatma
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+
+    // Global değişkenler
+    let currentUser = null;
+    const EXPENSES_COLLECTION = "expenses";
+
+    // Tarih formatlama fonksiyonu
+    function formatFirestoreDate(timestamp) {
+      if (!timestamp || typeof timestamp.toDate !== 'function') return "-";
+      try {
+        return timestamp.toDate().toLocaleString("tr-TR");
+      } catch (e) {
+        return "-";
+      }
+    }
+
+    // Sayfa yüklendiğinde çalışacak fonksiyon
+    document.addEventListener('DOMContentLoaded', function() {
+      // Tab kontrolü
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+          document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+          tab.classList.add('active');
+          document.getElementById(tab.dataset.tab).classList.add('active');
+          
+          if (tab.dataset.tab === 'accounting') {
+            loadStockExpenses();
+          }
+          if (tab.dataset.tab === 'expenseArchive') {
+            // Varsayılan olarak Dekont tablosunu yükle
+            loadDekontExpenses();
+          }
+        });
+      });
+
+      // Gider Arşiv sekmesi içindeki alt sekmeler
+document.querySelectorAll('#expenseArchive .tab[data-subtab]').forEach(tab => {
+  tab.addEventListener('click', function() {
+    // Aktif tabı değiştir
+    document.querySelectorAll('#expenseArchive .tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('#expenseArchive .subtab-content').forEach(c => c.classList.remove('active'));
+    
+    this.classList.add('active');
+    document.getElementById(this.dataset.subtab + 'Tab').classList.add('active');
+    
+    // Tabloları yükle
+    if (this.dataset.subtab === 'dekont') {
+      loadDekontExpenses();
+    } else if (this.dataset.subtab === 'cari') {
+      loadCariExpenses();
+    }
+  });
+});
+
+      // Kullanıcı oturum kontrolü
+      auth.onAuthStateChanged(async (user) => {
+        if (!user) {
+          alert("Bu sayfayı görüntülemek için giriş yapmalısınız");
+          window.location.href = "index.html";
+          return;
+        }
+
+        currentUser = user;
+        
+        try {
+          const userRef = db.collection("users").doc(user.uid);
+          const userSnap = await userRef.get();
+          
+          // Rol kontrolü: "ortak" veya "yonetici" olmalı
+          if (!userSnap.exists || (userSnap.data().role !== "ortak" && userSnap.data().role !== "yonetici")) {
+            alert("Bu sayfayı görüntülemek için yetkiniz yok");
+            window.location.href = "index.html";
+            return;
+          }
+
+          // Sayfa başlatma
+          initPage();
+        } catch (error) {
+          console.error("Yetki kontrol hatası:", error);
+          alert("Yetki kontrolü sırasında hata oluştu");
+          window.location.href = "index.html";
+        }
+      });
+    });
+
+    async function initPage() {
+      // ÖN MUHASEBE sekmesini yükle
+      await loadStockExpenses();
+      await loadOtherExpenses(); 
+    }
+
+    // Modal işlemleri
+    function closeModal(modalId) {
+      document.getElementById(modalId).style.display = 'none';
+    }
+
+
+
+
+    //diğer giderler kısmı js kodu
+    // Diğer gider modalını aç
+function openAddOtherExpenseModal() {
+  document.getElementById('otherExpenseDescription').value = '';
+  document.getElementById('otherExpenseAmount').value = '';
+  document.getElementById('otherExpenseMessage').style.display = 'none';
+  document.getElementById('otherExpenseModal').style.display = 'flex';
+}
+
+// Diğer gideri kaydet
+async function saveOtherExpense() {
+  const description = document.getElementById('otherExpenseDescription').value.trim();
+  const amount = parseFloat(document.getElementById('otherExpenseAmount').value);
+  const messageDiv = document.getElementById('otherExpenseMessage');
+
+  // Validasyon
+  if (!description) {
+    showMessage(messageDiv, "Gider açıklaması boş olamaz", 'error');
+    return;
+  }
+  if (isNaN(amount)){
+    showMessage(messageDiv, "Geçerli bir tutar girin", 'error');
+    return;
+  }
+
+  try {
+    // Firestore'a kaydet
+    await db.collection(EXPENSES_COLLECTION).add({
+      type: "other",
+      description: description,
+      amount: amount,
+      date: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    showMessage(messageDiv, "✔️ Gider başarıyla eklendi", 'success');
+    closeModal('otherExpenseModal');
+    await loadOtherExpenses(); // Tabloyu güncelle
+  } catch (err) {
+    console.error("Gider ekleme hatası:", err);
+    showMessage(messageDiv, "❌ Hata: " + err.message, 'error');
+  }
+}
+
+// Diğer giderleri yükle
+async function loadOtherExpenses() {
+  try {
+    const querySnapshot = await db.collection(EXPENSES_COLLECTION)
+      .where("type", "==", "other")
+      .orderBy("date", "desc")
+      .get();
+
+    updateOtherExpensesTable(querySnapshot);
+  } catch (error) {
+    console.error("Diğer giderler yüklenirken hata:", error);
+    const tbody = document.querySelector("#otherExpensesTable tbody");
+    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:red;">Hata: ${error.message}</td></tr>`;
+  }
+}
+
+// Diğer giderler tablosunu güncelle
+function updateOtherExpensesTable(snapshot) {
+  const tbody = document.querySelector("#otherExpensesTable tbody");
+  if (snapshot.empty) {
+    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;">Gider bulunamadı</td></tr>`;
+    return;
+  }
+
+  let tbodyContent = "";
+  snapshot.forEach(doc => {
+    const data = doc.data();
+    const date = formatFirestoreDate(data.date);
+
+    tbodyContent += `
+      <tr>
+        <td>${data.description}</td>
+        <td>${data.amount.toFixed(2)}</td>
+        <td>${date}</td>
+        <td>
+          <button class="btn-danger action-btn" onclick="deleteExpense('${doc.id}')">
+            <i class="fas fa-trash"></i> Sil
+          </button>
+        </td>
+      </tr>
+    `;
+  });
+
+  tbody.innerHTML = tbodyContent;
+}
+
+
+
+
+
+
+
+    function openAddStockExpenseModal() {
+      document.getElementById('expenseInvoiceName').value = '';
+      document.getElementById('expenseDescription').value = '';
+      document.getElementById('expenseUnitPrice').value = '';
+      document.getElementById('expenseQuantity').value = '';
+      document.getElementById('expenseTaxRate').value = '18';
+      document.getElementById('expensePaid').value = '';
+      document.getElementById('expensePayable').value = '';
+      document.getElementById('stockExpenseMessage').style.display = 'none';
+      document.getElementById('stockExpenseModal').style.display = 'flex';
+    }
+
+    // Stok giderini kaydet
+    async function saveStockExpense() {
+      const invoiceName = document.getElementById('expenseInvoiceName').value.trim();
+      const description = document.getElementById('expenseDescription').value.trim();
+      const unitPrice = parseFloat(document.getElementById('expenseUnitPrice').value);
+      const quantity = parseInt(document.getElementById('expenseQuantity').value);
+      const taxRate = parseFloat(document.getElementById('expenseTaxRate').value);
+      const paid = parseFloat(document.getElementById('expensePaid').value) || 0;
+      const payable = parseFloat(document.getElementById('expensePayable').value) || 0;
+      const messageDiv = document.getElementById('stockExpenseMessage');
+
+      // Validasyon
+      if (!invoiceName) {
+        showMessage(messageDiv, "Fatura adı boş olamaz", 'error');
+        return;
+      }
+      if (isNaN(unitPrice)) {
+        showMessage(messageDiv, "Geçerli bir birim fiyat girin", 'error');
+        return;
+      }
+      if (isNaN(quantity) || quantity < 1) {
+        showMessage(messageDiv, "Geçerli bir adet girin", 'error');
+        return;
+      }
+      if (isNaN(taxRate) || taxRate < 0 || taxRate > 100) {
+        showMessage(messageDiv, "Geçerli bir KDV oranı girin (0-100 arası)", 'error');
+        return;
+      }
+
+      // Hesaplamalar
+      const total = unitPrice * quantity;
+      const taxAmount = total * (taxRate / 100);
+      const totalWithTax = total + taxAmount;
+
+      try {
+        // Firestore'a kaydet
+        await db.collection(EXPENSES_COLLECTION).add({
+          type: "stock",
+          invoiceName: invoiceName,
+          description: description,
+          unitPrice: unitPrice,
+          quantity: quantity,
+          taxRate: taxRate,
+          total: total,
+          totalWithTax: totalWithTax,
+          paidAmount: paid,
+          payableAmount: payable,
+          date: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        showMessage(messageDiv, "✔️ Stok gideri başarıyla eklendi", 'success');
+        closeModal('stockExpenseModal');
+        await loadStockExpenses(); // Tabloyu güncelle
+      } catch (err) {
+        console.error("Stok gideri ekleme hatası:", err);
+        showMessage(messageDiv, "❌ Hata: " + err.message, 'error');
+      }
+    }
+
+    // Stok giderlerini yükle
+    async function loadStockExpenses() {
+      try {
+        const querySnapshot = await db.collection(EXPENSES_COLLECTION)
+          .where("type", "==", "stock")
+          .orderBy("date", "desc")
+          .get();
+
+        updateStockExpensesTable(querySnapshot);
+      } catch (error) {
+        console.error("Stok giderleri yüklenirken hata:", error);
+        const tbody = document.querySelector("#stockExpensesTable tbody");
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;color:red;">Hata: ${error.message}</td></tr>`;
+      }
+    }
+
+    // Tabloyu güncelle
+    function updateStockExpensesTable(snapshot) {
+      const tbody = document.querySelector("#stockExpensesTable tbody");
+      if (snapshot.empty) {
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;">Stok gideri bulunamadı</td></tr>`;
+        return;
+      }
+
+      let tbodyContent = "";
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const date = formatFirestoreDate(data.date);
+        // KDV tutarını hesapla: (toplam fiyat * KDV oranı) / 100
+        const taxAmount = (data.total * data.taxRate) / 100;
+
+        tbodyContent += `
+          <tr>
+            <td>${data.invoiceName}</td>
+            <td>${data.description}</td>
+            <td>${data.unitPrice.toFixed(2)}</td>
+            <td>${data.quantity}</td>
+            <td>${data.total.toFixed(2)}</td>
+            <td>${taxAmount.toFixed(2)}</td>
+            <td>${data.totalWithTax.toFixed(2)}</td>
+            <td>${date}</td>
+            <td>
+              <button class="btn-danger action-btn" onclick="deleteExpense('${doc.id}')">
+                <i class="fas fa-trash"></i> Sil
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+
+      tbody.innerHTML = tbodyContent;
+    }
+
+    // Gider silme
+    async function deleteExpense(expenseId) {
+      if (!confirm("Bu gideri silmek istediğinize emin misiniz?")) return;
+      try {
+        await db.collection(EXPENSES_COLLECTION).doc(expenseId).delete();
+        await loadStockExpenses();
+      } catch (err) {
+        console.error("Gider silme hatası:", err);
+        alert("Gider silinemedi: " + err.message);
+      }
+    }
+
+    // Dekont giderlerini yükle
+    async function loadDekontExpenses() {
+      try {
+        const querySnapshot = await db.collection(EXPENSES_COLLECTION)
+          .where("type", "==", "stock")
+          .where("paidAmount", ">", 0)
+          .orderBy("paidAmount", "desc")
+          .orderBy("date", "desc")
+          .get();
+
+        updateDekontTable(querySnapshot);
+      } catch (error) {
+        console.error("Dekont giderleri yüklenirken hata:", error);
+        const tbody = document.querySelector("#dekontTable tbody");
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;color:red;">Hata: ${error.message}</td></tr>`;
+      }
+    }
+
+    function updateDekontTable(snapshot) {
+      const tbody = document.querySelector("#dekontTable tbody");
+      if (snapshot.empty) {
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;">Dekont gideri bulunamadı</td></tr>`;
+        return;
+      }
+
+      let tbodyContent = "";
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const date = formatFirestoreDate(data.date);
+        const taxAmount = (data.total * data.taxRate) / 100;
+
+        tbodyContent += `
+          <tr>
+            <td>${data.invoiceName}</td>
+            <td>${data.description}</td>
+            <td>${data.unitPrice.toFixed(2)}</td>
+            <td>${data.quantity}</td>
+            <td>${data.total.toFixed(2)}</td>
+            <td>${taxAmount.toFixed(2)}</td>
+            <td>${data.totalWithTax.toFixed(2)}</td>
+            <td class="paid-cell">${data.paidAmount.toFixed(2)}</td>
+            <td>${date}</td>
+          </tr>
+        `;
+      });
+
+      tbody.innerHTML = tbodyContent;
+    }
+
+    // Cari giderlerini yükle
+    async function loadCariExpenses() {
+      try {
+        const querySnapshot = await db.collection(EXPENSES_COLLECTION)
+          .where("type", "==", "stock")
+          .where("payableAmount", ">", 0)
+          .orderBy("payableAmount", "desc")
+          .orderBy("date", "desc")
+          .get();
+
+        updateCariTable(querySnapshot);
+      } catch (error) {
+        console.error("Cari giderleri yüklenirken hata:", error);
+        const tbody = document.querySelector("#cariTable tbody");
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;color:red;">Hata: ${error.message}</td></tr>`;
+      }
+    }
+
+    function updateCariTable(snapshot) {
+      const tbody = document.querySelector("#cariTable tbody");
+      if (snapshot.empty) {
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;">Cari gideri bulunamadı</td></tr>`;
+        return;
+      }
+
+      let tbodyContent = "";
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const date = formatFirestoreDate(data.date);
+        const taxAmount = (data.total * data.taxRate) / 100;
+
+        tbodyContent += `
+          <tr>
+            <td>${data.invoiceName}</td>
+            <td>${data.description}</td>
+            <td>${data.unitPrice.toFixed(2)}</td>
+            <td>${data.quantity}</td>
+            <td>${data.total.toFixed(2)}</td>
+            <td>${taxAmount.toFixed(2)}</td>
+            <td>${data.totalWithTax.toFixed(2)}</td>
+            <td class="payable-cell">${data.payableAmount.toFixed(2)}</td>
+            <td>${date}</td>
+          </tr>
+        `;
+      });
+
+      tbody.innerHTML = tbodyContent;
+    }
+
+    // Yardımcı fonksiyonlar
+    function showMessage(elementId, message, type) {
+      const element = document.getElementById(elementId);
+      if (!element) return;
+      
+      element.textContent = message;
+      element.className = `message ${type}`;
+      element.style.display = 'block';
+      
+      if (type === 'success') {
+        setTimeout(() => {
+          element.style.display = 'none';
+        }, 3000);
+      }
+    }
+
+    // Global fonksiyonlar
+    window.openAddStockExpenseModal = openAddStockExpenseModal;
+    window.saveStockExpense = saveStockExpense;
+    window.deleteExpense = deleteExpense;
+    window.closeModal = closeModal;
+    window.openAddOtherExpenseModal = openAddOtherExpenseModal;
+    window.saveOtherExpense = saveOtherExpense; 
+
+
+  </script>
+</body>
+</html>
