@@ -486,8 +486,8 @@
     <div class="tab" data-tab="products">Ürün Yönetimi</div>
     <div class="tab" data-tab="history">Geçmiş İşlemler</div>
     <div class="tab" data-tab="settings">Ayarlar</div>
-    <div class="tab" data-tab="accounting">ÖN MUHASEBE</div>
-    <div class="tab" data-tab="expenseArchive">Gider Arşiv</div>
+    <!-- <div class="tab" data-tab="accounting">ÖN MUHASEBE</div>
+    <div class="tab" data-tab="expenseArchive">Gider Arşiv</div> -->
 
   </div>
 
@@ -833,6 +833,9 @@
           <button class="btn-warning" onclick="cancelStockOperation()" style="margin-top: 20px;">
             <i class="fas fa-undo"></i> İşlemi İptal Et
           </button>
+          <button class="btn-primary" onclick="openStockReportModal()" style="margin-top: 20px; margin-left: 10px;">
+            <i class="fas fa-file-pdf"></i> Stok Geçmiş Raporu Oluştur
+          </button>
         </div>
         
         <div class="section">
@@ -858,6 +861,10 @@
           <button class="btn-warning" onclick="cancelSelectedOrder()" style="margin-top: 20px;">
             <i class="fas fa-ban"></i> İşlemi İptal Et
           </button>
+          <button class="btn-primary" onclick="openOrderReportModal()" style="margin-top: 20px; margin-left: 10px;">
+             <i class="fas fa-file-pdf"></i> Sipariş Raporu Oluştur
+          </button>
+
         </div>
       </div>
     </div>
@@ -867,6 +874,57 @@
   <button class="btn-primary" onclick="openReportModal()">
     <i class="fas fa-file-pdf"></i> Günlük Rapor Oluştur
   </button>
+
+
+
+    <!-- Stok Rapor Modalı -->
+<div id="stockReportModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Stok Geçmiş Raporu</h3>
+      <button class="close-btn" onclick="closeModal('stockReportModal')">&times;</button>
+    </div>
+    <div class="form-group">
+      <label>Başlangıç Tarihi:</label>
+      <input type="date" id="stockReportStartDate">
+    </div>
+    <div class="form-group">
+      <label>Bitiş Tarihi:</label>
+      <input type="date" id="stockReportEndDate">
+    </div>
+    <button class="btn-success" onclick="generateStockReport()">
+      <i class="fas fa-file-export"></i> Rapor Oluştur
+    </button>
+    <div id="stockReportMessage" class="message"></div>
+  </div>
+</div>
+
+
+
+    <!-- Sipariş Rapor Modalı -->
+<div id="orderReportModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Sipariş Raporu</h3>
+      <button class="close-btn" onclick="closeModal('orderReportModal')">&times;</button>
+    </div>
+    <div class="form-group">
+      <label>Başlangıç Tarihi:</label>
+      <input type="date" id="orderReportStartDate">
+    </div>
+    <div class="form-group">
+      <label>Bitiş Tarihi:</label>
+      <input type="date" id="orderReportEndDate">
+    </div>
+    <button class="btn-success" onclick="generateOrderReport()">
+      <i class="fas fa-file-export"></i> Rapor Oluştur
+    </button>
+    <div id="orderReportMessage" class="message"></div>
+  </div>
+</div>
+
+
+
 
   <!-- Rapor Modal Penceresi -->
   <div id="reportModal" class="modal">
@@ -2257,6 +2315,198 @@ async function deleteExpense(expenseId) {
 
 
 
+  // Stok rapor modalını aç
+function openStockReportModal() {
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('stockReportStartDate').value = today;
+  document.getElementById('stockReportEndDate').value = today;
+  document.getElementById('stockReportMessage').style.display = 'none';
+  document.getElementById('stockReportModal').style.display = 'flex';
+}
+
+// Stok raporu oluştur
+async function generateStockReport() {
+  const startDate = document.getElementById('stockReportStartDate').value;
+  const endDate = document.getElementById('stockReportEndDate').value;
+  const messageDiv = document.getElementById('stockReportMessage');
+
+  if (!startDate || !endDate) {
+    showMessage(messageDiv, 'Lütfen tarih aralığı seçin', 'error');
+    return;
+  }
+
+  showMessage(messageDiv, 'Rapor oluşturuluyor...', 'warning');
+
+  try {
+    const start = new Date(startDate);
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(endDate);
+    end.setHours(23, 59, 59, 999);
+
+    const querySnapshot = await db.collection("stock_history")
+      .where("date", ">=", start)
+      .where("date", "<=", end)
+      .orderBy("date", "desc")
+      .get();
+
+    if (querySnapshot.empty) {
+      showMessage(messageDiv, 'Seçilen tarih aralığında stok işlemi bulunamadı', 'error');
+      return;
+    }
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    // Başlık
+    doc.setFontSize(16);
+    doc.text(`STOK GEÇMİŞ RAPORU (${startDate} - ${endDate})`, 105, 20, { align: 'center' });
+
+    // Tablo verileri
+    const reportData = querySnapshot.docs.map(doc => {
+      const data = doc.data();
+      return [
+        formatFirestoreDate(data.date),
+        data.productName,
+        data.operation === 'ekleme' ? `+${data.amount}` : `-${data.amount}`,
+        data.unit,
+        data.userName
+      ];
+    });
+
+    // Tablo oluştur
+    doc.autoTable({
+      startY: 30,
+      head: [['Tarih', 'Ürün', 'Miktar', 'Birim', 'Kullanıcı']],
+      body: reportData,
+      styles: { font: "times", fontSize: 10 },
+      headStyles: { fontStyle: 'bold' }
+    });
+
+    // Toplam işlem sayısı
+    doc.text(`Toplam İşlem Sayısı: ${querySnapshot.size}`, 14, doc.lastAutoTable.finalY + 10);
+
+    doc.save(`stok_gecmisi_${startDate}_${endDate}.pdf`);
+    showMessage(messageDiv, '✔️ Rapor hazır!', 'success');
+  } catch (error) {
+    console.error("Rapor oluşturma hatası:", error);
+    showMessage(messageDiv, '❌ Hata: ' + error.message, 'error');
+  }
+}
+
+
+// Sipariş rapor modalını aç
+function openOrderReportModal() {
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('orderReportStartDate').value = today;
+  document.getElementById('orderReportEndDate').value = today;
+  document.getElementById('orderReportMessage').style.display = 'none';
+  document.getElementById('orderReportModal').style.display = 'flex';
+}
+
+// Sipariş raporu oluştur
+async function generateOrderReport() {
+  const startDate = document.getElementById('orderReportStartDate').value;
+  const endDate = document.getElementById('orderReportEndDate').value;
+  const messageDiv = document.getElementById('orderReportMessage');
+
+  if (!startDate || !endDate) {
+    showMessage(messageDiv, 'Lütfen tarih aralığı seçin', 'error');
+    return;
+  }
+
+  showMessage(messageDiv, 'Rapor oluşturuluyor...', 'warning');
+
+  try {
+    const start = new Date(startDate);
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(endDate);
+    end.setHours(23, 59, 59, 999);
+
+    const querySnapshot = await db.collection("sales")
+      .where("timestamp", ">=", start)
+      .where("timestamp", "<=", end)
+      .orderBy("timestamp", "desc")
+      .get();
+
+    if (querySnapshot.empty) {
+      showMessage(messageDiv, 'Seçilen tarih aralığında sipariş bulunamadı', 'error');
+      return;
+    }
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    // Başlık
+    doc.setFontSize(16);
+    doc.text(`SİPARİŞ RAPORU (${startDate} - ${endDate})`, 105, 20, { align: 'center' });
+
+    // Günlere göre gruplandırma ve toplam ciro hesaplama
+    const dailyData = {};
+    let totalRevenue = 0;
+
+    querySnapshot.forEach(doc => {
+      const data = doc.data();
+      const dateStr = data.timestamp.toDate().toLocaleDateString('tr-TR');
+      const total = data.total || 0;
+      
+      if (!dailyData[dateStr]) {
+        dailyData[dateStr] = {
+          orders: [],
+          revenue: 0
+        };
+      }
+      
+      dailyData[dateStr].orders.push(data);
+      dailyData[dateStr].revenue += total;
+      totalRevenue += total;
+    });
+
+    // Her gün için bir tablo oluştur
+    let currentY = 30;
+    Object.entries(dailyData).forEach(([date, dayData]) => {
+      // Gün başlığı
+      doc.setFontSize(12);
+      doc.setFont("times", "bold");
+      doc.text(`${date} - Toplam Ciro: ${dayData.revenue.toFixed(2)}₺`, 14, currentY);
+      currentY += 10;
+
+      // Tablo verileri
+      const tableData = dayData.orders.map(order => {
+        const products = order.items?.map(item => `${item.qty}x ${item.product}`).join(', ') || '';
+        return [
+          order.user || 'Müşteri Yok',
+          products,
+          `${order.total.toFixed(2)}₺`,
+          formatFirestoreDate(order.timestamp)
+        ];
+      });
+
+      // Tablo oluştur
+      doc.autoTable({
+        startY: currentY,
+        head: [['Müşteri', 'Ürünler', 'Tutar', 'Tarih']],
+        body: tableData,
+        styles: { font: "times", fontSize: 8 },
+        headStyles: { fontStyle: 'bold' }
+      });
+
+      currentY = doc.lastAutoTable.finalY + 10;
+    });
+
+    // Toplam ciro
+    doc.setFontSize(12);
+    doc.setFont("times", "bold");
+    doc.text(`TOPLAM CİRO: ${totalRevenue.toFixed(2)}₺`, 105, currentY, { align: 'center' });
+
+    doc.save(`siparis_raporu_${startDate}_${endDate}.pdf`);
+    showMessage(messageDiv, '✔️ Rapor hazır!', 'success');
+  } catch (error) {
+    console.error("Rapor oluşturma hatası:", error);
+    showMessage(messageDiv, '❌ Hata: ' + error.message, 'error');
+  }
+}
+
+
 
 
 
@@ -2526,6 +2776,10 @@ async function deleteExpense(expenseId) {
         window.saveStockExpense = saveStockExpense;
         window.deleteExpense = deleteExpense;
 
+          window.openStockReportModal = openStockReportModal;
+          window.generateStockReport = generateStockReport;
+          window.openOrderReportModal = openOrderReportModal;
+          window.generateOrderReport = generateOrderReport;
 
   </script>
 </body>
