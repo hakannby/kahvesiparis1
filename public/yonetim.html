@@ -483,9 +483,9 @@
   <div class="tabs">
     <div class="tab active" data-tab="dashboard">Ana Panel</div>
     <div class="tab" data-tab="stock">Stok Yönetimi</div>
-    <div class="tab" data-tab="products">Ürün Yönetimi</div>
+    <div class="tab" data-tab="products">Ürün/Kategori Yönetimi</div>
     <div class="tab" data-tab="history">Geçmiş İşlemler</div>
-    <div class="tab" data-tab="settings">Ayarlar</div>
+    <div class="tab" data-tab="settings">Kullanıcılar</div>
     <!-- <div class="tab" data-tab="accounting">ÖN MUHASEBE</div>
     <div class="tab" data-tab="expenseArchive">Gider Arşiv</div> -->
 
@@ -661,7 +661,7 @@
       
       <div class="flex-container">
         <div>
-          <h3>Yeni Ürün Ekle</h3>
+          <h3>Yeni Stok Ürünü Ekle</h3>
           <div class="form-group">
             <label>Ürün Adı:</label>
             <input type="text" id="urunAdi" placeholder="Örn: Çikolata Sosu">
@@ -676,7 +676,13 @@
             <label>Birim:</label>
             <select id="urunBirim">
               <option value="ml">ml</option>
+              <option value="litre">litre</option>
               <option value="g">g</option>
+              <option value="kg">kg</option>
+              <option value="kutu">kutu</option>
+              <option value="sise">sise</option>
+              <option value="paket">paket</option>
+              <option value="olcu">olcu</option>
               <option value="adet">adet</option>
             </select>
           </div>
@@ -688,7 +694,7 @@
         </div>
         
         <div>
-          <h3>Stok Ekle</h3>
+          <h3>Mevcut Stok İlave</h3>
           <div class="form-group">
             <label>Ürün Seç:</label>
             <select id="guncelleSec">
@@ -1576,47 +1582,51 @@ function updateCariTable(snapshot) {
     }
 
     async function loadIngredients() {
-      try {
-        const querySnapshot = await db.collection("stocks").get();
-        allIngredients = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          name: doc.data().name,
-          unit: doc.data().unit
-        }));
-      } catch (error) {
-        console.error("İçerikler yüklenirken hata:", error);
-      }
-    }
+  try {
+    const querySnapshot = await db.collection("stocks").get();
+    allIngredients = querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      name: doc.data().name,
+      unit: doc.data().unit || "adet" // Varsayılan birim ataması yapın
+    }));
+  } catch (error) {
+    console.error("İçerikler yüklenirken hata:", error);
+    showMessage('productMessage', "İçerikler yüklenirken hata: " + error.message, 'error');
+  }
+}
 
     function addIngredientField() {
-      const container = document.getElementById("ingredientList");
-      
-      const row = document.createElement("div");
-      row.className = "ingredient-row";
-      
-      // Ürün seçimi
-      const select = document.createElement("select");
-      select.innerHTML = '<option value="">-- İçerik seçin --</option>';
-      allIngredients.forEach(ing => {
-        select.innerHTML += `<option value="${ing.name}">${ing.name} (${ing.unit})</option>`;
-      });
-      
-      // Miktar girişi
-      const input = document.createElement("input");
-      input.type = "number";
-      input.placeholder = "Miktar";
-      input.min = "0";
-      input.step = "1";
-      
-      // Sil butonu
-      const delBtn = document.createElement("button");
-      delBtn.className = "btn-danger";
-      delBtn.innerHTML = '<i class="fas fa-times"></i>';
-      delBtn.onclick = () => row.remove();
-      
-      row.append(select, input, delBtn);
-      container.appendChild(row);
-    }
+  const container = document.getElementById("ingredientList");
+  
+  const row = document.createElement("div");
+  row.className = "ingredient-row";
+  
+  // Ürün seçimi
+  const select = document.createElement("select");
+  select.innerHTML = '<option value="">-- İçerik seçin --</option>';
+  
+  allIngredients.forEach(ing => {
+    // Birim bilgisi yoksa varsayılan olarak "adet" kullan
+    const unit = ing.unit || "adet";
+    select.innerHTML += `<option value="${ing.name}">${ing.name} (${unit})</option>`;
+  });
+  
+  // Miktar girişi
+  const input = document.createElement("input");
+  input.type = "number";
+  input.placeholder = "Miktar";
+  input.min = "0";
+  input.step = "1";
+  
+  // Sil butonu
+  const delBtn = document.createElement("button");
+  delBtn.className = "btn-danger";
+  delBtn.innerHTML = '<i class="fas fa-times"></i>';
+  delBtn.onclick = () => row.remove();
+  
+  row.append(select, input, delBtn);
+  container.appendChild(row);
+}
 
     async function saveNewProduct() {
       const name = document.getElementById("newProductName").value.trim();
@@ -2374,7 +2384,7 @@ async function generateStockReport() {
     const doc = new jsPDF();
 
     // Başlık
-    doc.setFontSize(16);
+    doc.setFontSize(14);
     doc.text(`STOK GEÇMİŞ RAPORU (${startDate} - ${endDate})`, 105, 20, { align: 'center' });
 
     // Tablo verileri
@@ -2458,7 +2468,7 @@ async function generateOrderReport() {
     const doc = new jsPDF();
 
     // Başlık
-    doc.setFontSize(16);
+    doc.setFontSize(14);
     doc.text(`Siparis Raporu (${startDate} - ${endDate})`, 105, 20, { align: 'center' });
 
     let currentY = 30; // PDF'deki mevcut y pozisyonu
@@ -2539,7 +2549,7 @@ async function generateOrderReport() {
 
       // Toplam satışlar
       doc.setFontSize(12);
-      doc.text("toplam ürün satislari", 12, currentY);
+      doc.text("toplam ürün satislari (belirtilen tarihler) ", 12, currentY);
       currentY += 8;
 
       // Tüm ürünleri satış miktarına göre sırala
@@ -2561,9 +2571,9 @@ async function generateOrderReport() {
 
     // 2. Ciro Raporu
     if (includeRevenue) {
-      doc.setFontSize(14);
+      doc.setFontSize(12);
       doc.setFont("courier", "bold");
-      doc.text("CIRO RAPORU", 14, currentY);
+      doc.text("CIRO RAPORU", 12, currentY);
       currentY += 10;
 
       // Günlük ciro
@@ -2595,13 +2605,13 @@ async function generateOrderReport() {
     if (includeDetails) {
       doc.setFontSize(14);
       doc.setFont("courier", "bold");
-      doc.text("tum siparis detayo", 12, currentY);
+      doc.text("tum siparis detayo", 10, currentY);
       currentY += 10;
 
       // Her gün için bir tablo oluştur
       Object.entries(dailyData).forEach(([date, dayData]) => {
-        doc.setFontSize(12);
-        doc.text(`${date} - Toplam Ciro: ${dayData.revenue.toFixed(2)} TL`, 16, currentY);
+        doc.setFontSize(10);
+        doc.text(`${date} - Toplam Ciro: ${dayData.revenue.toFixed(2)} TL`, 14, currentY);
         currentY += 8;
 
         const tableData = dayData.orders.map(order => {
@@ -2748,7 +2758,7 @@ async function generateOrderReport() {
 
         // Tarih
         doc.setFontSize(12);
-        doc.setFont("courier", "normal");
+        doc.setFont("courier", "light");
         doc.text(`Rapor Tarihi: ${reportData.date}`, 14, 30);
 
          // 1. Genel Özet Tablosu
@@ -2756,23 +2766,23 @@ async function generateOrderReport() {
       startY: 40,
       head: [['GENEL ÖZET', '']],
       body: [
-        ['Toplam Sipariş', reportData.totalSales],
-        ['Toplam Ürün Adedi', `${reportData.totalProducts} adet`],
+        ['Toplam Siparis', reportData.totalSales],
+        ['Toplam Urun Adedi', `${reportData.totalProducts} adet`],
         ['Toplam Ciro', `${reportData.totalRevenue}₺`],
-        ['Ort. Sipariş Tutarı', `${Math.round(reportData.totalRevenue / reportData.totalSales)}₺`],
+        ['Ort. Siparis Tutari', `${Math.round(reportData.totalRevenue / reportData.totalSales)}₺`],
       ],
       styles: {
         font: "courier",
-        fontSize: 12,
+        fontSize: 10,
         cellPadding: 5,
-        lineWidth: 0.1, // İnce çizgiler
+        lineWidth: 0.3, // İnce çizgiler
         lineColor: 0 // Siyah çerçeve
       },
       headStyles: {
         fontStyle: 'bold',
         fillColor: false, // Arkaplan rengi kaldırıldı
         textColor: 0, // Siyah metin
-        lineWidth: 0.1
+        lineWidth: 0.3
       }
     });
 
@@ -2802,7 +2812,7 @@ async function generateOrderReport() {
     if (reportData.stockOperations.length > 0) {
       doc.autoTable({
         startY: doc.lastAutoTable.finalY + 15,
-        head: [['STOK HAREKETLERİ', 'Miktar']],
+        head: [['STOK HAREKETLERI', 'Miktar']],
         body: reportData.stockOperations.map(op => [op.time + ' - ' + op.product, op.amount]),
         styles: {
           font: "courier",
@@ -2814,7 +2824,7 @@ async function generateOrderReport() {
           fontStyle: 'bold',
           fillColor: false,
           textColor: 0,
-          lineWidth: 0.1
+          lineWidth: 0.2
         }
       });
     }
@@ -2822,7 +2832,7 @@ async function generateOrderReport() {
         // 4. Pik Saatler
          doc.autoTable({
       startY: doc.lastAutoTable.finalY + 15,
-      head: [['PİK SAATLER', '']],
+      head: [['Pik Saatler', '']],
       body: peakHours.map(hour => [hour]),
       styles: {
         font: "courier",
@@ -2840,7 +2850,7 @@ async function generateOrderReport() {
 
         // 5. Footer
         doc.setFontSize(10);
-    doc.text(`© ${new Date().getFullYear()} Kahvecim - Oluşturulma Tarihi: ${new Date().toLocaleString()}`, 105, 285, { align: 'center' });
+    doc.text(`© ${new Date().getFullYear()} Kahvecim - Olusturulma Tarihi: ${new Date().toLocaleString()}`, 105, 285, { align: 'center' });
 
     
         // 4. PDF'i indir

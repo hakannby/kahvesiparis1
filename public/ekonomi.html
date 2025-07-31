@@ -539,13 +539,13 @@
             <tr>
               <th>Fatura Adı</th>
               <th>Açıklama</th>
-              <th>Birim Fiyat (₺)</th>
+              <th>Birim Fiyat (TL)</th>
               <th>Adet</th>
-              <th>Toplam (₺)</th>
-              <th>KDV Tutarı (₺)</th>
-              <th>KDV'li Toplam (₺)</th>
-              <th>Ödenen (₺)</th>
-              <th>Ödenecek (₺)</th>
+              <th>Toplam (TL)</th>
+              <th>KDV Tutarı (TL)</th>
+              <th>KDV'li Toplam (TL)</th>
+              <th>Ödenen (TL)</th>
+              <th>Ödenecek (TL)</th>
               <th>Tarih</th>
               <th>İşlemler</th>
             </tr>
@@ -616,12 +616,12 @@
           <tr>
             <th>Fatura Adı</th>
             <th>Açıklama</th>
-            <th>Birim Fiyat (₺)</th>
+            <th>Birim Fiyat (TL)</th>
             <th>Adet</th>
-            <th>Toplam (₺)</th>
-            <th>KDV Tutarı (₺)</th>
-            <th>Toplam (KDV Dahil) (₺)</th>
-            <th>Ödenen (₺)</th>
+            <th>Toplam (TL)</th>
+            <th>KDV Tutarı (TL)</th>
+            <th>Toplam (KDV Dahil) (TL)</th>
+            <th>Ödenen (TL)</th>
             <th>Tarih</th>
           </tr>
         </thead>
@@ -659,12 +659,12 @@
           <tr>
             <th>Fatura Adı</th>
             <th>Açıklama</th>
-            <th>Birim Fiyat (₺)</th>
+            <th>Birim Fiyat (TL)</th>
             <th>Adet</th>
-            <th>Toplam (₺)</th>
-            <th>KDV Tutarı (₺)</th>
-            <th>Toplam (KDV Dahil) (₺)</th>
-            <th>Ödenecek (₺)</th>
+            <th>Toplam (TL)</th>
+            <th>KDV Tutarı (TL)</th>
+            <th>Toplam (KDV Dahil) (TL)</th>
+            <th>Ödenecek (TL)</th>
             <th>Tarih</th>
             <th>Ödeme</th>
           </tr>
@@ -789,6 +789,9 @@
     let currentUser = null;
     let expenseChart = null;
     let currentPaymentExpense = null;
+    let allStockExpenses = []; // Tüm stok giderlerini sakla
+    let allDekontExpenses = []; // Tüm dekont giderlerini sakla
+    let allCariExpenses = []; // Tüm cari giderlerini sakla
     const EXPENSES_COLLECTION = "expenses";
 
     // Tarih formatlama fonksiyonu
@@ -859,6 +862,18 @@
           alert("Yetki kontrolü sırasında hata oluştu");
           window.location.href = "index.html";
         }
+      });
+
+      // Filtreleme butonlarına enter desteği
+      document.querySelectorAll('input[type="date"], input[type="number"]').forEach(input => {
+        input.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') {
+            const tab = document.querySelector('.tab.active').dataset.tab;
+            if (tab === 'accounting') applyFilters();
+            else if (tab === 'dekont') applyDekontFilters();
+            else if (tab === 'cari') applyCariFilters();
+          }
+        });
       });
     });
 
@@ -1119,7 +1134,16 @@
           .orderBy("date", "desc")
           .get();
 
-        updateStockExpensesTable(querySnapshot);
+        // Tüm stok giderlerini global değişkene kaydet
+        allStockExpenses = [];
+        querySnapshot.forEach(doc => {
+          allStockExpenses.push({
+            id: doc.id,
+            ...doc.data()
+          });
+        });
+
+        updateStockExpensesTable(allStockExpenses);
       } catch (error) {
         console.error("Stok giderleri yüklenirken hata:", error);
         const tbody = document.querySelector("#stockExpensesTable tbody");
@@ -1128,33 +1152,32 @@
     }
 
     // Tabloyu güncelle
-    function updateStockExpensesTable(snapshot) {
+    function updateStockExpensesTable(expenses) {
       const tbody = document.querySelector("#stockExpensesTable tbody");
-      if (snapshot.empty) {
+      if (!expenses || expenses.length === 0) {
         tbody.innerHTML = `<tr><td colspan="11" style="text-align:center;">Stok gideri bulunamadı</td></tr>`;
         return;
       }
 
       let tbodyContent = "";
-      snapshot.forEach(doc => {
-        const data = doc.data();
-        const date = formatFirestoreDate(data.date);
-        const taxAmount = (data.total * data.taxRate) / 100;
+      expenses.forEach(expense => {
+        const date = formatFirestoreDate(expense.date);
+        const taxAmount = (expense.total * expense.taxRate) / 100;
 
         tbodyContent += `
           <tr>
-            <td>${data.invoiceName}</td>
-            <td>${data.description}</td>
-            <td>${data.unitPrice.toFixed(2)}</td>
-            <td>${data.quantity}</td>
-            <td>${data.total.toFixed(2)}</td>
+            <td>${expense.invoiceName}</td>
+            <td>${expense.description}</td>
+            <td>${expense.unitPrice.toFixed(2)}</td>
+            <td>${expense.quantity}</td>
+            <td>${expense.total.toFixed(2)}</td>
             <td>${taxAmount.toFixed(2)}</td>
-            <td>${data.totalWithTax.toFixed(2)}</td>
-            <td>${data.paidAmount.toFixed(2)}</td>
-            <td>${data.payableAmount.toFixed(2)}</td>
+            <td>${expense.totalWithTax.toFixed(2)}</td>
+            <td>${expense.paidAmount.toFixed(2)}</td>
+            <td>${expense.payableAmount.toFixed(2)}</td>
             <td>${date}</td>
             <td>
-              <button class="btn-danger action-btn" onclick="deleteExpense('${doc.id}')">
+              <button class="btn-danger action-btn" onclick="deleteExpense('${expense.id}')">
                 <i class="fas fa-trash"></i> Sil
               </button>
             </td>
@@ -1166,39 +1189,140 @@
     }
 
     // Filtre uygula
-    function applyFilters() {
-      // Filtreleme mantığı buraya eklenecek
-      alert("Filtreleme özelliği aktif edilecek!");
+    async function applyFilters() {
+      const startDateInput = document.getElementById('startDate').value;
+      const endDateInput = document.getElementById('endDate').value;
+      const minAmount = parseFloat(document.getElementById('minAmount').value) || 0;
+      const maxAmount = parseFloat(document.getElementById('maxAmount').value) || 0;
+
+      // Tüm giderler üzerinde filtre uygula
+      const filteredExpenses = allStockExpenses.filter(expense => {
+        const expenseDate = expense.date ? expense.date.toDate() : null;
+        const expenseAmount = expense.totalWithTax || 0;
+        
+        // Tarih filtresi
+        let datePass = true;
+        if (startDateInput) {
+          const startDate = new Date(startDateInput);
+          if (expenseDate < startDate) datePass = false;
+        }
+        if (endDateInput) {
+          const endDate = new Date(endDateInput);
+          endDate.setDate(endDate.getDate() + 1); // Bitiş gününü dahil etmek için
+          if (expenseDate >= endDate) datePass = false;
+        }
+        
+        // Tutar filtresi
+        let amountPass = true;
+        if (minAmount > 0 && expenseAmount < minAmount) amountPass = false;
+        if (maxAmount > 0 && expenseAmount > maxAmount) amountPass = false;
+        
+        return datePass && amountPass;
+      });
+
+      // Tabloyu güncelle
+      updateStockExpensesTable(filteredExpenses);
     }
 
     // PDF olarak dışa aktar
     function exportToPDF(tableId, fileName) {
       const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      
-      doc.autoTable({
-        html: `#${tableId}`,
-        theme: 'grid',
-        headStyles: {
-          fillColor: [41, 128, 185],
-          textColor: 255
-        }
+      const doc = new jsPDF({
+    orientation: 'portrait' // Yatay modda PDF oluştur
+  });
+      // Tablo başlığını ekle
+  doc.setFont('arial', 'bold');
+  doc.setFontSize(16);
+  doc.text(fileName.replace('_', ' '), 14, 15);
+
+  // Tablo verilerini çıkar
+  const table = document.getElementById(tableId);
+  const headers = [];
+  const rows = [];
+
+    // Başlıkları al (son sütunu hariç tut - "Sil" butonları)
+  const headerCells = table.querySelectorAll('thead tr th');
+  headerCells.forEach((th, index) => {
+    if (index < headerCells.length - 1) { // Son sütunu atla
+      headers.push({
+        header: th.textContent,
+        dataKey: index.toString()
       });
+    }
+  });
+
+  // Satır verilerini al (son sütunu hariç tut)
+  const tableRows = table.querySelectorAll('tbody tr');
+  tableRows.forEach(tr => {
+    const rowData = {};
+    const cells = tr.querySelectorAll('td');
+    cells.forEach((td, index) => {
+      if (index < cells.length - 1) { // Son sütunu atla
+        rowData[index.toString()] = td.textContent;
+      }
+    });
+    if (Object.keys(rowData).length > 0) {
+      rows.push(rowData);
+    }
+  });
+
+
+      // Tabloyu oluştur
+  doc.autoTable({
+    head: [headers.map(h => h.header)],
+    body: rows.map(row => headers.map(h => row[h.dataKey])),
+    startY: 20,
+    styles: {
+      font: 'arial',
+      fontSize: 7, // Yazı boyutunu küçült
+      cellPadding: 2,
+      overflow: 'linebreak'
+    },
+    headStyles: {
+      fillColor: [41, 128, 185],
+      textColor: 255,
+      fontStyle: 'bold',
+      fontSize: 9
+    },
+    columnStyles: {
+      // Özel sütun stilleri (isteğe bağlı)
+      0: { fontStyle: 'bold' } // İlk sütunu bold yap
+    },
+    didDrawPage: function (data) {
+      // Sayfa altına bilgi ekle
+      doc.setFontSize(8);
+      doc.setTextColor(150);
+      doc.text(
+        `Oluşturulma Tarihi: ${new Date().toLocaleString('tr-TR')} • Sayfa ${data.pageCount}`,
+        data.settings.margin.left,
+        doc.internal.pageSize.height - 5
+      );
+    }
+  });
       
       doc.save(`${fileName}_${new Date().toLocaleDateString('tr-TR')}.pdf`);
     }
 
-    // Dekont tablosu yükleme fonksiyonu - DÜZELTİLMİŞ SÜRÜM
+    // Dekont tablosu yükleme fonksiyonu
     async function loadDekontExpenses() {
       try {
         const querySnapshot = await db.collection(EXPENSES_COLLECTION)
-          .where("type", "==", "stock")
-          .where("paidAmount", ">", 0)
-          .orderBy("paidAmount", "desc") // Firestore kuralına uygun
-          .orderBy("date", "desc")
-          .get();
+      .where("type", "==", "stock")
+      .where("paidAmount", ">", 0)
+      .orderBy("paidAmount") // Önce eşitsizlik filtresi uygulanan alan
+      .orderBy("date", "desc") // Sonra tarihe göre sıralama
+      .get();
 
-        updateDekontTable(querySnapshot);
+        // Tüm dekont giderlerini global değişkene kaydet
+        allDekontExpenses = [];
+        querySnapshot.forEach(doc => {
+          allDekontExpenses.push({
+            id: doc.id,
+            ...doc.data()
+          });
+        });
+
+        updateDekontTable(allDekontExpenses);
       } catch (error) {
         console.error("Dekont giderleri yüklenirken hata:", error);
         const tbody = document.querySelector("#dekontTable tbody");
@@ -1206,31 +1330,28 @@
       }
     }
 
-    function updateDekontTable(snapshot) {
+    function updateDekontTable(expenses) {
       const tbody = document.querySelector("#dekontTable tbody");
-      if (!tbody) return;
-      
-      if (snapshot.empty) {
+      if (!expenses || expenses.length === 0) {
         tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;">Dekont gideri bulunamadı</td></tr>`;
         return;
       }
 
       let tbodyContent = "";
-      snapshot.forEach(doc => {
-        const data = doc.data();
-        const date = formatFirestoreDate(data.date);
-        const taxAmount = (data.total * data.taxRate) / 100;
+      expenses.forEach(expense => {
+        const date = formatFirestoreDate(expense.date);
+        const taxAmount = (expense.total * expense.taxRate) / 100;
 
         tbodyContent += `
           <tr>
-            <td>${data.invoiceName}</td>
-            <td>${data.description}</td>
-            <td>${data.unitPrice.toFixed(2)}</td>
-            <td>${data.quantity}</td>
-            <td>${data.total.toFixed(2)}</td>
+            <td>${expense.invoiceName}</td>
+            <td>${expense.description}</td>
+            <td>${expense.unitPrice.toFixed(2)}</td>
+            <td>${expense.quantity}</td>
+            <td>${expense.total.toFixed(2)}</td>
             <td>${taxAmount.toFixed(2)}</td>
-            <td>${data.totalWithTax.toFixed(2)}</td>
-            <td class="paid-cell">${data.paidAmount.toFixed(2)}</td>
+            <td>${expense.totalWithTax.toFixed(2)}</td>
+            <td class="paid-cell">${expense.paidAmount.toFixed(2)}</td>
             <td>${date}</td>
           </tr>
         `;
@@ -1239,17 +1360,54 @@
       tbody.innerHTML = tbodyContent;
     }
 
+    // Dekont filtreleme
+    function applyDekontFilters() {
+      const startDateInput = document.getElementById('dekontStartDate').value;
+      const endDateInput = document.getElementById('dekontEndDate').value;
+
+      // Tüm dekont giderleri üzerinde filtre uygula
+      const filteredExpenses = allDekontExpenses.filter(expense => {
+        const expenseDate = expense.date ? expense.date.toDate() : null;
+        
+        // Tarih filtresi
+        let datePass = true;
+        if (startDateInput) {
+          const startDate = new Date(startDateInput);
+          if (expenseDate < startDate) datePass = false;
+        }
+        if (endDateInput) {
+          const endDate = new Date(endDateInput);
+          endDate.setDate(endDate.getDate() + 1); // Bitiş gününü dahil etmek için
+          if (expenseDate >= endDate) datePass = false;
+        }
+        
+        return datePass;
+      });
+
+      // Tabloyu güncelle
+      updateDekontTable(filteredExpenses);
+    }
+
     // Cari giderlerini yükle
     async function loadCariExpenses() {
       try {
         const querySnapshot = await db.collection(EXPENSES_COLLECTION)
-          .where("type", "==", "stock")
-          .where("payableAmount", ">", 0)
-          .orderBy("payableAmount", "desc") // Firestore kuralına uygun
-          .orderBy("date", "desc")
-          .get();
+      .where("type", "==", "stock")
+      .where("payableAmount", ">", 0)
+      .orderBy("payableAmount") // Önce eşitsizlik filtresi uygulanan alan
+      .orderBy("date", "desc") // Sonra tarihe göre sıralama
+      .get();
 
-        updateCariTable(querySnapshot);
+        // Tüm cari giderlerini global değişkene kaydet
+        allCariExpenses = [];
+        querySnapshot.forEach(doc => {
+          allCariExpenses.push({
+            id: doc.id,
+            ...doc.data()
+          });
+        });
+
+        updateCariTable(allCariExpenses);
       } catch (error) {
         console.error("Cari giderleri yüklenirken hata:", error);
         const tbody = document.querySelector("#cariTable tbody");
@@ -1257,34 +1415,31 @@
       }
     }
 
-    function updateCariTable(snapshot) {
+    function updateCariTable(expenses) {
       const tbody = document.querySelector("#cariTable tbody");
-      if (!tbody) return;
-      
-      if (snapshot.empty) {
+      if (!expenses || expenses.length === 0) {
         tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;">Cari gideri bulunamadı</td></tr>`;
         return;
       }
 
       let tbodyContent = "";
-      snapshot.forEach(doc => {
-        const data = doc.data();
-        const date = formatFirestoreDate(data.date);
-        const taxAmount = (data.total * data.taxRate) / 100;
+      expenses.forEach(expense => {
+        const date = formatFirestoreDate(expense.date);
+        const taxAmount = (expense.total * expense.taxRate) / 100;
 
         tbodyContent += `
           <tr>
-            <td>${data.invoiceName}</td>
-            <td>${data.description}</td>
-            <td>${data.unitPrice.toFixed(2)}</td>
-            <td>${data.quantity}</td>
-            <td>${data.total.toFixed(2)}</td>
+            <td>${expense.invoiceName}</td>
+            <td>${expense.description}</td>
+            <td>${expense.unitPrice.toFixed(2)}</td>
+            <td>${expense.quantity}</td>
+            <td>${expense.total.toFixed(2)}</td>
             <td>${taxAmount.toFixed(2)}</td>
-            <td>${data.totalWithTax.toFixed(2)}</td>
-            <td class="payable-cell">${data.payableAmount.toFixed(2)}</td>
+            <td>${expense.totalWithTax.toFixed(2)}</td>
+            <td class="payable-cell">${expense.payableAmount.toFixed(2)}</td>
             <td>${date}</td>
             <td>
-              <button class="btn-success action-btn" onclick="openPaymentModal('${doc.id}')">
+              <button class="btn-success action-btn" onclick="openPaymentModal('${expense.id}')">
                 <i class="fas fa-money-bill-wave"></i> Ödeme Yap
               </button>
             </td>
@@ -1293,6 +1448,34 @@
       });
 
       tbody.innerHTML = tbodyContent;
+    }
+
+    // Cari filtreleme
+    function applyCariFilters() {
+      const startDateInput = document.getElementById('cariStartDate').value;
+      const endDateInput = document.getElementById('cariEndDate').value;
+
+      // Tüm cari giderleri üzerinde filtre uygula
+      const filteredExpenses = allCariExpenses.filter(expense => {
+        const expenseDate = expense.date ? expense.date.toDate() : null;
+        
+        // Tarih filtresi
+        let datePass = true;
+        if (startDateInput) {
+          const startDate = new Date(startDateInput);
+          if (expenseDate < startDate) datePass = false;
+        }
+        if (endDateInput) {
+          const endDate = new Date(endDateInput);
+          endDate.setDate(endDate.getDate() + 1); // Bitiş gününü dahil etmek için
+          if (expenseDate >= endDate) datePass = false;
+        }
+        
+        return datePass;
+      });
+
+      // Tabloyu güncelle
+      updateCariTable(filteredExpenses);
     }
 
     // Ödeme yapma modali
@@ -1393,8 +1576,8 @@
     window.exportToPDF = exportToPDF;
     window.openPaymentModal = openPaymentModal;
     window.savePayment = savePayment;
-    window.applyDekontFilters = loadDekontExpenses;
-    window.applyCariFilters = loadCariExpenses;
+    window.applyDekontFilters = applyDekontFilters;
+    window.applyCariFilters = applyCariFilters;
 
   </script>
 </body>
