@@ -679,11 +679,11 @@
               <option value="litre">litre</option>
               <option value="g">g</option>
               <option value="kg">kg</option>
+              <option value="adet">adet</option>
               <option value="kutu">kutu</option>
               <option value="sise">sise</option>
               <option value="paket">paket</option>
               <option value="olcu">olcu</option>
-              <option value="adet">adet</option>
             </select>
           </div>
           
@@ -2385,7 +2385,7 @@ async function generateStockReport() {
 
     // Başlık
     doc.setFontSize(14);
-    doc.text(`STOK GEÇMİŞ RAPORU (${startDate} - ${endDate})`, 105, 20, { align: 'center' });
+    doc.text(`STOK GECMIS RAPORU (${startDate} - ${endDate})`, 105, 20, { align: 'center' });
 
     // Tablo verileri
     const reportData = querySnapshot.docs.map(doc => {
@@ -2402,14 +2402,14 @@ async function generateStockReport() {
     // Tablo oluştur
     doc.autoTable({
       startY: 30,
-      head: [['Tarih', 'Ürün', 'Miktar', 'Birim', 'Kullanıcı']],
+      head: [['Tarih', 'Ürün', 'Miktar', 'Birim', 'Kullanici']],
       body: reportData,
-      styles: { font: "courier", fontSize: 10 },
+      styles: { font: "arial", fontSize: 8 },
       headStyles: { fontStyle: 'bold' }
     });
 
     // Toplam işlem sayısı
-    doc.text(`Toplam İşlem Sayısı: ${querySnapshot.size}`, 14, doc.lastAutoTable.finalY + 10);
+    doc.text(`Toplam Islem Sayisi: ${querySnapshot.size}`, 14, doc.lastAutoTable.finalY + 10);
 
     doc.save(`stok_gecmisi_${startDate}_${endDate}.pdf`);
     showMessage(messageDiv, '✔️ Rapor hazır!', 'success');
@@ -2741,7 +2741,7 @@ async function generateOrderReport() {
         const peakHours = Object.entries(reportData.hourlySales)
           .sort((a, b) => b[1] - a[1])
           .slice(0, 2)
-          .map(([hour, count]) => `${hour}:00-${hour + 1}:00 → ${count} sipariş`);
+          .map(([hour, count]) => `${hour}:00-${hour + 1}:00 → ${count} siparis`);
 
         // 3. PDF oluştur
         const { jsPDF } = window.jspdf;
@@ -2749,16 +2749,16 @@ async function generateOrderReport() {
 
         
         doc.setFont("couriers");
-        doc.setFontSize(12);
+        doc.setFontSize(10);
 
         // Başlık
-        doc.setFontSize(16);
+        doc.setFontSize(14);
         doc.setFont("courier", "bold");
-        doc.text("KAHVECİM - GÜNLÜK RAPOR", 105, 20, { align: 'center' });
+        doc.text("KAHVECIM - Gunluk Ozet", 105, 20, { align: 'center' });
 
         // Tarih
-        doc.setFontSize(12);
-        doc.setFont("courier", "light");
+        doc.setFontSize(10);
+        doc.setFont("arial", "bold");
         doc.text(`Rapor Tarihi: ${reportData.date}`, 14, 30);
 
          // 1. Genel Özet Tablosu
@@ -2768,8 +2768,8 @@ async function generateOrderReport() {
       body: [
         ['Toplam Siparis', reportData.totalSales],
         ['Toplam Urun Adedi', `${reportData.totalProducts} adet`],
-        ['Toplam Ciro', `${reportData.totalRevenue}₺`],
-        ['Ort. Siparis Tutari', `${Math.round(reportData.totalRevenue / reportData.totalSales)}₺`],
+        ['Toplam Ciro', `${reportData.totalRevenue} TL`],
+        ['Ort. Siparis Tutari', `${Math.round(reportData.totalRevenue / reportData.totalSales)} TL`],
       ],
       styles: {
         font: "courier",
@@ -2789,22 +2789,22 @@ async function generateOrderReport() {
         // 2. En Çok Satanlar
     doc.autoTable({
       startY: doc.lastAutoTable.finalY + 15,
-      head: [['EN ÇOK SATANLAR (Top 5)', 'Adet']],
+      head: [['EN COK SATANLAR (Top 5)', 'Adet']],
       body: Object.entries(reportData.popularProducts)
         .sort((a, b) => b[1] - a[1])
         .slice(0, 5)
         .map(([product, qty]) => [product, `${qty} adet`]),
       styles: {
-        font: "courier",
-        fontSize: 12,
-        lineWidth: 0.1,
+        font: "arial",
+        fontSize: 10,
+        lineWidth: 0.2,
         lineColor: 0
       },
       headStyles: {
         fontStyle: 'bold',
         fillColor: false,
         textColor: 0,
-        lineWidth: 0.1
+        lineWidth: 0.2
       }
     });
         
@@ -2815,9 +2815,9 @@ async function generateOrderReport() {
         head: [['STOK HAREKETLERI', 'Miktar']],
         body: reportData.stockOperations.map(op => [op.time + ' - ' + op.product, op.amount]),
         styles: {
-          font: "courier",
+          font: "arial",
           fontSize: 11,
-          lineWidth: 0.1,
+          lineWidth: 0.2,
           lineColor: 0
         },
         headStyles: {
@@ -2835,8 +2835,8 @@ async function generateOrderReport() {
       head: [['Pik Saatler', '']],
       body: peakHours.map(hour => [hour]),
       styles: {
-        font: "courier",
-        fontSize: 12,
+        font: "arial",
+        fontSize: 10,
         lineWidth: 0.1,
         lineColor: 0
       },

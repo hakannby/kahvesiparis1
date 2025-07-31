@@ -3,51 +3,100 @@
 <head>
   <meta charset="UTF-8" />
   <title>Kullanıcı Girişi</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <style>
     body {
-      font-family: Arial;
+      font-family: 'Arial', sans-serif;
       max-width: 400px;
       margin: 80px auto;
       text-align: center;
       background-color: #f5f5f5;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.1);
     }
     h2 {
       color: #333;
-      margin-bottom: 25px;
+      margin-bottom: 30px;
+      font-weight: 600;
+    }
+    .input-group {
+      position: relative;
+      margin-bottom: 20px;
+      width: 100%;
     }
     input {
-      margin-bottom: 15px;
       width: 100%;
-      padding: 12px;
+      padding: 14px 40px 14px 15px;
       border: 1px solid #ddd;
       border-radius: 8px;
       font-size: 16px;
+      box-sizing: border-box;
+      transition: border 0.3s;
+    }
+    input:focus {
+      border-color: #4CAF50;
+      outline: none;
+    }
+    .password-toggle {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: #777;
+    }
+    .button-group {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 20px;
     }
     button {
-      padding: 12px 25px;
-      margin: 10px;
+      padding: 12px 30px;
       border: none;
       border-radius: 8px;
       background-color: #4CAF50;
       color: white;
       font-size: 16px;
       cursor: pointer;
-      transition: background-color 0.3s;
+      transition: all 0.3s;
+      flex: 1;
+      max-width: 150px;
     }
     button:hover {
       background-color: #45a049;
+      transform: translateY(-2px);
+    }
+    button:active {
+      transform: translateY(0);
+    }
+    .container {
+      background-color: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
     }
   </style>
 </head>
 <body>
-  <h2>Giriş Yap veya Kayıt Ol</h2>
-  <input type="email" id="email" placeholder="Email adresiniz">
-  <input type="password" id="password" placeholder="Şifre">
-  <button onclick="login()">Giriş Yap</button>
-  <button onclick="register()">Kayıt Ol</button>
+  <div class="container">
+    <h2>Giriş Yap veya Kayıt Ol</h2>
+    
+    <div class="input-group">
+      <input type="email" id="email" placeholder="Email adresiniz">
+    </div>
+    
+    <div class="input-group">
+      <input type="password" id="password" placeholder="Şifre">
+      <i class="fas fa-eye password-toggle" id="togglePassword"></i>
+    </div>
+    
+    <div class="button-group">
+      <button onclick="login()">Giriş Yap</button>
+      <button onclick="register()">Kayıt Ol</button>
+    </div>
+  </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js";
@@ -76,6 +125,14 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
+
+    // Şifre görünürlük toggle
+    document.getElementById('togglePassword').addEventListener('click', function() {
+      const passwordInput = document.getElementById('password');
+      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordInput.setAttribute('type', type);
+      this.classList.toggle('fa-eye-slash');
+    });
 
     // Kayıt işlemi
     window.register = async () => {
@@ -138,7 +195,7 @@
         } 
         else if (userData.role === "ortak") {
           window.location.href = "ekonomi.html";
-      }
+        }
         else {
           alert("Geçersiz rol: " + userData.role);
         }

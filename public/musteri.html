@@ -26,20 +26,20 @@
       border-radius: 16px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.15);
       width: 100%;
-      max-width: 600px;
+      max-width: 800px;              /* enlemesine genişlik*/
       overflow: hidden;
     }
     
     header {
-      background: #4a89dc;
+      background: #128da8;
       color: white;
-      padding: 25px 30px;
+      padding: 15px 30px;
       text-align: center;
       position: relative;
     }
     
     header h1 {
-      font-size: 28px;
+      font-size: 22px;
       margin-bottom: 8px;
       display: flex;
       align-items: center;
@@ -104,15 +104,15 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      color: #4a89dc;
-      padding-bottom: 15px;
+      color: #0a4694;
+      padding-bottom: 20px;
       margin-bottom: 20px;
-      border-bottom: 2px solid #eee;
+      border-bottom: 4px solid #eee;
     }
     
     .items-list {
       display: grid;
-      gap: 15px;
+      gap: 20px;
     }
     
     .item {
@@ -173,8 +173,8 @@
       position: fixed;
       bottom: 20px;
       right: 20px;
-      background: #27ae60;
-      color: white;
+      background: #5ce193;
+      color: rgb(109, 105, 105);
       padding: 15px 25px;
       border-radius: 10px;
       box-shadow: 0 5px 15px rgba(0,0,0,0.2);
@@ -213,20 +213,9 @@
   <div class="container">
     <header>
       <h1><i class="fas fa-mug-hot"></i> Sipariş Takip</h1>
-      <div class="order-id">Sipariş No: <span id="orderNumber">YÜKLENİYOR...</span></div>
       
-      <div class="status-container">
-        <div class="status preparing">
-          <i class="fas fa-blender"></i>
-          <h3>Hazırlanıyor</h3>
-          <p id="preparingTime">~5 dakika kaldı</p>
-        </div>
-        <div class="status ready">
-          <i class="fas fa-check-circle"></i>
-          <h3>Hazır</h3>
-          <p id="readyStatus">Almaya hazır</p>
-        </div>
-      </div>
+      
+      
     </header>
     
     <div class="order-details">
@@ -315,6 +304,8 @@
         readyStatusEl.textContent = "Almaya hazır!";
         showNotification("Siparişiniz hazır!");
       }
+
+        
     } else {
       orderItemsEl.innerHTML = `
         <div class="item">
