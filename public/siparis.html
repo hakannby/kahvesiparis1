@@ -25,7 +25,7 @@
     
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      max-width: 900px;
+      max-width: 1200px;
       margin: 40px auto;
       padding: 30px;
       background: #fafafa;
@@ -44,17 +44,38 @@
       border-bottom: 2px solid #e0e6ed;
     }
     
-    /* YENİ KATEGORİ STİLLERİ */
+    /* YENİ İKİ SÜTUNLU DÜZEN */
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 25px;
+    }
+    
+    .left-column {
+      flex: 1;
+      min-width: 65%;
+    }
+    
+    .right-column {
+      flex: 1;
+      min-width: 32%;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    
+    /* KATEGORİ STİLLERİ (ORTA HİZALI) */
     .main-categories {
       display: flex;
       flex-wrap: wrap;
       gap: 12px;
       justify-content: center;
       margin-bottom: 20px;
-      padding: 10px;
+      padding: 15px;
       background: var(--white);
       border-radius: 12px;
       box-shadow: var(--shadow);
+      text-align: center;
     }
     
     .main-category-btn {
@@ -69,7 +90,9 @@
       box-shadow: 0 2px 6px rgba(74, 137, 220, 0.2);
       display: flex;
       align-items: center;
+      justify-content: center;
       gap: 8px;
+      margin: 5px;
     }
     
     .main-category-btn:hover {
@@ -90,7 +113,7 @@
       font-size: 18px;
     }
     
-    /* ALT KATEGORİ VE ÜRÜNLER ALANI */
+    /* ALT KATEGORİ VE ÜRÜNLER ALANI (ORTA HİZALI) */
     .category-content-area {
       background: var(--white);
       border-radius: 12px;
@@ -99,6 +122,7 @@
       box-shadow: var(--shadow);
       border: 1px solid #e0e6ed;
       display: none;
+      text-align: center;
     }
     
     .category-content-area.active {
@@ -116,6 +140,7 @@
       flex-wrap: wrap;
       gap: 10px;
       margin-bottom: 20px;
+      justify-content: center;
     }
     
     .subcategory-btn {
@@ -156,6 +181,7 @@
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
       gap: 12px;
+      justify-items: center;
     }
     
     .direct-product {
@@ -168,6 +194,8 @@
       box-shadow: 0 3px 6px rgba(0,0,0,0.08);
       transition: all 0.2s;
       border: 1px solid #e0e6ed;
+      width: 100%;
+      max-width: 160px;
     }
     
     .direct-product:hover {
@@ -197,7 +225,7 @@
       font-size: 13px;
     }
     
-    /* ÜRÜN SEÇİM ALANI */
+    /* ÜRÜN SEÇİM ALANI (ORTA HİZALI) */
     .coffee-selection {
       margin-top: 25px;
       display: grid;
@@ -208,6 +236,7 @@
       padding: 20px;
       border-radius: 12px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      justify-items: center;
     }
     
     .coffee-option {
@@ -225,6 +254,8 @@
       align-items: center;
       position: relative;
       height: 100%;
+      width: 100%;
+      max-width: 160px;
     }
     
     .coffee-option:hover {
@@ -287,6 +318,8 @@
       padding: 10px;
       border-radius: 8px;
       box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      margin-left: auto;
+      margin-right: auto;
     }
     
     .quantity-container button {
@@ -323,12 +356,13 @@
     
     .action-buttons {
       display: flex;
-      gap: 15px;
+      gap: 12px;
       margin-bottom: 25px;
+      align-items: center;
+      justify-content: center;
     }
     
     .action-buttons button {
-      flex: 1;
       padding: 15px 0;
       border-radius: 30px;
       color: white;
@@ -343,70 +377,90 @@
       justify-content: center;
       gap: 8px;
       box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      flex: 1;
     }
     
-    #addOrderBtn {
-      background-color: var(--primary);
-    }
-    
-    #addOrderBtn:hover {
-      background-color: var(--primary-dark);
-      transform: translateY(-3px);
-    }
-    
-    #confirmBtn {
-      background-color: var(--success);
-    }
-    
-    #confirmBtn:hover {
-      background-color: #219653;
-      transform: translateY(-3px);
+    #addOrderBtn, #confirmBtn {
+      min-width: 120px;
     }
     
     #refundBtn {
-      background-color: var(--danger);
+      min-width: 80px;
+      padding: 12px 0;
+      font-size: 15px;
     }
     
-    #refundBtn:hover {
-      background-color: #c0392b;
-      transform: translateY(-3px);
+    #addOrderBtn { 
+      background-color: var(--primary); 
+    }
+    #confirmBtn { 
+      background-color: var(--success); 
+    }
+    #refundBtn { 
+      background-color: var(--danger); 
     }
     
-
+    #addOrderBtn:hover { 
+      background-color: var(--primary-dark); 
+    }
+    #confirmBtn:hover { 
+      background-color: #219653; 
+    }
+    #refundBtn:hover { 
+      background-color: #c0392b; 
+    }
+    
     #addNameBtn {
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-#addNameBtn:hover {
-  background: var(--primary-dark) !important;
-  transform: scale(1.05);
-}
-
-
-    h3 {
-      color: var(--dark);
-      margin-bottom: 12px;
-      user-select: none;
+      cursor: pointer;
+      transition: all 0.3s;
+      padding: 10px 15px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      margin-left: 10px;
+    }
+    
+    #addNameBtn:hover {
+      background: var(--primary-dark);
+      transform: scale(1.05);
+    }
+    
+    /* SAĞ SÜTUN STİLLERİ */
+    .right-panel-section {
+      background: var(--light);
+      border-radius: 12px;
+      padding: 15px;
+      box-shadow: var(--shadow);
+    }
+    
+    .right-panel-section h3 {
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 10px 15px;
-      background: var(--light);
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      justify-content: space-between;
+      margin-bottom: 15px;
+      color: var(--dark);
+      padding-bottom: 10px;
+      border-bottom: 1px solid #e0e6ed;
+    }
+    
+    .right-panel-section h3 i {
+      margin-right: 8px;
     }
     
     #orderList, #customerView {
-      min-height: 60px;
-      padding: 18px 20px;
-      border-radius: 12px;
-      background: var(--light);
+      min-height: 150px;
+      max-height: 200px;
+      overflow-y: auto;
+      padding: 15px;
+      border-radius: 8px;
+      background: var(--white);
       box-shadow: inset 0 0 8px rgba(224, 230, 237, 0.67);
       font-weight: 600;
       font-size: 16px;
       color: var(--dark);
-      margin-bottom: 25px;
+      margin-bottom: 15px;
       user-select: text;
     }
     
@@ -444,7 +498,7 @@
     }
     
     .section {
-      margin-top: 20px;
+      margin-top: 0;
       background: var(--light);
       padding: 15px;
       border-radius: 12px;
@@ -470,6 +524,7 @@
       justify-content: space-between;
       align-items: center;
       border: 1px solid #d5dbe4;
+      width: 100%;
     }
     
     .collapsible:hover {
@@ -597,7 +652,6 @@
       font-weight: 600;
     }
     
-    /* Yeni eklenen stiller */
     .refund-item {
       padding: 10px;
       margin: 5px 0;
@@ -622,7 +676,6 @@
       cursor: pointer;
     }
     
-    /* Arama kutusu stilleri */
     .search-container {
       margin: 20px 0;
       display: flex;
@@ -661,10 +714,60 @@
       transform: scale(1.05);
     }
     
+    .canceled-order {
+      background-color: #ffeeee !important;
+      color: #999;
+    }
+    
+    .canceled-order td {
+      text-decoration: line-through;
+    }
+    
+    .status-canceled {
+      color: #e74c3c;
+      font-weight: bold;
+    }
+    
+    .history-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    
+    .history-table th, 
+    .history-table td {
+      padding: 8px 12px;
+      border: 1px solid #e0e0e0;
+      text-align: left;
+    }
+    
+    .history-table th {
+      background-color: #f5f5f5;
+      font-weight: 600;
+    }
+    
+    .history-table tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+    
+    .history-table tr:hover {
+      background-color: #f0f7ff;
+    }
+    
+    /* MOBİL UYUMLULUK */
     @media (max-width: 768px) {
       body {
-        padding: 20px 15px;
+        padding: 15px;
         margin: 20px auto;
+      }
+      
+      .container {
+        flex-direction: column;
+        gap: 15px;
+      }
+      
+      .left-column, .right-column {
+        min-width: 100%;
       }
       
       .main-categories {
@@ -688,53 +791,13 @@
       }
       
       .direct-products {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      }
+      
+      #orderList, #customerView {
+        max-height: 250px;
       }
     }
-
-
-    .canceled-order {
-    background-color: #ffeeee !important;
-    color: #999;
-  }
-
-  .canceled-order td {
-    text-decoration: line-through;
-  }
-
-  .status-canceled {
-    color: #e74c3c;
-    font-weight: bold;
-  }
-
-  /* Geçmiş siparişler tablosu için stil */
-  .history-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 14px;
-  }
-
-  .history-table th, 
-  .history-table td {
-    padding: 8px 12px;
-    border: 1px solid #e0e0e0;
-    text-align: left;
-  }
-
-  .history-table th {
-    background-color: #f5f5f5;
-    font-weight: 600;
-  }
-
-  .history-table tr:nth-child(even) {
-    background-color: #f9f9f9;
-  }
-
-  .history-table tr:hover {
-    background-color: #f0f7ff;
-  }
-
-
   </style>
 </head>
 <body>
@@ -747,81 +810,92 @@
     </button>
   </div>
 
-  <!-- YENİ KATEGORİ YAPISI -->
-  <div class="main-categories" id="mainCategories">
-    <!-- Ana kategoriler buraya dinamik olarak eklenecek -->
-  </div>
-  
-  <div id="categoryContent" class="category-content-area">
-    <!-- Alt kategoriler ve doğrudan ürünler burada gösterilecek -->
-  </div>
+  <div class="container">
+    <div class="left-column">
+      <!-- YENİ KATEGORİ YAPISI -->
+      <div class="main-categories" id="mainCategories">
+        <!-- Ana kategoriler buraya dinamik olarak eklenecek -->
+      </div>
+      
+      <div id="categoryContent" class="category-content-area">
+        <!-- Alt kategoriler ve doğrudan ürünler burada gösterilecek -->
+      </div>
 
-  <label>Ürün Seçimi:</label>
-  <div id="kahveListesi" class="coffee-selection" role="list" aria-label="Ürün seçenekleri">
-    <i style="grid-column: 1 / -1; text-align: center; color: var(--primary); font-style: normal;">
-      Kategori seçin veya ürün seçin
-    </i>
-  </div>
-  
-  <div class="form-group">
-    <label for="quantity">Adet:</label>
-    <div class="quantity-container" role="group" aria-label="Adet seçimi">
-      <button type="button" aria-label="Adet azalt" onclick="changeQty(-1)">-</button>
-      <input type="text" id="quantity" value="1" readonly aria-live="polite" aria-atomic="true" />
-      <button type="button" aria-label="Adet artır" onclick="changeQty(1)">+</button>
-    </div>
-  </div>
+      <label>Ürün Seçimi:</label>
+      <div id="kahveListesi" class="coffee-selection" role="list" aria-label="Ürün seçenekleri">
+        <i style="grid-column: 1 / -1; text-align: center; color: var(--primary); font-style: normal;">
+          Kategori seçin veya ürün seçin
+        </i>
+      </div>
+      
+      <div class="form-group">
+        <label for="quantity">Adet:</label>
+        <div class="quantity-container" role="group" aria-label="Adet seçimi">
+          <button type="button" aria-label="Adet azalt" onclick="changeQty(-1)">-</button>
+          <input type="text" id="quantity" value="1" readonly aria-live="polite" aria-atomic="true" />
+          <button type="button" aria-label="Adet artır" onclick="changeQty(1)">+</button>
+        </div>
+      </div>
 
-  <div class="action-buttons">
-    <button id="addOrderBtn" onclick="addToOrder()">
-      <i class="fas fa-plus"></i> Siparişe Ekle
-    </button>
-    <button id="confirmBtn" onclick="confirmOrder()">
-      <i class="fas fa-check"></i> Siparişi Onayla
-    </button>
-    <button id="refundBtn" onclick="openRefundModal()">
-      <i class="fas fa-exchange-alt"></i> İade/Değişim
-    </button>
-  </div>
+      <div class="action-buttons">
+        <button id="addOrderBtn" onclick="addToOrder()">
+          <i class="fas fa-plus"></i> Siparişe Ekle
+        </button>
+        <button id="confirmBtn" onclick="confirmOrder()">
+          <i class="fas fa-check"></i> Siparişi Onayla
+        </button>
+        <button id="refundBtn" onclick="openRefundModal()">
+          <i class="fas fa-exchange-alt"></i> İade
+        </button>
+      </div>
+    </div> <!-- left-column sonu -->
 
-  <h3><i class="fas fa-shopping-cart"></i> Aktif Sipariş</h3>
-    <button id="addNameBtn" style="margin-left:10px; padding:5px 10px; background:var(--primary); color:white; border:none; border-radius:4px;">
-    <i class="fas fa-user-plus"></i> İsim Ekle
-  </button>
+    <div class="right-column">
+      <div class="right-panel-section">
+        <h3>
+          <span><i class="fas fa-shopping-cart"></i> Aktif Sipariş</span>
+          <button id="addNameBtn">
+            <i class="fas fa-user-plus"></i> İsim Ekle
+          </button>
+        </h3>
+        <div id="orderList" aria-live="polite"><i>Henüz sipariş eklenmedi.</i></div>
+      </div>
 
-  <div id="orderList" aria-live="polite"><i>Henüz sipariş eklenmedi.</i></div>
+      <div class="right-panel-section">
+        <h3><i class="fas fa-user"></i> Müşteri Görünümü</h3>
+        <div id="customerView" aria-live="polite"><i>Müşteri için sipariş özeti yok.</i></div>
+      </div>
 
-  <h3><i class="fas fa-user"></i> Müşteri Görünümü</h3>
-  <div id="customerView" aria-live="polite"><i>Müşteri için sipariş özeti yok.</i></div>
+      <div class="section">
+        <button class="collapsible" aria-expanded="false">
+          <span><i class="fas fa-history"></i> Satış Geçmişi (Özet)</span>
+          <i class="fas fa-chevron-down"></i>
+        </button>
+        <div class="content" id="salesSummary">
+          <table class="history-table">
+            <thead>
+              <tr>
+                <th>Tarih</th>
+                <th>Sipariş No</th>
+                <th>Ürünler</th>
+                <th>Toplam</th>
+                <th>Durum</th>
+              </tr>
+            </thead>
+            <tbody id="salesHistoryBody">
+              <!-- Dinamik olarak dolacak -->
+            </tbody>
+          </table>
+        </div>
 
-  <div class="section">
-    <button class="collapsible" aria-expanded="false">
-      <span><i class="fas fa-history"></i> Satış Geçmişi (Özet)</span>
-      <i class="fas fa-chevron-down"></i>
-    </button>
-    <div class="content" id="salesSummary">
-  <table class="history-table">
-    <thead>
-      <tr>
-        <th>Tarih</th>
-        <th>Sipariş No</th>
-        <th>Ürünler</th>
-        <th>Toplam</th>
-        <th>Durum</th>
-      </tr>
-    </thead>
-    <tbody id="salesHistoryBody">
-      <!-- Dinamik olarak dolacak -->
-    </tbody>
-  </table>
-</div>
-
-    <button class="collapsible" aria-expanded="false">
-      <span><i class="fas fa-chart-bar"></i> Toplam Satış Adetleri</span>
-      <i class="fas fa-chevron-down"></i>
-    </button>
-    <div class="content" id="salesCounts"></div>
-  </div>
+        <button class="collapsible" aria-expanded="false">
+          <span><i class="fas fa-chart-bar"></i> Toplam Satış Adetleri</span>
+          <i class="fas fa-chevron-down"></i>
+        </button>
+        <div class="content" id="salesCounts"></div>
+      </div>
+    </div> <!-- right-column sonu -->
+  </div> <!-- container sonu -->
 
   <!-- İade/Değişim Modal -->
   <div id="refundModal" class="modal">
@@ -878,21 +952,15 @@
     let selectedOrderForRefund = null;
     let currentCustomerName = "";
 
-
-// İsim ekle butonu fonksiyonu
-document.getElementById("addNameBtn").addEventListener("click", function() {
-  const name = prompt("Müşteri ismini giriniz:");
-  if (name) {
-    currentCustomerName = name;
-    updateOrderDisplay();
-    saveActiveOrder();
-  }
-});
-
-
-
-
-
+    // İsim ekle butonu fonksiyonu
+    document.getElementById("addNameBtn").addEventListener("click", function() {
+      const name = prompt("Müşteri ismini giriniz:");
+      if (name) {
+        currentCustomerName = name;
+        updateOrderDisplay();
+        saveActiveOrder();
+      }
+    });
 
     // Kategori yükleme fonksiyonu
     async function loadCategories() {
@@ -1081,7 +1149,7 @@ document.getElementById("addNameBtn").addEventListener("click", function() {
              alt="${product.ad}" 
              onerror="this.onerror=null; this.src='img/placeholder.jpg'" />
         <p>${product.ad}</p>
-        <div class="price">${product.price}₺</div>
+        <div class="price">${product.price.toFixed(2)}₺</div>
       `;
       
       div.addEventListener("click", () => selectProduct(div, product.ad));
@@ -1189,18 +1257,17 @@ document.getElementById("addNameBtn").addEventListener("click", function() {
         return;
       }
 
-       if (currentCustomerName) {
-    htmlList = `<div class="order-item">
-                  <div>Müşteri: ${currentCustomerName}</div>
-                </div>` + htmlList;
-  }
-
+      if (currentCustomerName) {
+        htmlList = `<div class="order-item">
+                      <div>Müşteri: ${currentCustomerName}</div>
+                    </div>` + htmlList;
+      }
 
       let totalPrice = 0;
       let htmlList = "";
 
       currentOrder.forEach((item, index) => {
-        const price = item.price || 0;
+        const price = item.price.toFixed(2) || "0.00" ;
         totalPrice += item.qty * price;
 
         htmlList += `
@@ -1230,81 +1297,70 @@ document.getElementById("addNameBtn").addEventListener("click", function() {
       saveActiveOrder(); 
     }
 
-
-     async function printTickets(orderId, items, customerName) {
-  try {
-    for (const item of items) {
-      await addDoc(collection(db, "tickets"), {
-        orderId,
-        product: item.product,
-        customerName,
-        timestamp: serverTimestamp(),
-        price: item.price,
-        qty: item.qty
-      });
+    async function printTickets(orderId, items, customerName) {
+      try {
+        for (const item of items) {
+          await addDoc(collection(db, "tickets"), {
+            orderId,
+            product: item.product,
+            customerName,
+            timestamp: serverTimestamp(),
+            price: item.price,
+            qty: item.qty
+          });
+        }
+      } catch (error) {
+        console.error("Fiş oluşturma hatası:", error);
+      }
     }
-  } catch (error) {
-    console.error("Fiş oluşturma hatası:", error);
-  }
-}
-
-
 
     // Yeni eklenen fonksiyon - Toplam satış adetlerini hesaplar
-async function updateSalesCounts() {
-  const salesCountsDiv = document.getElementById('salesCounts');
-  try {
-    // İade edilen sipariş ID'lerini al
-    const refundsSnapshot = await getDocs(collection(db, "refunds"));
-    const refundedOrderIds = refundsSnapshot.docs.map(doc => doc.data().orderId);
+    async function updateSalesCounts() {
+      const salesCountsDiv = document.getElementById('salesCounts');
+      try {
+        // İade edilen sipariş ID'lerini al
+        const refundsSnapshot = await getDocs(collection(db, "refunds"));
+        const refundedOrderIds = refundsSnapshot.docs.map(doc => doc.data().orderId);
 
-    // Tüm satışları al
-    const salesSnapshot = await getDocs(collection(db, "sales"));
-    const productCounts = {};
+        // Tüm satışları al
+        const salesSnapshot = await getDocs(collection(db, "sales"));
+        const productCounts = {};
 
-    // Satışları işle
-    salesSnapshot.forEach(doc => {
-      // İade edilen siparişleri atla
-      if (refundedOrderIds.includes(doc.id)) return;
+        // Satışları işle
+        salesSnapshot.forEach(doc => {
+          // İade edilen siparişleri atla
+          if (refundedOrderIds.includes(doc.id)) return;
 
-      const order = doc.data();
-      order.items.forEach(item => {
-        if (!productCounts[item.product]) {
-          productCounts[item.product] = 0;
+          const order = doc.data();
+          order.items.forEach(item => {
+            if (!productCounts[item.product]) {
+              productCounts[item.product] = 0;
+            }
+            productCounts[item.product] += item.qty;
+          });
+        });
+
+        // HTML oluştur
+        if (Object.keys(productCounts).length === 0) {
+          salesCountsDiv.innerHTML = "<p>Henüz satış yok.</p>";
+          return;
         }
-        productCounts[item.product] += item.qty;
-      });
-    });
 
-    // HTML oluştur
-    if (Object.keys(productCounts).length === 0) {
-      salesCountsDiv.innerHTML = "<p>Henüz satış yok.</p>";
-      return;
+        let html = '<ul style="list-style-type:none; padding:0;">';
+        for (const [product, count] of Object.entries(productCounts)) {
+          html += `<li style="padding:8px; border-bottom:1px solid #eee;">
+                    <strong>${product}:</strong> ${count} adet
+                  </li>`;
+        }
+        html += '</ul>';
+
+        salesCountsDiv.innerHTML = html;
+
+      } catch (error) {
+        console.error("Toplam satış adetleri yüklenirken hata:", error);
+        salesCountsDiv.innerHTML = `<p>Hata: ${error.message}</p>`;
+      }
     }
-
-    let html = '<ul style="list-style-type:none; padding:0;">';
-    for (const [product, count] of Object.entries(productCounts)) {
-      html += `<li style="padding:8px; border-bottom:1px solid #eee;">
-                <strong>${product}:</strong> ${count} adet
-              </li>`;
-    }
-    html += '</ul>';
-
-    salesCountsDiv.innerHTML = html;
-
-  } catch (error) {
-    console.error("Toplam satış adetleri yüklenirken hata:", error);
-    salesCountsDiv.innerHTML = `<p>Hata: ${error.message}</p>`;
-  }
-}
-
-
-
-
-
-
-
-
 
     async function saveActiveOrder() {
       if (currentOrder.length === 0) return;
@@ -1372,92 +1428,91 @@ async function updateSalesCounts() {
     }
 
     // Satış geçmişi güncelleme
-   // Satış geçmişini güncelleyen fonksiyonu bulun ve şu şekilde değiştirin:
-async function updateSalesDisplays() {
-  const salesHistoryBody = document.getElementById("salesHistoryBody");
-  
-  try {
-    // İade ve iptal bilgilerini yükle
-    const refundsSnapshot = await getDocs(collection(db, "refunds"));
-    const canceledSnapshot = await getDocs(
-      query(collection(db, "sales"), where("canceled", "==", true))
-    );
+    async function updateSalesDisplays() {
+      const salesHistoryBody = document.getElementById("salesHistoryBody");
+      
+      try {
+        // İade ve iptal bilgilerini yükle
+        const refundsSnapshot = await getDocs(collection(db, "refunds"));
+        const canceledSnapshot = await getDocs(
+          query(collection(db, "sales"), where("canceled", "==", true))
+        );
 
-    const refundedOrderIds = refundsSnapshot.docs.map(doc => doc.data().orderId);
-    const canceledOrderIds = canceledSnapshot.docs.map(doc => doc.id);
+        const refundedOrderIds = refundsSnapshot.docs.map(doc => doc.data().orderId);
+        const canceledOrderIds = canceledSnapshot.docs.map(doc => doc.id);
 
-    const q = query(collection(db, "sales"), 
-             orderBy("timestamp", "desc"), 
-             limit(50));
-    
-    const querySnapshot = await getDocs(q);
-    
-    if (querySnapshot.empty) {
-      salesHistoryBody.innerHTML = `<tr><td colspan="5">Henüz sipariş yok</td></tr>`;
-      return;
+        const q = query(collection(db, "sales"), 
+                 orderBy("timestamp", "desc"), 
+                 limit(50));
+        
+        const querySnapshot = await getDocs(q);
+        
+        if (querySnapshot.empty) {
+          salesHistoryBody.innerHTML = `<tr><td colspan="5">Henüz sipariş yok</td></tr>`;
+          return;
+        }
+
+        let tbodyContent = "";
+        
+        querySnapshot.forEach(doc => {
+          const data = doc.data();
+          const isRefunded = refundedOrderIds.includes(doc.id);
+          const isCanceled = canceledOrderIds.includes(doc.id);
+          
+          // Tarih formatlama
+          let date = "Tarih bilgisi yok";
+          if (data.timestamp && typeof data.timestamp.toDate === 'function') {
+            date = data.timestamp.toDate().toLocaleString("tr-TR");
+          } else if (typeof data.timestamp === "string") {
+            date = new Date(data.timestamp).toLocaleString("tr-TR");
+          }
+          
+          // Ürün listesi
+          const products = data.items.map(i => `${i.qty}x ${i.product}`).join(', ');
+          
+          // Durum bilgisi
+          let status = "Tamamlandı";
+          let statusClass = "";
+          if (isRefunded) {
+            status = "İade Edildi";
+            statusClass = "status-canceled";
+          } else if (isCanceled) {
+            status = "İptal Edildi";
+            statusClass = "status-canceled";
+          }
+          
+          // Satır stili
+          const rowClass = isRefunded || isCanceled ? "canceled-order" : "";
+          
+          tbodyContent += `
+            <tr class="${rowClass}">
+              <td>${date}</td>
+              <td>${doc.id.substring(0, 6)}</td>
+              <td>${products}</td>
+              <td>${data.total}₺</td>
+              <td class="${statusClass}">${status}</td>
+            </tr>
+          `;
+        });
+        
+        salesHistoryBody.innerHTML = tbodyContent;
+        
+      } catch (error) {
+        console.error("Satış geçmişi yüklenirken hata:", error);
+        salesHistoryBody.innerHTML = `<tr><td colspan="5">Hata: ${error.message}</td></tr>`;
+      }
     }
 
-    let tbodyContent = "";
-    
-    querySnapshot.forEach(doc => {
-      const data = doc.data();
-      const isRefunded = refundedOrderIds.includes(doc.id);
-      const isCanceled = canceledOrderIds.includes(doc.id);
-      
-      // Tarih formatlama
-      let date = "Tarih bilgisi yok";
-      if (data.timestamp && typeof data.timestamp.toDate === 'function') {
-        date = data.timestamp.toDate().toLocaleString("tr-TR");
-      } else if (typeof data.timestamp === "string") {
-        date = new Date(data.timestamp).toLocaleString("tr-TR");
-      }
-      
-      // Ürün listesi
-      const products = data.items.map(i => `${i.qty}x ${i.product}`).join(', ');
-      
-      // Durum bilgisi
-      let status = "Tamamlandı";
-      let statusClass = "";
-      if (isRefunded) {
-        status = "İade Edildi";
-        statusClass = "status-canceled";
-      } else if (isCanceled) {
-        status = "İptal Edildi";
-        statusClass = "status-canceled";
-      }
-      
-      // Satır stili
-      const rowClass = isRefunded || isCanceled ? "canceled-order" : "";
-      
-      tbodyContent += `
-        <tr class="${rowClass}">
-          <td>${date}</td>
-          <td>${doc.id.substring(0, 6)}</td>
-          <td>${products}</td>
-          <td>${data.total}₺</td>
-          <td class="${statusClass}">${status}</td>
-        </tr>
-      `;
+    // Realtime güncelleme için listener ekle
+    onSnapshot(collection(db, "sales"), () => {
+      updateSalesDisplays();
+      updateSalesCounts();
     });
-    
-    salesHistoryBody.innerHTML = tbodyContent;
-    
-  } catch (error) {
-    console.error("Satış geçmişi yüklenirken hata:", error);
-    salesHistoryBody.innerHTML = `<tr><td colspan="5">Hata: ${error.message}</td></tr>`;
-  }
-}
 
-// Realtime güncelleme için listener ekleyin
-onSnapshot(collection(db, "sales"), () => {
-  updateSalesDisplays();
-  updateSalesCounts(); // YENİ EKLENDİ
-});
-
-onSnapshot(collection(db, "refunds"), () => {
-  updateSalesDisplays();
-  updateSalesCounts(); // YENİ EKLENDİ
-});
+    onSnapshot(collection(db, "refunds"), () => {
+      updateSalesDisplays();
+      updateSalesCounts();
+    });
 
     // Ürünleri yükle
     async function loadProducts() {
@@ -1527,72 +1582,72 @@ onSnapshot(collection(db, "refunds"), () => {
 
     // Siparişi onayla
     async function confirmOrder() {
-  if (currentOrder.length === 0) {
-    alert("Siparişte ürün yok.");
-    return;
-  }
-
-  const requiredStocks = {};
-  let totalPrice = 0;
-
-  for (let item of currentOrder) {
-    const spec = productSpecs[item.product];
-    if (!spec) continue;
-
-    totalPrice += item.qty * spec.price;
-
-    for (const [ingredient, amount] of Object.entries(spec)) {
-      if (ingredient === 'price') continue;
-      requiredStocks[ingredient] = (requiredStocks[ingredient] || 0) + (item.qty * amount);
-    }
-  }
-
-  try {
-    for (const [name, required] of Object.entries(requiredStocks)) {
-      const available = stockData[name] || 0;
-      if (available < required) {
-        throw new Error(`Yeterli ${name} stoğu yok! Gereken: ${required}, Mevcut: ${available}`);
+      if (currentOrder.length === 0) {
+        alert("Siparişte ürün yok.");
+        return;
       }
+
+      const requiredStocks = {};
+      let totalPrice = 0;
+
+      for (let item of currentOrder) {
+        const spec = productSpecs[item.product];
+        if (!spec) continue;
+
+        totalPrice += item.qty * spec.price;
+
+        for (const [ingredient, amount] of Object.entries(spec)) {
+          if (ingredient === 'price') continue;
+          requiredStocks[ingredient] = (requiredStocks[ingredient] || 0) + (item.qty * amount);
+        }
+      }
+
+      try {
+        for (const [name, required] of Object.entries(requiredStocks)) {
+          const available = stockData[name] || 0;
+          if (available < required) {
+            throw new Error(`Yeterli ${name} stoğu yok! Gereken: ${required}, Mevcut: ${available}`);
+          }
+        }
+
+        if (!confirm(`Toplam Tutar: ${totalPrice}₺\nOnaylıyor musunuz?`)) return;
+
+        // Siparişi Firestore'a ekle ve referansını al
+        const newOrderRef = await addDoc(collection(db, "sales"), {
+          items: currentOrder,
+          total: totalPrice,
+          timestamp: serverTimestamp(),
+          user: currentUserEmail
+        });
+
+        // İsim varsa biletleri yazdır
+        if (currentCustomerName) {
+          await printTickets(newOrderRef.id, currentOrder, currentCustomerName);
+        }
+
+        // Stokları güncelle
+        for (const [name, required] of Object.entries(requiredStocks)) {
+          const newStock = (stockData[name] || 0) - required;
+          await updateStock(name, newStock);
+          stockData[name] = newStock;
+        }
+
+        // Aktif siparişi sil
+        await deleteDoc(doc(db, "active_orders", "tekSiparis"));
+        window.activeOrderId = null;
+
+        alert("Sipariş başarıyla tamamlandı.");
+        currentOrder = [];
+        updateOrderDisplay();
+        updateSalesDisplays();
+
+      } catch (error) {
+        console.error("Sipariş hatası:", error);
+        alert(error.message);
+      }
+
+      currentCustomerName = ""; // İsmi sıfırla
     }
-
-    if (!confirm(`Toplam Tutar: ${totalPrice}₺\nOnaylıyor musunuz?`)) return;
-
-    // Siparişi Firestore'a ekle ve referansını al
-    const newOrderRef = await addDoc(collection(db, "sales"), {
-      items: currentOrder,
-      total: totalPrice,
-      timestamp: serverTimestamp(),
-      user: currentUserEmail
-    });
-
-    // İsim varsa biletleri yazdır (DÜZELTME BURADA!)
-    if (currentCustomerName) {
-      await printTickets(newOrderRef.id, currentOrder, currentCustomerName);
-    }
-
-    // Stokları güncelle
-    for (const [name, required] of Object.entries(requiredStocks)) {
-      const newStock = (stockData[name] || 0) - required;
-      await updateStock(name, newStock);
-      stockData[name] = newStock;
-    }
-
-    // Aktif siparişi sil
-    await deleteDoc(doc(db, "active_orders", "tekSiparis"));
-    window.activeOrderId = null;
-
-    alert("Sipariş başarıyla tamamlandı.");
-    currentOrder = [];
-    updateOrderDisplay();
-    updateSalesDisplays();
-
-  } catch (error) {
-    console.error("Sipariş hatası:", error);
-    alert(error.message);
-  }
-
-  currentCustomerName = ""; // İsmi sıfırla
-}
 
     // İade modalını aç
     async function openRefundModal() {
@@ -1630,55 +1685,54 @@ onSnapshot(collection(db, "refunds"), () => {
 
     // Son siparişleri yükle
     async function loadLastOrders() {
-  try {
-    const refundsSnapshot = await getDocs(collection(db, "refunds"));
-    const refundedOrderIds = refundsSnapshot.docs.map(doc => doc.data().orderId);
-    
-    const q = query(collection(db, "sales"),    
-             orderBy("timestamp", "desc"), 
-             limit(10));
-    
-    const querySnapshot = await getDocs(q);
-    const container = document.getElementById('lastOrdersList');
-    container.innerHTML = '';
-    
-    querySnapshot.forEach(doc => {
-      if (refundedOrderIds.includes(doc.id)) return;
-      
-      const data = doc.data();
-      let date = "Tarih bilgisi yok";
-      if (data.timestamp && typeof data.timestamp.toDate === 'function') {
-        date = data.timestamp.toDate().toLocaleString("tr-TR");
-      } else if (typeof data.timestamp === "string") {
-        date = new Date(data.timestamp).toLocaleString("tr-TR");
-      }
-      
-      const item = document.createElement('div');
-      item.className = 'history-item';
-      item.dataset.id = doc.id;
-      item.innerHTML = `
-        <div class="order-id">Sipariş #${doc.id.slice(0, 6)}</div>
-        <div class="items">${data.items.map(i => `${i.qty}x ${i.product}`).join(', ')}</div>
-        <div class="total">${data.total}₺</div>
-        <div class="date">${date}</div>
-      `;
-      
-      // DÜZELTME: Ok fonksiyonu yerine normal fonksiyon kullanıyoruz
-      item.addEventListener('click', function() {
-        document.querySelectorAll('.history-item').forEach(el => {
-          el.classList.remove('selected');
+      try {
+        const refundsSnapshot = await getDocs(collection(db, "refunds"));
+        const refundedOrderIds = refundsSnapshot.docs.map(doc => doc.data().orderId);
+        
+        const q = query(collection(db, "sales"),    
+                 orderBy("timestamp", "desc"), 
+                 limit(10));
+        
+        const querySnapshot = await getDocs(q);
+        const container = document.getElementById('lastOrdersList');
+        container.innerHTML = '';
+        
+        querySnapshot.forEach(doc => {
+          if (refundedOrderIds.includes(doc.id)) return;
+          
+          const data = doc.data();
+          let date = "Tarih bilgisi yok";
+          if (data.timestamp && typeof data.timestamp.toDate === 'function') {
+            date = data.timestamp.toDate().toLocaleString("tr-TR");
+          } else if (typeof data.timestamp === "string") {
+            date = new Date(data.timestamp).toLocaleString("tr-TR");
+          }
+          
+          const item = document.createElement('div');
+          item.className = 'history-item';
+          item.dataset.id = doc.id;
+          item.innerHTML = `
+            <div class="order-id">Sipariş #${doc.id.slice(0, 6)}</div>
+            <div class="items">${data.items.map(i => `${i.qty}x ${i.product}`).join(', ')}</div>
+            <div class="total">${data.total}₺</div>
+            <div class="date">${date}</div>
+          `;
+          
+          item.addEventListener('click', function() {
+            document.querySelectorAll('.history-item').forEach(el => {
+              el.classList.remove('selected');
+            });
+            this.classList.add('selected');
+            selectedOrderForRefund = { id: doc.id, ...data };
+            selectOrderForRefund(doc.id, data);
+          });
+          
+          container.appendChild(item);
         });
-        this.classList.add('selected');
-        selectedOrderForRefund = { id: doc.id, ...data };
-        selectOrderForRefund(doc.id, data);
-      });
-      
-      container.appendChild(item);
-    });
-  } catch (error) {
-    console.error("Son siparişler yüklenirken hata:", error);
-  }
-}
+      } catch (error) {
+        console.error("Son siparişler yüklenirken hata:", error);
+      }
+    }
 
     // Sipariş seçildiğinde ürünleri listele
     function selectOrderForRefund(orderId, orderData) {
@@ -1798,7 +1852,6 @@ onSnapshot(collection(db, "refunds"), () => {
 
     // Sayfa yüklendiğinde
     document.addEventListener("DOMContentLoaded", () => {
-
       
       // Arama input'una event listener ekle
       document.getElementById('productSearch').addEventListener('input', searchProducts);

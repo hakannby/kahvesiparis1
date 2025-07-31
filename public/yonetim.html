@@ -636,7 +636,7 @@
           <table id="sonSiparisler">
             <thead>
               <tr>
-                <th>Müşteri</th>
+                <th>Personel</th>
                 <th>Tutar</th>
                 <th>Tarih</th>
               </tr>
@@ -767,7 +767,7 @@
           
           <div class="form-group">
             <label>Fiyat (₺):</label>
-            <input type="number" id="newProductPrice" placeholder="Örn: 120" min="0">
+            <input type="number" id="newProductPrice" placeholder="Örn: 120" min="0" step="0.01">
           </div>
           
           <div class="form-group">
@@ -850,7 +850,7 @@
             <thead>
               <tr>
                 <th>Seç</th>
-                <th>Müşteri</th>
+                <th>Personel</th>
                 <th>Ürünler</th>
                 <th>Toplam</th>
                 <th>Tarih</th>
@@ -1567,7 +1567,7 @@ function updateCariTable(snapshot) {
         tbodyContent += `
           <tr>
             <td>${data.name}</td>
-            <td>${data.price}₺</td>
+            <td>${data.price.toFixed(2)}₺</td>
             <td>${categoryName}</td>
             <td class="action-cell">
               <button class="btn-danger action-btn" onclick="deleteProduct('${doc.id}')">
@@ -1630,7 +1630,7 @@ function updateCariTable(snapshot) {
 
     async function saveNewProduct() {
       const name = document.getElementById("newProductName").value.trim();
-      const price = parseInt(document.getElementById("newProductPrice").value);
+      const price = parseFloat(document.getElementById("newProductPrice").value);
       const category = document.getElementById("newProductCategory").value;
       const messageDiv = document.getElementById("productMessage");
       
@@ -2626,7 +2626,7 @@ async function generateOrderReport() {
 
         doc.autoTable({
           startY: currentY,
-          head: [['Müşteri', 'Ürünler', 'Tutar', 'Tarih']],
+          head: [['Personel', 'Ürünler', 'Tutar', 'Tarih']],
           body: tableData,
           styles: { font: "courier", fontSize: 8 },
           headStyles: { fontStyle: 'bold' }
