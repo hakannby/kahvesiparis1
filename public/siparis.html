@@ -25,9 +25,9 @@
     
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      max-width: 1200px;
-      margin: 40px auto;
-      padding: 30px;
+      max-width: 1600px;
+      margin: 20px auto;
+      padding: 10px;
       background: #fafafa;
       border-radius: 16px;
       box-shadow: var(--shadow);
@@ -38,9 +38,9 @@
     
     h2 {
       text-align: center;
-      margin-bottom: 30px;
+      margin-bottom: 15px;
       color: var(--dark);
-      padding-bottom: 15px;
+      padding-bottom: 5px;
       border-bottom: 2px solid #e0e6ed;
     }
     
@@ -48,7 +48,7 @@
     .container {
       display: flex;
       flex-wrap: wrap;
-      gap: 25px;
+      gap: 5px;
     }
     
     .left-column {
@@ -70,8 +70,8 @@
       flex-wrap: wrap;
       gap: 12px;
       justify-content: center;
-      margin-bottom: 20px;
-      padding: 15px;
+      margin-bottom: 5px;
+      padding: 5px;
       background: var(--white);
       border-radius: 12px;
       box-shadow: var(--shadow);
@@ -79,7 +79,7 @@
     }
     
     .main-category-btn {
-      padding: 12px 20px;
+      padding: 25px 20px;
       background: var(--white);
       border: 2px solid var(--primary-light);
       border-radius: 30px;
@@ -120,7 +120,7 @@
       padding: 20px;
       margin-bottom: 20px;
       box-shadow: var(--shadow);
-      border: 1px solid #e0e6ed;
+      border: 1px solid #3f89de;
       display: none;
       text-align: center;
     }
@@ -139,12 +139,12 @@
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
-      margin-bottom: 20px;
+      margin-bottom: 5px;
       justify-content: center;
     }
     
     .subcategory-btn {
-      padding: 10px 16px;
+      padding: 20px 16px;
       background: var(--light);
       border: none;
       border-radius: 20px;
@@ -166,6 +166,7 @@
       box-shadow: 0 4px 8px rgba(74, 137, 220, 0.2);
     }
     
+    /*
     .direct-products-title {
       font-weight: bold;
       margin: 15px 0 10px 0;
@@ -175,11 +176,11 @@
       padding: 8px;
       background: rgba(74, 137, 220, 0.1);
       border-radius: 8px;
-    }
+    }   */
     
     .direct-products {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
       gap: 12px;
       justify-items: center;
     }
@@ -189,7 +190,7 @@
       border-radius: 8px;
       padding: 12px;
       text-align: center;
-      font-size: 13px;
+      font-size: 15px;
       cursor: pointer;
       box-shadow: 0 3px 6px rgba(0,0,0,0.08);
       transition: all 0.2s;
@@ -206,7 +207,7 @@
     
     .direct-product img {
       width: 100%;
-      height: 60px;
+      height: 40px;
       object-fit: cover;
       border-radius: 6px;
       margin-bottom: 8px;
@@ -1021,79 +1022,47 @@
     
     // Kategori içeriğini göster
     function showCategoryContent(mainCat, allSubCategories) {
-      const contentArea = document.getElementById('categoryContent');
-      const subCategories = allSubCategories.filter(subCat => subCat.parent === mainCat.id);
-      
-      // Doğrudan ürünleri bul
-      const directProducts = [];
-      for (const category in productMenu) {
-        if (category === mainCat.slug) {
-          directProducts.push(...productMenu[category]);
-        }
-      }
-      
-      // İçerik oluştur
-      let contentHTML = '';
-      
-      // Alt kategoriler varsa göster
-      if (subCategories.length > 0) {
-        contentHTML += `
-          <div class="subcategories">
-            ${subCategories.map(subCat => `
-              <button class="subcategory-btn" data-slug="${subCat.slug}">
-                ${subCat.name}
-              </button>
-            `).join('')}
-          </div>
-        `;
-      }
-      
-      // Doğrudan ürünler varsa göster
-      if (directProducts.length > 0) {
-        contentHTML += `
-          <div class="direct-products-title">Doğrudan Ürünler</div>
-          <div class="direct-products">
-            ${directProducts.map(product => `
-              <div class="direct-product" data-name="${product.ad}">
-                <img src="${product.resim}" alt="${product.ad}" 
-                     onerror="this.onerror=null; this.src='img/placeholder.jpg'">
-                <div class="name">${product.ad}</div>
-                <div class="price">${product.price}₺</div>
-              </div>
-            `).join('')}
-          </div>
-        `;
-      }
-      
-      // İçeriği güncelle ve göster
-      contentArea.innerHTML = contentHTML;
-      contentArea.classList.add('active');
-      
-      // Alt kategori butonlarına event ekle
-      contentArea.querySelectorAll('.subcategory-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-          selectSubCategory(this.dataset.slug);
-        });
-      });
-      
-      // Doğrudan ürünlere event ekle
-      contentArea.querySelectorAll('.direct-product').forEach(product => {
-        product.addEventListener('click', function() {
-          selectDirectProduct(this.dataset.name);
-        });
-      });
-      
-      // İlk alt kategoriyi otomatik seç
-      if (subCategories.length > 0) {
-        const firstSubBtn = contentArea.querySelector('.subcategory-btn');
-        if (firstSubBtn) {
-          selectSubCategory(firstSubBtn.dataset.slug);
-        }
-      } else if (directProducts.length > 0) {
-        // Alt kategori yok ama doğrudan ürünler varsa
-        listProducts(mainCat.slug);
-      }
+  const contentArea = document.getElementById('categoryContent');
+  const subCategories = allSubCategories.filter(subCat => subCat.parent === mainCat.id);
+  
+  // İçerik oluştur
+  let contentHTML = '';
+  
+  // Alt kategoriler varsa göster
+  if (subCategories.length > 0) {
+    contentHTML += `
+      <div class="subcategories">
+        ${subCategories.map(subCat => `
+          <button class="subcategory-btn" data-slug="${subCat.slug}">
+            ${subCat.name}
+          </button>
+        `).join('')}
+      </div>
+    `;
+  }
+  
+  // İçeriği güncelle ve göster
+  contentArea.innerHTML = contentHTML;
+  contentArea.classList.add('active');
+  
+  // Alt kategori butonlarına event ekle
+  contentArea.querySelectorAll('.subcategory-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      selectSubCategory(this.dataset.slug);
+    });
+  });
+  
+  // İlk alt kategoriyi otomatik seç VEYA doğrudan ürünleri listele
+  if (subCategories.length > 0) {
+    const firstSubBtn = contentArea.querySelector('.subcategory-btn');
+    if (firstSubBtn) {
+      selectSubCategory(firstSubBtn.dataset.slug);
     }
+  } else {
+    // Alt kategori yoksa ana kategorinin ürünlerini doğrudan listele
+    listProducts(mainCat.slug);
+  }
+}
 
     // Alt kategori seçimi
     function selectSubCategory(slug) {
