@@ -814,6 +814,7 @@
               <th>Tarih</th>
               <th>Ödeme Tutarı</th>
               <th>Kullanıcı</th>
+              <th>Ödeme Tipi</th>
             </tr>
           </thead>
           <tbody id="paymentHistoryBody">
@@ -1159,7 +1160,7 @@
 
       try {
         // Firestore'a kaydet
-        await db.collection(EXPENSES_COLLECTION).add({
+        const docRef = await db.collection(EXPENSES_COLLECTION).add({
           type: "stock",
           invoiceName: invoiceName,
           description: description,
@@ -1172,6 +1173,20 @@
           payableAmount: payable,
           date: firebase.firestore.FieldValue.serverTimestamp()
         });
+
+        if (paid > 0) {
+      await db.collection(PAYMENT_HISTORY_COLLECTION).add({
+        expenseId: docRef.id,
+        amount: paid,
+        date: firebase.firestore.FieldValue.serverTimestamp(),
+        userId: currentUser.uid,
+        userEmail: currentUser.email,
+        invoiceName: invoiceName,
+        paymentType: "İlk Ödeme" // Yeni alan
+      });
+    }
+
+        
 
         showMessage(messageDiv, "✔️ Stok gideri başarıyla eklendi", 'success');
         closeModal('stockExpenseModal');
@@ -1651,21 +1666,19 @@
         }
         
         let historyHTML = "";
-        querySnapshot.forEach(doc => {
-          const payment = doc.data();
-          console.log("Ödeme kaydı:", payment);
-          
-          // Tarih formatlama
-          const formattedDate = formatFirestoreDate(payment.date);
-          
-          historyHTML += `
-            <tr>
-              <td>${formattedDate}</td>
-              <td>${payment.amount.toFixed(2)} ₺</td>
-              <td>${payment.userEmail}</td>
-            </tr>
-          `;
-        });
+    querySnapshot.forEach(doc => {
+      const payment = doc.data();
+      const formattedDate = formatFirestoreDate(payment.date);
+      
+      historyHTML += `
+        <tr>
+          <td>${formattedDate}</td>
+          <td>${payment.amount.toFixed(2)} ₺</td>
+          <td>${payment.userEmail}</td>
+          <td>${payment.paymentType || "Sonraki Ödeme"}</td> <!-- Yeni sütun -->
+        </tr>
+      `;
+    });
         
         tbody.innerHTML = historyHTML;
         
