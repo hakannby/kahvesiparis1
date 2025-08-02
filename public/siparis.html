@@ -76,10 +76,10 @@
       border-radius: 12px;
       box-shadow: var(--shadow);
       text-align: center;
-    }
+    }                                             /*margin-bottom kısımlarını azalt. dikey boşluk azalır */
     
     .main-category-btn {
-      padding: 25px 20px;
+      padding: 20px 20px;
       background: var(--white);
       border: 2px solid var(--primary-light);
       border-radius: 30px;
@@ -110,8 +110,12 @@
     }
     
     .main-category-btn i {
-      font-size: 18px;
+      font-size: 18px;          /*ANA KATEGORİ SİMGE BOYUTU */
     }
+
+    .main-category-btn {
+  font-size: 16px;              /* ANA KATEGORİ YAZI BOYUTU */
+}
     
     /* ALT KATEGORİ VE ÜRÜNLER ALANI (ORTA HİZALI) */
     .category-content-area {
@@ -271,8 +275,8 @@
     }
     
     .coffee-option img {
-      width: 100%;
-      height: 120px;
+      width: 80%;
+      height: 100px;          /* ÜRÜN SEÇİMİ KARTLAR FOTO BÜYÜKLÜĞÜ*/
       object-fit: cover;
       border-radius: 12px;
       margin-bottom: 10px;
@@ -284,7 +288,7 @@
     .coffee-option p {
       font-weight: 600;
       color: var(--dark);
-      font-size: 15px;
+      font-size: 18px;           /*ÜRÜN SEÇİMİ KARTLAR YAZI BOYUTU*/
       margin: 0;
       user-select: none;
     }
@@ -954,7 +958,10 @@
     let currentCustomerName = "";
 
     // İsim ekle butonu fonksiyonu
-    document.getElementById("addNameBtn").addEventListener("click", function() {
+    document.addEventListener('DOMContentLoaded', function() {
+  const addNameBtn = document.getElementById('addNameBtn');
+  if (addNameBtn) {
+    addNameBtn.addEventListener('click', function() {
       const name = prompt("Müşteri ismini giriniz:");
       if (name) {
         currentCustomerName = name;
@@ -962,6 +969,8 @@
         saveActiveOrder();
       }
     });
+  }
+});
 
     // Kategori yükleme fonksiyonu
     async function loadCategories() {

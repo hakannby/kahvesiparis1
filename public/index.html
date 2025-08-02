@@ -203,6 +203,21 @@
         alert("Giriş hatası: " + err.message);
       }
     };
+
+    // Email input'una ENTER tuşu desteği
+  document.getElementById('email').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      login();
+    }
+  });
+
+  // Şifre input'una ENTER tuşu desteği
+  document.getElementById('password').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      login();
+    }
+  });
+  
   </script>
 </body>
 </html>
