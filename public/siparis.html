@@ -859,8 +859,8 @@
       <div class="right-panel-section">
         <h3>
           <span><i class="fas fa-shopping-cart"></i> Aktif Sipariş</span>
-          <button id="addNameBtn">
-            <i class="fas fa-user-plus"></i> İsim Ekle
+          <button id="addNameBtn" onclick="addCustomerName()">
+              <i class="fas fa-user-plus"></i> İsim Ekle
           </button>
         </h3>
         <div id="orderList" aria-live="polite"><i>Henüz sipariş eklenmedi.</i></div>
@@ -908,6 +908,20 @@
       <!-- Dinamik olarak oluşturulacak -->
     </div>
   </div>
+
+      <div id="nameModal" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); align-items:center; justify-content:center; z-index:9999;">
+  <div style="background:white; padding:30px; border-radius:12px; max-width:400px; width:90%; box-shadow:0 5px 20px rgba(0,0,0,0.2);">
+    <h3>Müşteri İsmi</h3>
+    <input type="text" id="nameInput" placeholder="İsim giriniz..." style="width:100%; padding:10px; margin:15px 0; font-size:16px;" />
+    <div style="display:flex; justify-content:space-between;">
+      <button onclick="submitName()" style="padding:10px 20px; background:#4a89dc; color:white; border:none; border-radius:6px;">Kaydet</button>
+      <button onclick="closeNameModal()" style="padding:10px 20px; background:#ccc; border:none; border-radius:6px;">İptal</button>
+    </div>
+  </div>
+</div>
+
+
+
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js";
@@ -958,20 +972,27 @@
     let currentCustomerName = "";
 
     // İsim ekle butonu fonksiyonu
-    document.addEventListener('DOMContentLoaded', function() {
-  const addNameBtn = document.getElementById('addNameBtn');
-  if (addNameBtn) {
-    addNameBtn.addEventListener('click', function() {
-      const name = prompt("Müşteri ismini giriniz:");
-      if (name) {
-        currentCustomerName = name;
-        updateOrderDisplay();
-        saveActiveOrder();
-      }
-    });
-  }
-});
+   window.addCustomerName = function () {
+  document.getElementById("nameModal").style.display = "flex";
+  document.getElementById("nameInput").value = "";
+  setTimeout(() => document.getElementById("nameInput").focus(), 100);
+};
 
+// Kaydet butonuna tıklanınca çalışır
+window.submitName = function () {
+  const name = document.getElementById("nameInput").value.trim();
+  if (name) {
+    currentCustomerName = name;
+    updateOrderDisplay();
+    saveActiveOrder();
+  }
+  closeNameModal();
+};
+
+// Modalı kapatır
+window.closeNameModal = function () {
+  document.getElementById("nameModal").style.display = "none";
+};
     // Kategori yükleme fonksiyonu
     async function loadCategories() {
       const container = document.getElementById('mainCategories');
@@ -1226,47 +1247,51 @@
 
     // Siparişi güncelle
     function updateOrderDisplay() {
-      const listDiv = document.getElementById("orderList");
-      const customerView = document.getElementById("customerView");
+  const listDiv = document.getElementById("orderList");
+  const customerView = document.getElementById("customerView");
 
-      if (currentOrder.length === 0) {
-        listDiv.innerHTML = "<i>Henüz sipariş eklenmedi.</i>";
-        customerView.innerHTML = "<i>Müşteri için sipariş özeti yok.</i>";
-        return;
-      }
+  if (currentOrder.length === 0) {
+    listDiv.innerHTML = "<i>Henüz sipariş eklenmedi.</i>";
+    customerView.innerHTML = "<i>Müşteri için sipariş özeti yok.</i>";
+    return;
+  }
 
-      if (currentCustomerName) {
-        htmlList = `<div class="order-item">
-                      <div>Müşteri: ${currentCustomerName}</div>
-                    </div>` + htmlList;
-      }
+  let htmlList = "";  // ✅ HATALI OLAN BU YOKTU
 
-      let totalPrice = 0;
-      let htmlList = "";
-
-      currentOrder.forEach((item, index) => {
-        const price = item.price.toFixed(2) || "0.00" ;
-        totalPrice += item.qty * price;
-
-        htmlList += `
-          <div class="order-item">
-            <div>${item.qty} x ${item.product} (${price}₺)</div>
-            <div class="remove-item" onclick="removeFromOrder(${index})">
-              <i class="fas fa-times"></i>
-            </div>
-          </div>
-        `;
-      });
-
-      listDiv.innerHTML = htmlList;
-      customerView.innerHTML = `
-        <div>${htmlList.replace(/class="order-item"/g, 'class="order-item" style="border:none; padding:5px 0;"')}</div>
-        <hr style="margin: 15px 0;">
-        <div style="text-align: right; font-size: 18px;">
-          <strong>Toplam: ${totalPrice}₺</strong>
+  currentOrder.forEach((item, index) => {
+    const price = item.price.toFixed(2) || "0.00";
+    htmlList += `
+      <div class="order-item">
+        <div>${item.qty} x ${item.product} (${price}₺)</div>
+        <div class="remove-item" onclick="removeFromOrder(${index})">
+          <i class="fas fa-times"></i>
         </div>
-      `;
-    }
+      </div>
+    `;
+  });
+
+  // Müşteri ismini en başa ekle (varsa)
+  if (currentCustomerName) {
+    htmlList = `
+      <div class="order-item">
+        <div>Müşteri: ${currentCustomerName}</div>
+      </div>
+    ` + htmlList;
+  }
+
+  listDiv.innerHTML = htmlList;
+
+  const totalPrice = currentOrder.reduce((sum, item) => sum + (item.qty * item.price), 0);
+
+  customerView.innerHTML = `
+    <div>${htmlList.replace(/class="order-item"/g, 'class="order-item" style="border:none; padding:5px 0;"')}</div>
+    <hr style="margin: 15px 0;">
+    <div style="text-align: right; font-size: 18px;">
+      <strong>Toplam: ${totalPrice.toFixed(2)}₺</strong>
+    </div>
+  `;
+}
+
 
     // Siparişten kaldırma
     function removeFromOrder(index) {
