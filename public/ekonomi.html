@@ -415,6 +415,12 @@
       padding: 10px;
       font-size: 14px;
     }
+
+    /* Ödeme Geçmişi Stilleri */
+    #paymentHistoryTable {
+      width: 100%;
+      margin-top: 15px;
+    }
     
     @media (max-width: 992px) {
       .flex-container {
@@ -423,7 +429,7 @@
       }
     }
     
-    @media (max-width: 768px) {
+    @media (max-width: 1768px) {
       body {
         padding: 15px;
       }
@@ -440,6 +446,31 @@
         padding: 10px;
       }
     }
+
+    /* ÖDEME GEÇMİŞİ TABLOSU İÇİN EK STİL */
+    #paymentHistoryTable {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    
+    #paymentHistoryTable th {
+      background-color: #f2f2f2;
+      padding: 10px;
+      text-align: left;
+      font-weight: bold;
+    }
+    
+    #paymentHistoryTable td {
+      padding: 8px 10px;
+      border-bottom: 1px solid #eee;
+    }
+    
+    #paymentHistoryTable tr:hover {
+      background-color: #f9f9f9;
+    }
+
+
   </style>
 </head>
 
@@ -666,7 +697,7 @@
             <th>Toplam (KDV Dahil) (TL)</th>
             <th>Ödenecek (TL)</th>
             <th>Tarih</th>
-            <th>Ödeme</th>
+            <th>İşlemler</th>
           </tr>
         </thead>
         <tbody>
@@ -769,6 +800,31 @@
     </div>
   </div>
 
+  <!-- ÖDEME GEÇMİŞİ MODALI -->
+  <div id="paymentHistoryModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Ödeme Geçmişi: <span id="paymentHistoryTitle"></span></h3>
+        <button class="close-btn" onclick="closeModal('paymentHistoryModal')">&times;</button>
+      </div>
+      <div class="form-group">
+        <table id="paymentHistoryTable">
+          <thead>
+            <tr>
+              <th>Tarih</th>
+              <th>Ödeme Tutarı</th>
+              <th>Kullanıcı</th>
+            </tr>
+          </thead>
+          <tbody id="paymentHistoryBody">
+            <!-- Ödeme geçmişi buraya eklenecek -->
+          </tbody>
+        </table>
+      </div>
+      <div id="paymentHistoryMessage" class="message"></div>
+    </div>
+  </div>
+
   <script>
     // Firebase konfigürasyonu
     const firebaseConfig = {
@@ -793,6 +849,7 @@
     let allDekontExpenses = []; // Tüm dekont giderlerini sakla
     let allCariExpenses = []; // Tüm cari giderlerini sakla
     const EXPENSES_COLLECTION = "expenses";
+    const PAYMENT_HISTORY_COLLECTION = "paymentHistory"; // Ödeme geçmişi koleksiyonu
 
     // Tarih formatlama fonksiyonu
     function formatFirestoreDate(timestamp) {
@@ -1228,77 +1285,76 @@
     function exportToPDF(tableId, fileName) {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF({
-    orientation: 'portrait' // Yatay modda PDF oluştur
-  });
-      // Tablo başlığını ekle
-  doc.setFont('arial', 'bold');
-  doc.setFontSize(16);
-  doc.text(fileName.replace('_', ' '), 14, 15);
-
-  // Tablo verilerini çıkar
-  const table = document.getElementById(tableId);
-  const headers = [];
-  const rows = [];
-
-    // Başlıkları al (son sütunu hariç tut - "Sil" butonları)
-  const headerCells = table.querySelectorAll('thead tr th');
-  headerCells.forEach((th, index) => {
-    if (index < headerCells.length - 1) { // Son sütunu atla
-      headers.push({
-        header: th.textContent,
-        dataKey: index.toString()
+        orientation: 'portrait'
       });
-    }
-  });
+      // Tablo başlığını ekle
+      doc.setFont('arial', 'bold');
+      doc.setFontSize(16);
+      doc.text(fileName.replace('_', ' '), 14, 15);
 
-  // Satır verilerini al (son sütunu hariç tut)
-  const tableRows = table.querySelectorAll('tbody tr');
-  tableRows.forEach(tr => {
-    const rowData = {};
-    const cells = tr.querySelectorAll('td');
-    cells.forEach((td, index) => {
-      if (index < cells.length - 1) { // Son sütunu atla
-        rowData[index.toString()] = td.textContent;
-      }
-    });
-    if (Object.keys(rowData).length > 0) {
-      rows.push(rowData);
-    }
-  });
+      // Tablo verilerini çıkar
+      const table = document.getElementById(tableId);
+      const headers = [];
+      const rows = [];
 
+      // Başlıkları al (son sütunu hariç tut - "Sil" butonları)
+      const headerCells = table.querySelectorAll('thead tr th');
+      headerCells.forEach((th, index) => {
+        if (index < headerCells.length - 1) { // Son sütunu atla
+          headers.push({
+            header: th.textContent,
+            dataKey: index.toString()
+          });
+        }
+      });
+
+      // Satır verilerini al (son sütunu hariç tut)
+      const tableRows = table.querySelectorAll('tbody tr');
+      tableRows.forEach(tr => {
+        const rowData = {};
+        const cells = tr.querySelectorAll('td');
+        cells.forEach((td, index) => {
+          if (index < cells.length - 1) { // Son sütunu atla
+            rowData[index.toString()] = td.textContent;
+          }
+        });
+        if (Object.keys(rowData).length > 0) {
+          rows.push(rowData);
+        }
+      });
 
       // Tabloyu oluştur
-  doc.autoTable({
-    head: [headers.map(h => h.header)],
-    body: rows.map(row => headers.map(h => row[h.dataKey])),
-    startY: 20,
-    styles: {
-      font: 'arial',
-      fontSize: 7, // Yazı boyutunu küçült
-      cellPadding: 2,
-      overflow: 'linebreak'
-    },
-    headStyles: {
-      fillColor: [41, 128, 185],
-      textColor: 255,
-      fontStyle: 'bold',
-      fontSize: 9
-    },
-    columnStyles: {
-      // Özel sütun stilleri (isteğe bağlı)
-      0: { fontStyle: 'bold' } // İlk sütunu bold yap
-    },
-    didDrawPage: function (data) {
-      // Sayfa altına bilgi ekle
-      doc.setFontSize(8);
-      doc.setTextColor(150);
-      doc.text(
-        `Oluşturulma Tarihi: ${new Date().toLocaleString('tr-TR')} • Sayfa ${data.pageCount}`,
-        data.settings.margin.left,
-        doc.internal.pageSize.height - 5
-      );
-    }
-  });
+      doc.autoTable({
+        head: [headers.map(h => h.header)],
+        body: rows.map(row => headers.map(h => row[h.dataKey])),
+        startY: 20,
+        styles: {
+          font: 'arial',
+          fontSize: 7, // Yazı boyutunu küçült
+          cellPadding: 2,
+          overflow: 'linebreak'
+        },
+        headStyles: {
+          fillColor: [41, 128, 185],
+          textColor: 255,
+          fontStyle: 'bold',
+          fontSize: 9
+        },
+        columnStyles: {
+          // Özel sütun stilleri (isteğe bağlı)
+          0: { fontStyle: 'bold' } // İlk sütunu bold yap
+        },
+        didDrawPage: function (data) {
+          // Sayfa altına bilgi ekle
+          doc.setFontSize(8);
+          doc.setTextColor(150);
+          doc.text(
+            `Oluşturulma Tarihi: ${new Date().toLocaleString('tr-TR')} • Sayfa ${data.pageCount}`,
+            data.settings.margin.left,
+            doc.internal.pageSize.height - 5
+          );
+        }
+      });
       
       doc.save(`${fileName}_${new Date().toLocaleDateString('tr-TR')}.pdf`);
     }
@@ -1307,11 +1363,11 @@
     async function loadDekontExpenses() {
       try {
         const querySnapshot = await db.collection(EXPENSES_COLLECTION)
-      .where("type", "==", "stock")
-      .where("paidAmount", ">", 0)
-      .orderBy("paidAmount") // Önce eşitsizlik filtresi uygulanan alan
-      .orderBy("date", "desc") // Sonra tarihe göre sıralama
-      .get();
+          .where("type", "==", "stock")
+          .where("paidAmount", ">", 0)
+          .orderBy("paidAmount") // Önce eşitsizlik filtresi uygulanan alan
+          .orderBy("date", "desc") // Sonra tarihe göre sıralama
+          .get();
 
         // Tüm dekont giderlerini global değişkene kaydet
         allDekontExpenses = [];
@@ -1392,11 +1448,11 @@
     async function loadCariExpenses() {
       try {
         const querySnapshot = await db.collection(EXPENSES_COLLECTION)
-      .where("type", "==", "stock")
-      .where("payableAmount", ">", 0)
-      .orderBy("payableAmount") // Önce eşitsizlik filtresi uygulanan alan
-      .orderBy("date", "desc") // Sonra tarihe göre sıralama
-      .get();
+          .where("type", "==", "stock")
+          .where("payableAmount", ">", 0)
+          .orderBy("payableAmount") // Önce eşitsizlik filtresi uygulanan alan
+          .orderBy("date", "desc") // Sonra tarihe göre sıralama
+          .get();
 
         // Tüm cari giderlerini global değişkene kaydet
         allCariExpenses = [];
@@ -1438,9 +1494,13 @@
             <td>${expense.totalWithTax.toFixed(2)}</td>
             <td class="payable-cell">${expense.payableAmount.toFixed(2)}</td>
             <td>${date}</td>
-            <td>
+            <td class="action-cell">
               <button class="btn-success action-btn" onclick="openPaymentModal('${expense.id}')">
                 <i class="fas fa-money-bill-wave"></i> Ödeme Yap
+              </button>
+              <button class="btn-primary action-btn" style="margin-top:5px;" 
+                      onclick="viewPaymentHistory('${expense.id}', '${expense.invoiceName.replace(/'/g, "\\'")}')">
+                <i class="fas fa-history"></i> Geçmiş
               </button>
             </td>
           </tr>
@@ -1449,6 +1509,7 @@
 
       tbody.innerHTML = tbodyContent;
     }
+
 
     // Cari filtreleme
     function applyCariFilters() {
@@ -1512,11 +1573,43 @@
         return;
       }
       
+      // ÖNEMLİ: ÖDEME ONAY POPUP'I EKLENDİ
+      const confirmPayment = confirm(`${amount.toFixed(2)} ₺ tutarındaki ödeme işleminden emin misiniz?`);
+      if (!confirmPayment) return;
+      
       try {
         const expenseRef = db.collection(EXPENSES_COLLECTION).doc(currentPaymentExpense.id);
-        await expenseRef.update({
-          paidAmount: firebase.firestore.FieldValue.increment(amount),
-          payableAmount: firebase.firestore.FieldValue.increment(-amount)
+        
+        // Firestore transaction kullanarak güvenli güncelleme
+        await db.runTransaction(async (transaction) => {
+          const doc = await transaction.get(expenseRef);
+          
+          if (!doc.exists) {
+            throw new Error("Fatura bulunamadı!");
+          }
+          
+          const data = doc.data();
+          const newPayable = data.payableAmount - amount;
+          const newPaid = data.paidAmount + amount;
+          
+          if (newPayable < 0) {
+            throw new Error("Ödeme tutarı kalan borçtan fazla olamaz!");
+          }
+          
+          transaction.update(expenseRef, {
+            paidAmount: newPaid,
+            payableAmount: newPayable
+          });
+        });
+        
+        // Ödeme geçmişini kaydet
+        await db.collection(PAYMENT_HISTORY_COLLECTION).add({
+          expenseId: currentPaymentExpense.id,
+          amount: amount,
+          date: firebase.firestore.FieldValue.serverTimestamp(),
+          userId: currentUser.uid,
+          userEmail: currentUser.email,
+          invoiceName: document.getElementById('paymentInvoiceName').value
         });
         
         showMessage(messageDiv, "✔️ Ödeme başarıyla kaydedildi", 'success');
@@ -1532,6 +1625,63 @@
       }
     }
 
+    // Ödeme geçmişini görüntüle
+    async function viewPaymentHistory(expenseId, invoiceName) {
+      try {
+        console.log("Ödeme geçmişi görüntüleme başladı:", expenseId);
+        
+        // Başlık güncelle
+        document.getElementById('paymentHistoryTitle').textContent = invoiceName;
+        
+        const tbody = document.getElementById("paymentHistoryBody");
+        tbody.innerHTML = '<tr><td colspan="3">Yükleniyor...</td></tr>';
+        
+        // Firestore'dan ödeme geçmişini al - DÜZELTİLMİŞ SORGULAMA
+        const querySnapshot = await db.collection(PAYMENT_HISTORY_COLLECTION)
+          .where("expenseId", "==", expenseId)
+          .orderBy("date", "desc")
+          .get();
+        
+        console.log("Ödeme geçmişi sorgu sonucu:", querySnapshot.size, "kayıt bulundu");
+        
+        if (querySnapshot.empty) {
+          tbody.innerHTML = '<tr><td colspan="3">Ödeme geçmişi bulunamadı</td></tr>';
+          document.getElementById('paymentHistoryModal').style.display = 'flex';
+          return;
+        }
+        
+        let historyHTML = "";
+        querySnapshot.forEach(doc => {
+          const payment = doc.data();
+          console.log("Ödeme kaydı:", payment);
+          
+          // Tarih formatlama
+          const formattedDate = formatFirestoreDate(payment.date);
+          
+          historyHTML += `
+            <tr>
+              <td>${formattedDate}</td>
+              <td>${payment.amount.toFixed(2)} ₺</td>
+              <td>${payment.userEmail}</td>
+            </tr>
+          `;
+        });
+        
+        tbody.innerHTML = historyHTML;
+        
+        // Modalı göster - DÜZELTİLDİ
+        document.getElementById('paymentHistoryModal').style.display = 'flex';
+        console.log("Ödeme geçmişi modalı gösterildi");
+        
+      } catch (error) {
+        console.error("Ödeme geçmişi yüklenirken hata:", error);
+        const tbody = document.getElementById("paymentHistoryBody");
+        tbody.innerHTML = `<tr><td colspan="3" style="color:red;">Hata: ${error.message}</td></tr>`;
+        document.getElementById('paymentHistoryModal').style.display = 'flex';
+      }
+    }
+
+
     // Gider silme
     async function deleteExpense(expenseId) {
       if (!confirm("Bu gideri silmek istediğinize emin misiniz?")) return;
@@ -1546,8 +1696,7 @@
     }
 
     // Yardımcı fonksiyonlar
-    function showMessage(elementId, message, type) {
-      const element = document.getElementById(elementId);
+    function showMessage(element, message, type) {
       if (!element) return;
       
       element.textContent = message;
@@ -1578,6 +1727,8 @@
     window.savePayment = savePayment;
     window.applyDekontFilters = applyDekontFilters;
     window.applyCariFilters = applyCariFilters;
+    window.viewPaymentHistory = viewPaymentHistory;
+    
 
   </script>
 </body>
