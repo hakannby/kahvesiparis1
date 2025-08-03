@@ -170,18 +170,6 @@
       box-shadow: 0 4px 8px rgba(74, 137, 220, 0.2);
     }
     
-    /*
-    .direct-products-title {
-      font-weight: bold;
-      margin: 15px 0 10px 0;
-      color: var(--dark);
-      font-size: 14px;
-      text-align: center;
-      padding: 8px;
-      background: rgba(74, 137, 220, 0.1);
-      border-radius: 8px;
-    }   */
-    
     .direct-products {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
@@ -230,18 +218,34 @@
       font-size: 13px;
     }
     
-    /* ÜRÜN SEÇİM ALANI (ORTA HİZALI) */
+    /* ÜRÜN SEÇİM ALANI (YATAY KAYDIRILABİLİR) */
     .coffee-selection {
       margin-top: 25px;
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      display: flex;
+      flex-wrap: nowrap;
+      overflow-x: auto;
       gap: 18px;
-      justify-content: center;
+      padding: 15px 10px;
       background: var(--light);
-      padding: 20px;
       border-radius: 12px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-      justify-items: center;
+      scrollbar-width: thin;
+      scrollbar-color: var(--primary) var(--light);
+    }
+    
+    /* Kaydırma çubuğu için özel stil */
+    .coffee-selection::-webkit-scrollbar {
+      height: 8px;
+    }
+    
+    .coffee-selection::-webkit-scrollbar-track {
+      background: var(--light);
+      border-radius: 4px;
+    }
+    
+    .coffee-selection::-webkit-scrollbar-thumb {
+      background: var(--primary);
+      border-radius: 4px;
     }
     
     .coffee-option {
@@ -259,7 +263,8 @@
       align-items: center;
       position: relative;
       height: 100%;
-      width: 100%;
+      flex: 0 0 auto;
+      min-width: 140px;
       max-width: 160px;
     }
     
@@ -786,8 +791,12 @@
       }
       
       .coffee-selection {
-        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
         gap: 12px;
+        padding: 12px 8px;
+      }
+      
+      .coffee-option {
+        min-width: 120px;
       }
       
       .action-buttons {
@@ -828,9 +837,7 @@
 
       <label>Ürün Seçimi:</label>
       <div id="kahveListesi" class="coffee-selection" role="list" aria-label="Ürün seçenekleri">
-        <i style="grid-column: 1 / -1; text-align: center; color: var(--primary); font-style: normal;">
-          Kategori seçin veya ürün seçin
-        </i>
+        <div class="no-product-message">Kategori seçin veya ürün seçin</div>
       </div>
       
       <div class="form-group">
@@ -919,9 +926,6 @@
     </div>
   </div>
 </div>
-
-
-
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js";
@@ -1118,7 +1122,7 @@ window.closeNameModal = function () {
       selectedProduct = "";
       
       if (!productMenu[category]) {
-        productListDiv.innerHTML = "<i style='grid-column:1/-1;text-align:center;color:var(--primary);'>Bu kategoride ürün bulunamadı.</i>";
+        productListDiv.innerHTML = '<div class="no-product-message">Bu kategoride ürün bulunamadı.</div>';
         return;
       }
       
@@ -1414,7 +1418,7 @@ window.closeNameModal = function () {
       }
 
       if (foundProducts.length === 0) {
-        productListDiv.innerHTML = "<i style='grid-column:1/-1;text-align:center;color:var(--primary);'>Aranan ürün bulunamadı.</i>";
+        productListDiv.innerHTML = '<div class="no-product-message">Aranan ürün bulunamadı.</div>';
         return;
       }
 
