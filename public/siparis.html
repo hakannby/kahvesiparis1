@@ -2,53 +2,62 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Personel Paneli - Sipariş Al</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     :root {
-      --primary: #4a89dc;
-      --primary-light: #5d9cec;
-      --primary-dark: #3b7dd8;
-      --danger: #e74c3c;
-      --success: #27ae60;
-      --dark: #34495e;
-      --light: #f5f7fa;
+      --primary: #5a67d8;
+      --primary-light: #7e8de3;
+      --primary-dark: #4c51bf;
+      --danger: #e53e3e;
+      --success: #38a169;
+      --warning: #dd6b20;
+      --dark: #2d3748;
+      --light: #f7fafc;
       --white: #ffffff;
-      --shadow: 0 4px 12px rgba(0,0,0,0.1);
+      --gray-100: #f8f9fa;
+      --gray-200: #e9ecef;
+      --shadow: 0 6px 15px rgba(0,0,0,0.1);
+      --shadow-hover: 0 10px 25px rgba(0,0,0,0.15);
+      --radius: 14px;
+      --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     }
     
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
+      touch-action: manipulation;
     }
     
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       max-width: 1600px;
       margin: 20px auto;
-      padding: 10px;
+      padding: 15px;
       background: #fafafa;
-      border-radius: 16px;
+      border-radius: var(--radius);
       box-shadow: var(--shadow);
       color: #333;
-      position: relative;
       background: linear-gradient(135deg, #f9f9f9 0%, #f0f2f5 100%);
     }
     
     h2 {
       text-align: center;
-      margin-bottom: 15px;
+      margin-bottom: 20px;
       color: var(--dark);
-      padding-bottom: 5px;
+      padding-bottom: 10px;
       border-bottom: 2px solid #e0e6ed;
+      font-weight: 700;
+      font-size: 28px;
     }
     
     /* YENİ İKİ SÜTUNLU DÜZEN */
     .container {
       display: flex;
       flex-wrap: wrap;
-      gap: 5px;
+      gap: 15px;
     }
     
     .left-column {
@@ -64,40 +73,42 @@
       gap: 20px;
     }
     
-    /* KATEGORİ STİLLERİ (ORTA HİZALI) */
+    /* KATEGORİ STİLLERİ */
     .main-categories {
       display: flex;
       flex-wrap: wrap;
       gap: 12px;
       justify-content: center;
-      margin-bottom: 5px;
-      padding: 5px;
+      margin-bottom: 10px;
+      padding: 10px;
       background: var(--white);
-      border-radius: 12px;
+      border-radius: var(--radius);
       box-shadow: var(--shadow);
       text-align: center;
-    }                                             /*margin-bottom kısımlarını azalt. dikey boşluk azalır */
+    }
     
     .main-category-btn {
-      padding: 20px 20px;
+      padding: 22px 25px;
       background: var(--white);
       border: 2px solid var(--primary-light);
-      border-radius: 30px;
+      border-radius: 50px;
       color: var(--dark);
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 2px 6px rgba(74, 137, 220, 0.2);
+      transition: var(--transition);
+      box-shadow: 0 3px 8px rgba(74, 137, 220, 0.15);
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      gap: 10px;
       margin: 5px;
+      font-size: 17px;
+      min-width: 150px;
     }
     
     .main-category-btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 6px 12px rgba(74, 137, 220, 0.25);
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-hover);
     }
     
     .main-category-btn.active {
@@ -105,22 +116,17 @@
       color: var(--white);
       border-color: var(--primary);
       transform: scale(1.05);
-      box-shadow: 0 8px 16px rgba(74, 137, 220, 0.3);
-      z-index: 1;
+      box-shadow: 0 10px 20px rgba(74, 137, 220, 0.3);
     }
     
     .main-category-btn i {
-      font-size: 18px;          /*ANA KATEGORİ SİMGE BOYUTU */
+      font-size: 20px;
     }
 
-    .main-category-btn {
-  font-size: 16px;              /* ANA KATEGORİ YAZI BOYUTU */
-}
-    
-    /* ALT KATEGORİ VE ÜRÜNLER ALANI (ORTA HİZALI) */
+    /* ALT KATEGORİ VE ÜRÜNLER ALANI */
     .category-content-area {
       background: var(--white);
-      border-radius: 12px;
+      border-radius: var(--radius);
       padding: 20px;
       margin-bottom: 20px;
       box-shadow: var(--shadow);
@@ -142,98 +148,98 @@
     .subcategories {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 5px;
+      gap: 12px;
+      margin-bottom: 10px;
       justify-content: center;
     }
     
     .subcategory-btn {
-      padding: 20px 16px;
+      padding: 18px 20px;
       background: var(--light);
       border: none;
-      border-radius: 20px;
+      border-radius: 50px;
       color: var(--dark);
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.2s;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      transition: var(--transition);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      font-size: 16px;
     }
     
     .subcategory-btn:hover {
       background: #e0e6ed;
-      transform: translateY(-2px);
+      transform: translateY(-3px);
     }
     
     .subcategory-btn.active {
       background: var(--primary);
       color: var(--white);
-      box-shadow: 0 4px 8px rgba(74, 137, 220, 0.2);
+      box-shadow: 0 6px 12px rgba(74, 137, 220, 0.2);
     }
     
     .direct-products {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-      gap: 12px;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 15px;
       justify-items: center;
     }
     
     .direct-product {
       background: var(--white);
-      border-radius: 8px;
-      padding: 12px;
+      border-radius: 12px;
+      padding: 15px;
       text-align: center;
-      font-size: 15px;
+      font-size: 16px;
       cursor: pointer;
-      box-shadow: 0 3px 6px rgba(0,0,0,0.08);
-      transition: all 0.2s;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+      transition: var(--transition);
       border: 1px solid #e0e6ed;
       width: 100%;
       max-width: 160px;
     }
     
     .direct-product:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 6px 10px rgba(0,0,0,0.15);
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-hover);
       border-color: var(--primary);
     }
     
     .direct-product img {
       width: 100%;
-      height: 40px;
+      height: 50px;
       object-fit: cover;
-      border-radius: 6px;
-      margin-bottom: 8px;
+      border-radius: 8px;
+      margin-bottom: 10px;
       border: 1px solid #e0e6ed;
     }
     
     .direct-product .name {
       font-weight: 600;
       color: var(--dark);
-      margin-bottom: 3px;
+      margin-bottom: 5px;
     }
     
     .direct-product .price {
       color: var(--success);
       font-weight: 700;
-      font-size: 13px;
+      font-size: 14px;
     }
     
-    /* ÜRÜN SEÇİM ALANI (YATAY KAYDIRILABİLİR) */
+    /* ÜRÜN SEÇİM ALANI */
     .coffee-selection {
       margin-top: 25px;
       display: flex;
       flex-wrap: nowrap;
       overflow-x: auto;
-      gap: 18px;
+      gap: 20px;
       padding: 15px 10px;
       background: var(--light);
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      border-radius: var(--radius);
+      box-shadow: 0 5px 12px rgba(0,0,0,0.06);
       scrollbar-width: thin;
       scrollbar-color: var(--primary) var(--light);
     }
     
-    /* Kaydırma çubuğu için özel stil */
     .coffee-selection::-webkit-scrollbar {
       height: 8px;
     }
@@ -251,12 +257,12 @@
     .coffee-option {
       cursor: pointer;
       border: 3px solid transparent;
-      border-radius: 14px;
-      padding: 10px;
+      border-radius: 16px;
+      padding: 15px;
       text-align: center;
       background: white;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.08);
-      transition: all 0.3s ease;
+      box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+      transition: var(--transition);
       user-select: none;
       display: flex;
       flex-direction: column;
@@ -264,36 +270,36 @@
       position: relative;
       height: 100%;
       flex: 0 0 auto;
-      min-width: 140px;
-      max-width: 160px;
+      min-width: 150px;
+      max-width: 180px;
     }
     
     .coffee-option:hover {
-      box-shadow: 0 8px 14px rgba(0,0,0,0.2);
-      transform: translateY(-4px);
+      box-shadow: var(--shadow-hover);
+      transform: translateY(-5px);
     }
     
     .coffee-option.selected {
       border-color: var(--primary);
-      box-shadow: 0 0 15px rgba(74, 137, 220, 0.8);
+      box-shadow: 0 0 20px rgba(90, 103, 216, 0.6);
       background-color: var(--light);
     }
     
     .coffee-option img {
-      width: 80%;
-      height: 100px;          /* ÜRÜN SEÇİMİ KARTLAR FOTO BÜYÜKLÜĞÜ*/
+      width: 85%;
+      height: 110px;
       object-fit: cover;
       border-radius: 12px;
-      margin-bottom: 10px;
-      filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1));
+      margin-bottom: 12px;
+      filter: drop-shadow(0 3px 3px rgba(0,0,0,0.1));
       background: #f5f5f5;
       border: 1px solid #e0e6ed;
     }
     
     .coffee-option p {
-      font-weight: 600;
+      font-weight: 700;
       color: var(--dark);
-      font-size: 18px;           /*ÜRÜN SEÇİMİ KARTLAR YAZI BOYUTU*/
+      font-size: 18px;
       margin: 0;
       user-select: none;
     }
@@ -301,50 +307,49 @@
     .coffee-option .price {
       color: var(--success);
       font-weight: 700;
-      margin-top: 5px;
+      margin-top: 8px;
+      font-size: 16px;
     }
     
     label {
       display: block;
-      margin-bottom: 10px;
-      font-size: 16px;
+      margin-bottom: 15px;
+      font-size: 17px;
       font-weight: 600;
       color: var(--dark);
       user-select: none;
       background: var(--light);
-      padding: 10px 15px;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      padding: 12px 18px;
+      border-radius: var(--radius);
+      box-shadow: 0 3px 6px rgba(0,0,0,0.05);
     }
     
     .quantity-container {
       display: flex;
-      gap: 12px;
+      gap: 15px;
       align-items: center;
-      max-width: 180px;
-      margin-bottom: 30px;
-      margin-top: 10px;
+      max-width: 220px;
+      margin: 20px auto;
       background: var(--light);
-      padding: 10px;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-      margin-left: auto;
-      margin-right: auto;
+      padding: 12px;
+      border-radius: var(--radius);
+      box-shadow: 0 3px 8px rgba(0,0,0,0.05);
     }
     
     .quantity-container button {
       flex: 1;
-      padding: 12px 0;
+      padding: 15px 0;
       background-color: var(--primary-dark);
       border: none;
-      border-radius: 8px;
+      border-radius: var(--radius);
       color: white;
       font-weight: 700;
-      font-size: 18px;
+      font-size: 22px;
       cursor: pointer;
       transition: background-color 0.25s ease;
       user-select: none;
-      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      min-width: 50px;
     }
     
     .quantity-container button:hover {
@@ -353,51 +358,52 @@
     }
     
     #quantity {
-      width: 60px;
+      width: 70px;
       text-align: center;
-      font-size: 18px;
-      font-weight: 600;
+      font-size: 22px;
+      font-weight: 700;
       border: 2px solid var(--primary-dark);
-      border-radius: 8px;
-      padding: 8px 0;
+      border-radius: var(--radius);
+      padding: 10px 0;
       background: white;
       user-select: none;
     }
     
     .action-buttons {
       display: flex;
-      gap: 12px;
+      gap: 15px;
       margin-bottom: 25px;
       align-items: center;
       justify-content: center;
     }
     
     .action-buttons button {
-      padding: 15px 0;
-      border-radius: 30px;
+      padding: 18px 0;
+      border-radius: 50px;
       color: white;
       font-weight: 700;
-      font-size: 17px;
+      font-size: 18px;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: var(--transition);
       user-select: none;
       border: none;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      gap: 10px;
+      box-shadow: 0 5px 12px rgba(0,0,0,0.12);
       flex: 1;
+      min-width: 150px;
     }
     
     #addOrderBtn, #confirmBtn {
-      min-width: 120px;
+      min-width: 150px;
     }
     
     #refundBtn {
-      min-width: 80px;
-      padding: 12px 0;
-      font-size: 15px;
+      min-width: 100px;
+      padding: 15px 0;
+      font-size: 16px;
     }
     
     #addOrderBtn { 
@@ -414,22 +420,23 @@
       background-color: var(--primary-dark); 
     }
     #confirmBtn:hover { 
-      background-color: #219653; 
+      background-color: #2f855a; 
     }
     #refundBtn:hover { 
-      background-color: #c0392b; 
+      background-color: #c53030; 
     }
     
     #addNameBtn {
       cursor: pointer;
-      transition: all 0.3s;
-      padding: 10px 15px;
+      transition: var(--transition);
+      padding: 12px 18px;
       background: var(--primary);
       color: white;
       border: none;
-      border-radius: 6px;
-      font-size: 14px;
+      border-radius: 8px;
+      font-size: 15px;
       margin-left: 10px;
+      font-weight: 600;
     }
     
     #addNameBtn:hover {
@@ -439,9 +446,9 @@
     
     /* SAĞ SÜTUN STİLLERİ */
     .right-panel-section {
-      background: var(--light);
-      border-radius: 12px;
-      padding: 15px;
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 20px;
       box-shadow: var(--shadow);
     }
     
@@ -451,24 +458,25 @@
       justify-content: space-between;
       margin-bottom: 15px;
       color: var(--dark);
-      padding-bottom: 10px;
+      padding-bottom: 12px;
       border-bottom: 1px solid #e0e6ed;
+      font-size: 20px;
     }
     
     .right-panel-section h3 i {
-      margin-right: 8px;
+      margin-right: 10px;
     }
     
     #orderList, #customerView {
-      min-height: 150px;
-      max-height: 200px;
+      min-height: 180px;
+      max-height: 250px;
       overflow-y: auto;
       padding: 15px;
-      border-radius: 8px;
+      border-radius: var(--radius);
       background: var(--white);
-      box-shadow: inset 0 0 8px rgba(224, 230, 237, 0.67);
+      box-shadow: inset 0 0 10px rgba(224, 230, 237, 0.5);
       font-weight: 600;
-      font-size: 16px;
+      font-size: 17px;
       color: var(--dark);
       margin-bottom: 15px;
       user-select: text;
@@ -482,17 +490,35 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 8px 0;
+      padding: 12px 0;
       border-bottom: 1px dashed #d5c48b;
     }
     
-    .remove-item {
+    .item-details {
+      flex: 1;
+    }
+    
+    .item-actions {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .remove-item, .note-btn {
       color: var(--danger);
       cursor: pointer;
       font-weight: bold;
-      padding: 5px 10px;
+      padding: 8px;
       border-radius: 50%;
-      transition: all 0.3s;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+    }
+    
+    .note-btn {
+      color: var(--primary);
     }
     
     .remove-item:hover {
@@ -500,65 +526,79 @@
       transform: rotate(90deg);
     }
     
+    .note-btn:hover {
+      background: rgba(90, 103, 216, 0.1);
+      transform: scale(1.1);
+    }
+    
+    .order-note {
+      font-size: 14px;
+      color: #666;
+      font-style: italic;
+      margin-top: 5px;
+      padding-left: 10px;
+      border-left: 3px solid var(--primary);
+    }
+    
     #customerView {
       border: 2px dashed #c7b36f;
-      min-height: 100px;
-      line-height: 1.4;
+      min-height: 120px;
+      line-height: 1.5;
       background: var(--light);
     }
     
     .section {
       margin-top: 0;
-      background: var(--light);
+      background: var(--white);
       padding: 15px;
-      border-radius: 12px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+      border-radius: var(--radius);
+      box-shadow: 0 5px 12px rgba(0,0,0,0.06);
     }
     
     .collapsible {
-      background-color: #e0e6ed;
+      background-color: var(--gray-100);
       cursor: pointer;
-      padding: 14px 20px;
+      padding: 18px 22px;
       border: none;
       text-align: left;
       outline: none;
-      font-size: 18px;
+      font-size: 19px;
       font-weight: 600;
-      border-radius: 15px;
+      border-radius: var(--radius);
       color: var(--dark);
       user-select: none;
-      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
-      margin-bottom: 10px;
-      transition: background-color 0.3s ease;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+      margin-bottom: 12px;
+      transition: var(--transition);
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border: 1px solid #d5dbe4;
+      border: 1px solid var(--gray-200);
       width: 100%;
     }
     
     .collapsible:hover {
-      background-color: #d5dbe4;
+      background-color: var(--gray-200);
     }
     
     .collapsible.active {
       background-color: var(--primary-dark);
       color: white;
-      box-shadow: 0 6px 12px rgba(59, 125, 216, 0.8);
+      box-shadow: 0 8px 16px rgba(59, 125, 216, 0.8);
     }
     
     .content {
-      padding: 18px 22px;
+      padding: 20px;
       display: none;
-      border: 2px solid #d5dbe4;
+      border: 2px solid var(--gray-200);
       border-top: none;
-      border-radius: 0 0 15px 15px;
-      background-color: var(--light);
-      font-size: 15px;
+      border-radius: 0 0 var(--radius) var(--radius);
+      background-color: var(--white);
+      font-size: 16px;
       color: var(--dark);
       font-weight: 600;
       user-select: text;
-      max-height: 300px;
+      max-height: 350px;
       overflow-y: auto;
     }
     
@@ -569,21 +609,22 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0,0,0,0.7);
+      background: rgba(0,0,0,0.75);
       z-index: 1000;
       align-items: center;
       justify-content: center;
+      backdrop-filter: blur(3px);
     }
     
     .modal-content {
       background: white;
       padding: 30px;
-      border-radius: 16px;
+      border-radius: var(--radius);
       width: 90%;
       max-width: 500px;
       max-height: 90vh;
       overflow-y: auto;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      box-shadow: 0 15px 40px rgba(0,0,0,0.25);
     }
     
     .modal-header {
@@ -598,7 +639,7 @@
     .close-btn {
       background: none;
       border: none;
-      font-size: 28px;
+      font-size: 32px;
       cursor: pointer;
       color: #777;
       transition: transform 0.2s;
@@ -610,12 +651,12 @@
     }
     
     .history-item {
-      padding: 15px;
-      border-radius: 10px;
+      padding: 18px;
+      border-radius: 12px;
       background: #f9f9f9;
-      margin-bottom: 12px;
+      margin-bottom: 15px;
       cursor: pointer;
-      transition: all 0.3s;
+      transition: var(--transition);
       border: 1px solid #eee;
     }
     
@@ -635,7 +676,7 @@
     }
     
     .history-item .items {
-      margin: 8px 0;
+      margin: 10px 0;
       color: #555;
     }
     
@@ -645,78 +686,105 @@
     }
     
     .history-item .date {
-      font-size: 14px;
+      font-size: 15px;
       color: #777;
     }
     
     .refund-actions {
       display: flex;
       gap: 15px;
-      margin-top: 20px;
+      margin-top: 25px;
     }
     
     .refund-actions button {
       flex: 1;
-      padding: 12px;
-      border-radius: 8px;
+      padding: 14px;
+      border-radius: var(--radius);
       font-weight: 600;
+      font-size: 16px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    
+    .refund-actions button:hover {
+      transform: translateY(-3px);
+    }
+    
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      border: none;
+    }
+    
+    .btn-danger {
+      background: var(--danger);
+      color: white;
+      border: none;
+    }
+    
+    .btn-warning {
+      background: var(--warning);
+      color: white;
+      border: none;
     }
     
     .refund-item {
-      padding: 10px;
-      margin: 5px 0;
+      padding: 12px;
+      margin: 8px 0;
       background: #f9f9f9;
-      border-radius: 8px;
+      border-radius: var(--radius);
       border: 1px solid #eee;
     }
     
     .refund-item label {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
       cursor: pointer;
       background: none;
       padding: 0;
       box-shadow: none;
+      font-weight: 500;
     }
     
     .refund-item input[type="checkbox"] {
-      width: 18px;
-      height: 18px;
+      width: 20px;
+      height: 20px;
       cursor: pointer;
     }
     
     .search-container {
-      margin: 20px 0;
+      margin: 25px 0;
       display: flex;
-      gap: 10px;
+      gap: 12px;
     }
     
     #productSearch {
       flex: 1;
-      padding: 12px 15px;
+      padding: 15px 20px;
       border: 2px solid #ddd;
-      border-radius: 30px;
-      font-size: 16px;
+      border-radius: 50px;
+      font-size: 17px;
       outline: none;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      transition: all 0.3s;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+      transition: var(--transition);
     }
     
     #productSearch:focus {
       border-color: var(--primary);
-      box-shadow: 0 2px 12px rgba(74, 137, 220, 0.2);
+      box-shadow: 0 3px 15px rgba(90, 103, 216, 0.25);
     }
     
     .search-container button {
-      padding: 0 20px;
+      padding: 0 25px;
       background: var(--danger);
       color: white;
       border: none;
-      border-radius: 30px;
+      border-radius: 50px;
       cursor: pointer;
       font-weight: bold;
-      transition: all 0.3s;
+      transition: var(--transition);
+      font-size: 16px;
     }
     
     .search-container button:hover {
@@ -741,19 +809,19 @@
     .history-table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 14px;
+      font-size: 15px;
     }
     
     .history-table th, 
     .history-table td {
-      padding: 8px 12px;
+      padding: 10px 15px;
       border: 1px solid #e0e0e0;
       text-align: left;
     }
     
     .history-table th {
       background-color: #f5f5f5;
-      font-weight: 600;
+      font-weight: 700;
     }
     
     .history-table tr:nth-child(even) {
@@ -764,11 +832,65 @@
       background-color: #f0f7ff;
     }
     
+    /* YENİ MODAL STİLLERİ */
+    .modal-btn-container {
+      display: flex;
+      gap: 15px;
+      margin-top: 25px;
+    }
+    
+    .modal-btn {
+      flex: 1;
+      padding: 15px;
+      border-radius: var(--radius);
+      font-weight: 700;
+      font-size: 17px;
+      cursor: pointer;
+      transition: var(--transition);
+      text-align: center;
+    }
+    
+    .modal-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .btn-yes {
+      background: var(--success);
+      color: white;
+    }
+    
+    .btn-no {
+      background: var(--warning);
+      color: white;
+    }
+    
+    .btn-cancel {
+      background: var(--danger);
+      color: white;
+    }
+    
+    .note-input {
+      width: 100%;
+      padding: 15px;
+      margin: 20px 0;
+      font-size: 16px;
+      border: 2px solid #ddd;
+      border-radius: var(--radius);
+      transition: var(--transition);
+    }
+    
+    .note-input:focus {
+      border-color: var(--primary);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(90, 103, 216, 0.25);
+    }
+    
     /* MOBİL UYUMLULUK */
     @media (max-width: 768px) {
       body {
         padding: 15px;
-        margin: 20px auto;
+        margin: 15px auto;
       }
       
       .container {
@@ -791,25 +913,29 @@
       }
       
       .coffee-selection {
-        gap: 12px;
-        padding: 12px 8px;
+        gap: 15px;
+        padding: 15px 10px;
       }
       
       .coffee-option {
-        min-width: 120px;
+        min-width: 140px;
       }
       
       .action-buttons {
         flex-direction: column;
-        gap: 12px;
+        gap: 15px;
       }
       
       .direct-products {
-        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
       }
       
       #orderList, #customerView {
-        max-height: 250px;
+        max-height: 300px;
+      }
+      
+      .modal-content {
+        padding: 20px;
       }
     }
   </style>
@@ -820,13 +946,13 @@
   <div class="search-container">
     <input type="text" id="productSearch" placeholder="Ürün ara..." />
     <button onclick="clearSearch()">
-      <i class="fas fa-times"></i>
+      <i class="fas fa-times"></i> Temizle
     </button>
   </div>
 
   <div class="container">
     <div class="left-column">
-      <!-- YENİ KATEGORİ YAPISI -->
+      <!-- KATEGORİ YAPISI -->
       <div class="main-categories" id="mainCategories">
         <!-- Ana kategoriler buraya dinamik olarak eklenecek -->
       </div>
@@ -916,16 +1042,45 @@
     </div>
   </div>
 
-      <div id="nameModal" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); align-items:center; justify-content:center; z-index:9999;">
-  <div style="background:white; padding:30px; border-radius:12px; max-width:400px; width:90%; box-shadow:0 5px 20px rgba(0,0,0,0.2);">
-    <h3>Müşteri İsmi</h3>
-    <input type="text" id="nameInput" placeholder="İsim giriniz..." style="width:100%; padding:10px; margin:15px 0; font-size:16px;" />
-    <div style="display:flex; justify-content:space-between;">
-      <button onclick="submitName()" style="padding:10px 20px; background:#4a89dc; color:white; border:none; border-radius:6px;">Kaydet</button>
-      <button onclick="closeNameModal()" style="padding:10px 20px; background:#ccc; border:none; border-radius:6px;">İptal</button>
+  <!-- Stok Geri Ekleme Onay Modal -->
+  <div id="refundConfirmModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Stok Geri Eklensin mi?</h3>
+        <button class="close-btn" onclick="closeModal('refundConfirmModal')">&times;</button>
+      </div>
+      <p>İade edilen ürünlerin malzemeleri stoğa geri eklensin mi?</p>
+      <div class="modal-btn-container">
+        <button class="modal-btn btn-yes" onclick="refundConfirm(true)">Evet</button>
+        <button class="modal-btn btn-no" onclick="refundConfirm(false)">Hayır</button>
+        <button class="modal-btn btn-cancel" onclick="closeModal('refundConfirmModal')">İptal</button>
+      </div>
     </div>
   </div>
-</div>
+
+  <!-- Müşteri İsmi Modal -->
+  <div id="nameModal" class="modal">
+    <div class="modal-content">
+      <h3>Müşteri İsmi</h3>
+      <input type="text" id="nameInput" placeholder="İsim giriniz..." class="note-input" />
+      <div class="modal-btn-container">
+        <button class="modal-btn btn-primary" onclick="submitName()">Kaydet</button>
+        <button class="modal-btn btn-cancel" onclick="closeNameModal()">İptal</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Not Ekleme Modal -->
+  <div id="noteModal" class="modal">
+    <div class="modal-content">
+      <h3>Sipariş Notu</h3>
+      <textarea id="noteInput" placeholder="Not giriniz..." class="note-input" rows="4"></textarea>
+      <div class="modal-btn-container">
+        <button class="modal-btn btn-primary" onclick="saveNote()">Kaydet</button>
+        <button class="modal-btn btn-cancel" onclick="closeNoteModal()">İptal</button>
+      </div>
+    </div>
+  </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js";
@@ -974,29 +1129,57 @@
     let selectedRefundItems = [];
     let selectedOrderForRefund = null;
     let currentCustomerName = "";
+    let currentNoteIndex = -1;
 
     // İsim ekle butonu fonksiyonu
-   window.addCustomerName = function () {
-  document.getElementById("nameModal").style.display = "flex";
-  document.getElementById("nameInput").value = "";
-  setTimeout(() => document.getElementById("nameInput").focus(), 100);
-};
+    window.addCustomerName = function () {
+      document.getElementById("nameModal").style.display = "flex";
+      document.getElementById("nameInput").value = "";
+      setTimeout(() => document.getElementById("nameInput").focus(), 100);
+    };
 
-// Kaydet butonuna tıklanınca çalışır
-window.submitName = function () {
-  const name = document.getElementById("nameInput").value.trim();
-  if (name) {
-    currentCustomerName = name;
-    updateOrderDisplay();
-    saveActiveOrder();
-  }
-  closeNameModal();
-};
+    // Kaydet butonuna tıklanınca çalışır
+    window.submitName = function () {
+      const name = document.getElementById("nameInput").value.trim();
+      if (name) {
+        currentCustomerName = name;
+        updateOrderDisplay();
+        saveActiveOrder();
+      }
+      closeNameModal();
+    };
 
-// Modalı kapatır
-window.closeNameModal = function () {
-  document.getElementById("nameModal").style.display = "none";
-};
+    // Modalı kapatır
+    window.closeNameModal = function () {
+      document.getElementById("nameModal").style.display = "none";
+    };
+
+    // Not ekle butonu fonksiyonu
+    window.openNoteModal = function (index) {
+      currentNoteIndex = index;
+      const note = currentOrder[index].note || "";
+      document.getElementById("noteInput").value = note;
+      document.getElementById("noteModal").style.display = "flex";
+      setTimeout(() => document.getElementById("noteInput").focus(), 100);
+    };
+
+    // Notu kaydetme fonksiyonu
+    window.saveNote = function () {
+      const note = document.getElementById("noteInput").value.trim();
+      if (currentNoteIndex !== -1) {
+        currentOrder[currentNoteIndex].note = note;
+        updateOrderDisplay();
+        saveActiveOrder();
+      }
+      closeNoteModal();
+    };
+
+    // Not modalını kapat
+    window.closeNoteModal = function () {
+      document.getElementById("noteModal").style.display = "none";
+      currentNoteIndex = -1;
+    };
+
     // Kategori yükleme fonksiyonu
     async function loadCategories() {
       const container = document.getElementById('mainCategories');
@@ -1056,47 +1239,47 @@ window.closeNameModal = function () {
     
     // Kategori içeriğini göster
     function showCategoryContent(mainCat, allSubCategories) {
-  const contentArea = document.getElementById('categoryContent');
-  const subCategories = allSubCategories.filter(subCat => subCat.parent === mainCat.id);
-  
-  // İçerik oluştur
-  let contentHTML = '';
-  
-  // Alt kategoriler varsa göster
-  if (subCategories.length > 0) {
-    contentHTML += `
-      <div class="subcategories">
-        ${subCategories.map(subCat => `
-          <button class="subcategory-btn" data-slug="${subCat.slug}">
-            ${subCat.name}
-          </button>
-        `).join('')}
-      </div>
-    `;
-  }
-  
-  // İçeriği güncelle ve göster
-  contentArea.innerHTML = contentHTML;
-  contentArea.classList.add('active');
-  
-  // Alt kategori butonlarına event ekle
-  contentArea.querySelectorAll('.subcategory-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-      selectSubCategory(this.dataset.slug);
-    });
-  });
-  
-  // İlk alt kategoriyi otomatik seç VEYA doğrudan ürünleri listele
-  if (subCategories.length > 0) {
-    const firstSubBtn = contentArea.querySelector('.subcategory-btn');
-    if (firstSubBtn) {
-      selectSubCategory(firstSubBtn.dataset.slug);
+      const contentArea = document.getElementById('categoryContent');
+      const subCategories = allSubCategories.filter(subCat => subCat.parent === mainCat.id);
+      
+      // İçerik oluştur
+      let contentHTML = '';
+      
+      // Alt kategoriler varsa göster
+      if (subCategories.length > 0) {
+        contentHTML += `
+          <div class="subcategories">
+            ${subCategories.map(subCat => `
+              <button class="subcategory-btn" data-slug="${subCat.slug}">
+                ${subCat.name}
+              </button>
+            `).join('')}
+          </div>
+        `;
+      }
+      
+      // İçeriği güncelle ve göster
+      contentArea.innerHTML = contentHTML;
+      contentArea.classList.add('active');
+      
+      // Alt kategori butonlarına event ekle
+      contentArea.querySelectorAll('.subcategory-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          selectSubCategory(this.dataset.slug);
+        });
+      });
+      
+      // İlk alt kategoriyi otomatik seç VEYA doğrudan ürünleri listele
+      if (subCategories.length > 0) {
+        const firstSubBtn = contentArea.querySelector('.subcategory-btn');
+        if (firstSubBtn) {
+          selectSubCategory(firstSubBtn.dataset.slug);
+        }
+      } else {
+        // Alt kategori yoksa ana kategorinin ürünlerini doğrudan listele
+        listProducts(mainCat.slug);
+      }
     }
-  } else {
-    // Alt kategori yoksa ana kategorinin ürünlerini doğrudan listele
-    listProducts(mainCat.slug);
-  }
-}
 
     // Alt kategori seçimi
     function selectSubCategory(slug) {
@@ -1233,8 +1416,9 @@ window.closeNameModal = function () {
         currentOrder.push({ 
           product: selectedProduct, 
           qty,
-          price: productSpecs[selectedProduct]?.price || 0 ,
-          image: productSpecs[selectedProduct]?.image || "" 
+          price: productSpecs[selectedProduct]?.price || 0,
+          image: productSpecs[selectedProduct]?.image || "",
+          note: "" // Not alanı eklendi
         });
       }
       
@@ -1251,51 +1435,60 @@ window.closeNameModal = function () {
 
     // Siparişi güncelle
     function updateOrderDisplay() {
-  const listDiv = document.getElementById("orderList");
-  const customerView = document.getElementById("customerView");
+      const listDiv = document.getElementById("orderList");
+      const customerView = document.getElementById("customerView");
 
-  if (currentOrder.length === 0) {
-    listDiv.innerHTML = "<i>Henüz sipariş eklenmedi.</i>";
-    customerView.innerHTML = "<i>Müşteri için sipariş özeti yok.</i>";
-    return;
-  }
+      if (currentOrder.length === 0) {
+        listDiv.innerHTML = "<i>Henüz sipariş eklenmedi.</i>";
+        customerView.innerHTML = "<i>Müşteri için sipariş özeti yok.</i>";
+        return;
+      }
 
-  let htmlList = "";  // ✅ HATALI OLAN BU YOKTU
+      let htmlList = "";
 
-  currentOrder.forEach((item, index) => {
-    const price = item.price.toFixed(2) || "0.00";
-    htmlList += `
-      <div class="order-item">
-        <div>${item.qty} x ${item.product} (${price}₺)</div>
-        <div class="remove-item" onclick="removeFromOrder(${index})">
-          <i class="fas fa-times"></i>
+      // Müşteri ismini en başa ekle (varsa)
+      if (currentCustomerName) {
+        htmlList += `
+          <div class="order-item">
+            <div class="item-details">
+              <strong>Müşteri:</strong> ${currentCustomerName}
+            </div>
+          </div>
+        `;
+      }
+
+      currentOrder.forEach((item, index) => {
+        const price = item.price.toFixed(2) || "0.00";
+        htmlList += `
+          <div class="order-item">
+            <div class="item-details">
+              <div>${item.qty} x ${item.product} (${price}₺)</div>
+              ${item.note ? `<div class="order-note">${item.note}</div>` : ''}
+            </div>
+            <div class="item-actions">
+              <div class="note-btn" onclick="openNoteModal(${index})">
+                <i class="fas fa-comment"></i>
+              </div>
+              <div class="remove-item" onclick="removeFromOrder(${index})">
+                <i class="fas fa-times"></i>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+
+      listDiv.innerHTML = htmlList;
+
+      const totalPrice = currentOrder.reduce((sum, item) => sum + (item.qty * item.price), 0);
+
+      customerView.innerHTML = `
+        <div>${htmlList.replace(/class="order-item"/g, 'class="order-item" style="border:none; padding:8px 0;"')}</div>
+        <hr style="margin: 15px 0;">
+        <div style="text-align: right; font-size: 20px;">
+          <strong>Toplam: ${totalPrice.toFixed(2)}₺</strong>
         </div>
-      </div>
-    `;
-  });
-
-  // Müşteri ismini en başa ekle (varsa)
-  if (currentCustomerName) {
-    htmlList = `
-      <div class="order-item">
-        <div>Müşteri: ${currentCustomerName}</div>
-      </div>
-    ` + htmlList;
-  }
-
-  listDiv.innerHTML = htmlList;
-
-  const totalPrice = currentOrder.reduce((sum, item) => sum + (item.qty * item.price), 0);
-
-  customerView.innerHTML = `
-    <div>${htmlList.replace(/class="order-item"/g, 'class="order-item" style="border:none; padding:5px 0;"')}</div>
-    <hr style="margin: 15px 0;">
-    <div style="text-align: right; font-size: 18px;">
-      <strong>Toplam: ${totalPrice.toFixed(2)}₺</strong>
-    </div>
-  `;
-}
-
+      `;
+    }
 
     // Siparişten kaldırma
     function removeFromOrder(index) {
@@ -1311,6 +1504,7 @@ window.closeNameModal = function () {
             orderId,
             product: item.product,
             customerName,
+            note: item.note || "", // Notu kaydet
             timestamp: serverTimestamp(),
             price: item.price,
             qty: item.qty
@@ -1347,7 +1541,7 @@ window.closeNameModal = function () {
           });
         });
 
-        // HTML oluştur
+        // HTML oluştür
         if (Object.keys(productCounts).length === 0) {
           salesCountsDiv.innerHTML = "<p>Henüz satış yok.</p>";
           return;
@@ -1355,8 +1549,9 @@ window.closeNameModal = function () {
 
         let html = '<ul style="list-style-type:none; padding:0;">';
         for (const [product, count] of Object.entries(productCounts)) {
-          html += `<li style="padding:8px; border-bottom:1px solid #eee;">
-                    <strong>${product}:</strong> ${count} adet
+          html += `<li style="padding:10px; border-bottom:1px solid #eee; display:flex; justify-content:space-between;">
+                    <span>${product}:</span> 
+                    <span><strong>${count} adet</strong></span>
                   </li>`;
         }
         html += '</ul>';
@@ -1370,14 +1565,13 @@ window.closeNameModal = function () {
     }
 
     async function saveActiveOrder() {
-      if (currentOrder.length === 0) return;
-
       const activeOrder = {
         items: currentOrder,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
         total: calculateTotal(),
-        status: "draft"
+        status: "draft",
+        customerName: currentCustomerName
       };
 
       // Firestore'da sabit bir belge adıyla (tekSiparis) belge oluştur
@@ -1624,7 +1818,8 @@ window.closeNameModal = function () {
           items: currentOrder,
           total: totalPrice,
           timestamp: serverTimestamp(),
-          user: currentUserEmail
+          user: currentUserEmail,
+          customerName: currentCustomerName
         });
 
         // İsim varsa biletleri yazdır
@@ -1645,6 +1840,7 @@ window.closeNameModal = function () {
 
         alert("Sipariş başarıyla tamamlandı.");
         currentOrder = [];
+        currentCustomerName = "";
         updateOrderDisplay();
         updateSalesDisplays();
 
@@ -1652,8 +1848,6 @@ window.closeNameModal = function () {
         console.error("Sipariş hatası:", error);
         alert(error.message);
       }
-
-      currentCustomerName = ""; // İsmi sıfırla
     }
 
     // İade modalını aç
@@ -1794,8 +1988,13 @@ window.closeNameModal = function () {
         return;
       }
 
-      // Stok geri ekleme onayı
-      const restock = confirm("İade edilen ürünlerin malzemeleri stoğa geri eklensin mi?");
+      // Onay modalını aç
+      document.getElementById('refundConfirmModal').style.display = 'flex';
+    }
+
+    // Stok geri ekleme onayı
+    async function refundConfirm(restock) {
+      closeModal('refundConfirmModal');
       
       try {
         if (restock) {
@@ -1832,12 +2031,6 @@ window.closeNameModal = function () {
         console.error('İade işlemi sırasında hata:', error);
         alert('İade işlemi sırasında bir hata oluştu: ' + error.message);
       }
-    }
-
-    // Değişim işlemi
-    function processExchange() {
-      alert('Değişim işlemi için önce iade yapın, sonra yeni sipariş alın.');
-      closeModal('refundModal');
     }
 
     // Collapsible bölümler
@@ -1880,6 +2073,15 @@ window.closeNameModal = function () {
           await loadStocks();
           updateSalesDisplays();
           updateSalesCounts();
+          
+          // Aktif siparişi yükle
+          const activeOrderDoc = await getDoc(doc(db, "active_orders", "tekSiparis"));
+          if (activeOrderDoc.exists()) {
+            const data = activeOrderDoc.data();
+            currentOrder = data.items || [];
+            currentCustomerName = data.customerName || "";
+            updateOrderDisplay();
+          }
         } catch (error) {
           console.error("Veri yükleme hatası:", error);
         }
@@ -1892,6 +2094,14 @@ window.closeNameModal = function () {
         });
         onSnapshot(collection(db, "stocks"), loadStocks);
         onSnapshot(collection(db, "sales"), updateSalesDisplays);
+        onSnapshot(doc(db, "active_orders", "tekSiparis"), (doc) => {
+          if (doc.exists()) {
+            const data = doc.data();
+            currentOrder = data.items || [];
+            currentCustomerName = data.customerName || "";
+            updateOrderDisplay();
+          }
+        });
       });
     });
 
@@ -1903,8 +2113,14 @@ window.closeNameModal = function () {
     window.openRefundModal = openRefundModal;
     window.closeModal = closeModal;
     window.processRefund = processRefund;
-    window.processExchange = processExchange; 
+    window.refundConfirm = refundConfirm;
     window.clearSearch = clearSearch;
+    window.addCustomerName = addCustomerName;
+    window.submitName = submitName;
+    window.closeNameModal = closeNameModal;
+    window.openNoteModal = openNoteModal;
+    window.saveNote = saveNote;
+    window.closeNoteModal = closeNoteModal;
   </script>
 </body>
 </html>
