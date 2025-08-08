@@ -465,6 +465,41 @@
   font-size: 14px;
 }
 
+
+  /* Boyut seçenekleri için stil */
+.size-option-container {
+  display: flex;
+  gap: 15px;
+  margin: 10px 0;
+}
+
+.size-option {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-align: center;
+  width: 80px;
+}
+
+.size-option:hover {
+  background-color: #f0f0f0;
+}
+
+.size-option.selected {
+  border-color: #3498db;
+  background-color: #e3f2fd;
+}
+
+.size-icon {
+  font-size: 24px;
+  margin-bottom: 5px;
+  color: #a97443;
+}
+
+
+
     
   </style>
 
@@ -745,70 +780,142 @@
   <!-- Ürün Yönetimi -->
   <div class="tab-content" id="products">
     <div class="section">
-      <div class="section-title">
-        <h2>Kategori Yönetimi</h2>
-        <button class="btn-primary" onclick="openCategoryModal()">
-          <i class="fas fa-plus"></i> Yeni Kategori
-        </button>
+  <div class="section-title">
+    <h2>Kategori Yönetimi</h2>
+    <button class="btn-primary" onclick="openCategoryModal()">
+      <i class="fas fa-plus"></i> Yeni Kategori
+    </button>
+  </div>
+  
+  <div class="flex-container">
+    <div>
+      <h3>Kategori Hierarşisi</h3>
+      <div id="categoryTree">
+        <ul id="categoryList" style="list-style-type: none; padding-left: 0;"></ul>
       </div>
       
-      <div class="flex-container">
-        <div>
-          <h3>Kategori Hierarşisi</h3>
-          <div id="categoryTree">
-            <ul id="categoryList" style="list-style-type: none; padding-left: 0;"></ul>
+      <h3 style="margin-top: 20px;">Yeni Ürün Ekle</h3>
+      <div class="form-group">
+        <label>Ürün Adı:</label>
+        <input type="text" id="newProductName" placeholder="Örn: Cold Brew">
+      </div>
+      
+      <!-- Boyut seçeneklerini buraya ekleyin -->
+      <div class="form-group">
+        <label>
+          <input type="checkbox" id="enableSizes"> Bu ürünün boyut seçenekleri var
+        </label>
+      </div>
+      
+      <div id="sizeOptions" style="display:none; margin-bottom:15px;">
+        <div class="size-option-container">
+          <div class="size-option" onclick="document.getElementById('sizeSmall').click()">
+            <input type="checkbox" id="sizeSmall" style="display:none">
+            <div class="size-icon"><i class="fas fa-coffee"></i></div>
+            <div>Küçük</div>
           </div>
           
-          <h3 style="margin-top: 20px;">Yeni Ürün Ekle</h3>
-          <div class="form-group">
-            <label>Ürün Adı:</label>
-            <input type="text" id="newProductName" placeholder="Örn: Cold Brew">
+          <div class="size-option" onclick="document.getElementById('sizeMedium').click()">
+            <input type="checkbox" id="sizeMedium" style="display:none">
+            <div class="size-icon"><i class="fas fa-mug-hot"></i></div>
+            <div>Orta</div>
           </div>
           
-          <div class="form-group">
-            <label>Fiyat (₺):</label>
-            <input type="number" id="newProductPrice" placeholder="Örn: 120" min="0" step="0.01">
+          <div class="size-option" onclick="document.getElementById('sizeLarge').click()">
+            <input type="checkbox" id="sizeLarge" style="display:none">
+            <div class="size-icon"><i class="fas fa-beer"></i></div>
+            <div>Büyük</div>
           </div>
-          
-          <div class="form-group">
-            <label>Kategori:</label>
-            <select id="newProductCategory">
-              <option value="">-- Kategori seçin --</option>
-            </select>
-          </div>
-          
-          <h4 style="margin-top: 20px;">İçerikler</h4>
-          <div id="ingredientList"></div>
-          <button class="btn-primary" onclick="addIngredientField()">
-            <i class="fas fa-plus"></i> İçerik Ekle
-          </button>
-          
-          <button class="btn-success" onclick="saveNewProduct()" style="margin-top: 20px;">
-            <i class="fas fa-save"></i> Ürünü Kaydet
-          </button>
-          <div id="productMessage" class="message"></div>
         </div>
         
-        <div>
-          <h3>Mevcut Ürünler</h3>
-          <table id="productTable">
-            <thead>
-              <tr>
-                <th>Ad</th>
-                <th>Fiyat</th>
-                <th>Kategori</th>
-                <th>İşlemler</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td colspan="4" style="text-align:center;">Ürünler yükleniyor...</td>
-              </tr>
-            </tbody>
-          </table>
+        <div id="sizePriceFields" style="display:none; margin-top:15px;">
+          <div id="smallPriceField" style="display:none; margin-bottom:10px;">
+            <label>Küçük Boy Fiyatı (₺):</label>
+            <input type="number" id="priceSmall" min="0" step="0.01" placeholder="Fiyat">
+          </div>
+          
+          <div id="mediumPriceField" style="display:none; margin-bottom:10px;">
+            <label>Orta Boy Fiyatı (₺):</label>
+            <input type="number" id="priceMedium" min="0" step="0.01" placeholder="Fiyat">
+          </div>
+          
+          <div id="largePriceField" style="display:none; margin-bottom:10px;">
+            <label>Büyük Boy Fiyatı (₺):</label>
+            <input type="number" id="priceLarge" min="0" step="0.01" placeholder="Fiyat">
+          </div>
         </div>
       </div>
+      
+      <div class="form-group">
+        <label>Fiyat (₺):</label>
+        <input type="number" id="newProductPrice" placeholder="Örn: 120" min="0" step="0.01">
+      </div>
+      
+      <div class="form-group">
+        <label>Kategori:</label>
+        <select id="newProductCategory">
+          <option value="">-- Kategori seçin --</option>
+        </select>
+      </div>
+      
+      <h4 style="margin-top: 20px;">Standart İçerikler</h4>
+      <div id="ingredientList"></div>
+      <button class="btn-primary" onclick="addIngredientField()">
+        <i class="fas fa-plus"></i> İçerik Ekle
+      </button>
+      
+      <div id="sizeIngredientSections" style="display:none; margin-top:20px;">
+        <div id="smallIngredientsSection" style="display:none;">
+          <h4>Küçük Boy İçerikleri</h4>
+          <div id="smallIngredientList"></div>
+          <button class="btn-primary" onclick="addSmallIngredientField()">
+            <i class="fas fa-plus"></i> İçerik Ekle
+          </button>
+        </div>
+        
+        <div id="mediumIngredientsSection" style="display:none;">
+          <h4>Orta Boy İçerikleri</h4>
+          <div id="mediumIngredientList"></div>
+          <button class="btn-primary" onclick="addMediumIngredientField()">
+            <i class="fas fa-plus"></i> İçerik Ekle
+          </button>
+        </div>
+        
+        <div id="largeIngredientsSection" style="display:none;">
+          <h4>Büyük Boy İçerikleri</h4>
+          <div id="largeIngredientList"></div>
+          <button class="btn-primary" onclick="addLargeIngredientField()">
+            <i class="fas fa-plus"></i> İçerik Ekle
+          </button>
+        </div>
+      </div>
+      
+      <button class="btn-success" onclick="saveNewProduct()" style="margin-top: 20px;">
+        <i class="fas fa-save"></i> Ürünü Kaydet
+      </button>
+      <div id="productMessage" class="message"></div>
     </div>
+    
+    <div>
+      <h3>Mevcut Ürünler</h3>
+      <table id="productTable">
+        <thead>
+          <tr>
+            <th>Ad</th>
+            <th>Fiyat</th>
+            <th>Kategori</th>
+            <th>İşlemler</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td colspan="4" style="text-align:center;">Ürünler yükleniyor...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
   </div>
 
   <!-- Geçmiş İşlemler -->
@@ -1127,6 +1234,10 @@
     </div>
   </div>
 
+        
+
+
+
   <script>
     // Firebase konfigürasyonu
     const firebaseConfig = {
@@ -1206,6 +1317,17 @@ document.querySelectorAll('#expenseArchive .tab[data-subtab]').forEach(tab => {
     }
   });
 });
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1311,6 +1433,104 @@ function updateDekontTable(snapshot) {
 
   tbody.innerHTML = tbodyContent;
 }
+
+
+
+
+
+
+
+
+// Boyut seçeneklerini yönetmek için yeni fonksiyonlar
+document.getElementById('enableSizes').addEventListener('change', function() {
+  const sizeOptions = document.getElementById('sizeOptions');
+  sizeOptions.style.display = this.checked ? 'block' : 'none';
+  
+  if (!this.checked) {
+    // Boyutları devre dışı bırak
+    document.getElementById('sizePriceFields').style.display = 'none';
+    document.getElementById('sizeIngredientSections').style.display = 'none';
+    // Tüm boyut checkbox'larını temizle
+    ['Small', 'Medium', 'Large'].forEach(size => {
+      document.getElementById(`size${size}`).checked = false;
+      document.getElementById(`${size.toLowerCase()}IngredientsSection`).style.display = 'none';
+      document.getElementById(`price${size}`).value = '';
+    });
+  }
+});
+
+
+// Boyut seçimine göre fiyat alanlarını göster/gizle
+['Small', 'Medium', 'Large'].forEach(size => {
+  document.getElementById(`size${size}`).addEventListener('change', function() {
+    const priceField = document.getElementById(`${size.toLowerCase()}PriceField`);
+    const ingredientSection = document.getElementById(`${size.toLowerCase()}IngredientsSection`);
+    
+    if (this.checked) {
+      priceField.style.display = 'block';
+      ingredientSection.style.display = 'block';
+      document.getElementById('sizePriceFields').style.display = 'block';
+      document.getElementById('sizeIngredientSections').style.display = 'block';
+    } else {
+      priceField.style.display = 'none';
+      ingredientSection.style.display = 'none';
+      document.getElementById(`price${size}`).value = '';
+      
+      // Tüm boyutlar kapatıldıysa bölümleri gizle
+      if (!document.getElementById('sizeSmall').checked && 
+          !document.getElementById('sizeMedium').checked && 
+          !document.getElementById('sizeLarge').checked) {
+        document.getElementById('sizePriceFields').style.display = 'none';
+        document.getElementById('sizeIngredientSections').style.display = 'none';
+      }
+    }
+  });
+});
+
+// Boyutlara özel içerik ekleme fonksiyonları
+function addSmallIngredientField() {
+  addIngredientFieldTo('smallIngredientList');
+}
+
+function addMediumIngredientField() {
+  addIngredientFieldTo('mediumIngredientList');
+}
+
+function addLargeIngredientField() {
+  addIngredientFieldTo('largeIngredientList');
+}
+
+
+function addIngredientFieldTo(containerId) {
+  const container = document.getElementById(containerId);
+  const row = document.createElement("div");
+  row.className = "ingredient-row";
+  
+  const select = document.createElement("select");
+  select.innerHTML = '<option value="">-- İçerik seçin --</option>';
+  allIngredients.forEach(ing => {
+    select.innerHTML += `<option value="${ing.name}">${ing.name} (${ing.unit || 'adet'})</option>`;
+  });
+  
+  const input = document.createElement("input");
+  input.type = "number";
+  input.placeholder = "Miktar";
+  input.min = "0";
+  input.step = "1";
+  
+  const delBtn = document.createElement("button");
+  delBtn.className = "btn-danger";
+  delBtn.innerHTML = '<i class="fas fa-times"></i>';
+  delBtn.onclick = () => row.remove();
+  
+  row.append(select, input, delBtn);
+  container.appendChild(row);
+}
+
+
+
+
+
 
 async function loadCariExpenses() {
   try {
@@ -1549,38 +1769,44 @@ function updateCariTable(snapshot) {
     }
 
     function updateProductTable(snapshot) {
-      const tbody = document.querySelector("#productTable tbody");
-      allProducts = [];
-      
-      if (snapshot.empty) {
-        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;">Ürün bulunamadı</td></tr>`;
-        return;
-      }
-      
-      let tbodyContent = "";
-      snapshot.forEach(doc => {
-        const data = doc.data();
-        allProducts.push({ id: doc.id, ...data });
-        
-        const categoryName = allCategories.find(cat => cat.slug === data.category)?.name || data.category;
-        
-        tbodyContent += `
-          <tr>
-            <td>${data.name}</td>
-            <td>${data.price.toFixed(2)}₺</td>
-            <td>${categoryName}</td>
-            <td class="action-cell">
-              <button class="btn-danger action-btn" onclick="deleteProduct('${doc.id}')">
-                <i class="fas fa-trash"></i> Sil
-              </button>
-            </td>
-          </tr>
-        `;
-      });
-      
-      tbody.innerHTML = tbodyContent;
-    }
-
+  const tbody = document.querySelector("#productTable tbody");
+  allProducts = [];
+  
+  if (snapshot.empty) {
+    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;">Ürün bulunamadı</td></tr>`;
+    return;
+  }
+  
+  let tbodyContent = "";
+  snapshot.forEach(doc => {
+    const data = doc.data();
+    allProducts.push({ id: doc.id, ...data });
+    
+    const categoryName = allCategories.find(cat => cat.slug === data.category)?.name || data.category;
+    
+    // Fiyat/boyut bilgisi
+    let priceInfo = data.hasSizes ? 
+      Object.entries(data.sizes).map(([size, info]) => 
+        `${size}: ${info.price.toFixed(2)}₺`
+      ).join('<br>') : 
+      `${data.price.toFixed(2)}₺`;
+    
+    tbodyContent += `
+      <tr>
+        <td>${data.name}</td>
+        <td>${priceInfo}</td>
+        <td>${categoryName}</td>
+        <td class="action-cell">
+          <button class="btn-danger action-btn" onclick="deleteProduct('${doc.id}')">
+            <i class="fas fa-trash"></i> Sil
+          </button>
+        </td>
+      </tr>
+    `;
+  });
+  
+  tbody.innerHTML = tbodyContent;
+}
     async function loadIngredients() {
   try {
     const querySnapshot = await db.collection("stocks").get();
@@ -1629,77 +1855,169 @@ function updateCariTable(snapshot) {
 }
 
     async function saveNewProduct() {
-      const name = document.getElementById("newProductName").value.trim();
-      const price = parseFloat(document.getElementById("newProductPrice").value);
-      const category = document.getElementById("newProductCategory").value;
-      const messageDiv = document.getElementById("productMessage");
-      
-      showMessage(messageDiv, "", "");
+  const name = document.getElementById("newProductName").value.trim();
+  const price = parseFloat(document.getElementById("newProductPrice").value);
+  const category = document.getElementById("newProductCategory").value;
+  const messageDiv = document.getElementById("productMessage");
+  const hasSizes = document.getElementById("enableSizes").checked;
+  
+  // Validasyon
+  if (!name) {
+    showMessage(messageDiv, "Ürün adı boş olamaz", 'error');
+    return;
+  }
+  if (!category) {
+    showMessage(messageDiv, "Kategori seçmelisiniz", 'error');
+    return;
+  }
 
-      // Validasyon
-      if (!name) {
-        showMessage(messageDiv, "Ürün adı boş olamaz", 'error');
-        return;
-      }
-      if (isNaN(price)) {
-        showMessage(messageDiv, "Geçerli bir fiyat girin", 'error');
-        return;
-      }
-      if (price <= 0) {
-        showMessage(messageDiv, "Fiyat pozitif olmalı", 'error');
-        return;
-      }
+  // Standart içerikleri topla
+  const ingredients = {};
+  let hasError = false;
+  
+  document.querySelectorAll("#ingredientList .ingredient-row").forEach(row => {
+    const ingName = row.querySelector("select").value;
+    const amount = parseInt(row.querySelector("input").value);
+    
+    if (!ingName) {
+      showMessage(messageDiv, "Lütfen tüm içerikleri seçin", 'error');
+      hasError = true;
+      return;
+    }
+    if (isNaN(amount) || amount <= 0) {
+      showMessage(messageDiv, "Lütfen geçerli miktar girin", 'error');
+      hasError = true;
+      return;
+    }
+    
+    ingredients[ingName] = amount;
+  });
+  
+  if (hasError) return;
 
-      // İçerikleri topla
-      const ingredients = {};
-      let hasError = false;
+  // Boyut bilgilerini topla
+  const sizes = {};
+  if (hasSizes) {
+    // Küçük boy
+    if (document.getElementById("sizeSmall").checked) {
+      const smallPrice = parseFloat(document.getElementById("priceSmall").value);
+      if (isNaN(smallPrice) || smallPrice <= 0) {
+        showMessage(messageDiv, "Küçük boy için geçerli fiyat girin", 'error');
+        return;
+      }
       
-      document.querySelectorAll(".ingredient-row").forEach(row => {
+      const smallIngredients = {};
+      document.querySelectorAll("#smallIngredientList .ingredient-row").forEach(row => {
         const ingName = row.querySelector("select").value;
         const amount = parseInt(row.querySelector("input").value);
-        
-        if (!ingName) {
-          showMessage(messageDiv, "Lütfen tüm içerikleri seçin", 'error');
-          hasError = true;
-          return;
-        }
-        if (isNaN(amount) || amount <= 0) {
-          showMessage(messageDiv, "Lütfen geçerli miktar girin", 'error');
-          hasError = true;
-          return;
-        }
-        
-        ingredients[ingName] = amount;
+        smallIngredients[ingName] = amount;
       });
       
-      if (hasError) return;
-      if (Object.keys(ingredients).length === 0) {
-        showMessage(messageDiv, "En az bir içerik eklemelisiniz", 'error');
+      sizes.küçük = {
+        price: smallPrice,
+        ingredients: smallIngredients
+      };
+    }
+    
+    // Orta boy
+    if (document.getElementById("sizeMedium").checked) {
+      const mediumPrice = parseFloat(document.getElementById("priceMedium").value);
+      if (isNaN(mediumPrice) || mediumPrice <= 0) {
+        showMessage(messageDiv, "Orta boy için geçerli fiyat girin", 'error');
         return;
       }
+      
+      const mediumIngredients = {};
+      document.querySelectorAll("#mediumIngredientList .ingredient-row").forEach(row => {
+        const ingName = row.querySelector("select").value;
+        const amount = parseInt(row.querySelector("input").value);
+        mediumIngredients[ingName] = amount;
+      });
+      
+      sizes.orta = {
+        price: mediumPrice,
+        ingredients: mediumIngredients
+      };
+    }
+    
+    // Büyük boy
+    if (document.getElementById("sizeLarge").checked) {
+      const largePrice = parseFloat(document.getElementById("priceLarge").value);
+      if (isNaN(largePrice) || largePrice <= 0) {
+        showMessage(messageDiv, "Büyük boy için geçerli fiyat girin", 'error');
+        return;
+      }
+      
+      const largeIngredients = {};
+      document.querySelectorAll("#largeIngredientList .ingredient-row").forEach(row => {
+        const ingName = row.querySelector("select").value;
+        const amount = parseInt(row.querySelector("input").value);
+        largeIngredients[ingName] = amount;
+      });
+      
+      sizes.büyük = {
+        price: largePrice,
+        ingredients: largeIngredients
+      };
+    }
+    
+    // En az bir boyut seçilmiş mi kontrolü
+    if (Object.keys(sizes).length === 0) {
+      showMessage(messageDiv, "En az bir boyut seçmelisiniz", 'error');
+      return;
+    }
+  } else {
+    // Boyutsuz ürün için fiyat kontrolü
+    if (isNaN(price) || price <= 0) {
+      showMessage(messageDiv, "Geçerli bir fiyat girin", 'error');
+      return;
+    }
+    
+    // En az bir içerik kontrolü
+    if (Object.keys(ingredients).length === 0) {
+      showMessage(messageDiv, "En az bir içerik eklemelisiniz", 'error');
+      return;
+    }
+  }
 
-      try {
-        // Ürünü ekle
-        await db.collection("products").add({
-          name: name,
-          price: price,
-          category: category,
-          ingredients: ingredients,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
+  try {
+    const productData = {
+      name: name,
+      category: category,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+
+    // Boyutlu ürün mü?
+    if (hasSizes && Object.keys(sizes).length > 0) {
+      productData.sizes = sizes;
+      productData.hasSizes = true;
+    } else {
+      // Standart ürün
+      productData.price = price;
+      productData.ingredients = ingredients;
+      productData.hasSizes = false;
+    }
+
+    await db.collection("products").add(productData);
 
         // Formu temizle
-        document.getElementById("newProductName").value = "";
-        document.getElementById("newProductPrice").value = "";
-        document.getElementById("ingredientList").innerHTML = "";
-        
-        showMessage(messageDiv, "✔️ Ürün başarıyla eklendi", 'success');
-        await loadProducts();
-      } catch (err) {
-        showMessage(messageDiv, "❌ Hata: " + err.message, 'error');
-        console.error("Ürün ekleme hatası:", err);
-      }
-    }
+         document.getElementById("newProductName").value = "";
+    document.getElementById("newProductPrice").value = "";
+    document.getElementById("ingredientList").innerHTML = "";
+    document.getElementById("enableSizes").checked = false;
+    document.getElementById("sizeOptions").style.display = "none";
+    document.getElementById("sizePriceFields").style.display = "none";
+    document.getElementById("sizeIngredientSections").style.display = "none";
+    
+    showMessage(messageDiv, "✔️ Ürün başarıyla eklendi", 'success');
+    await loadProducts();
+  } catch (err) {
+    showMessage(messageDiv, "❌ Hata: " + err.message, 'error');
+    console.error("Ürün ekleme hatası:", err);
+  }
+}
+
+
 
     async function deleteProduct(productId) {
       if (!confirm("Bu ürünü silmek istediğinize emin misiniz? Bu işlem geri alınamaz.")) return;

@@ -324,6 +324,59 @@
       box-shadow: 0 3px 6px rgba(0,0,0,0.05);
     }
     
+    /* Boyut Seçimi Stilleri */
+    .size-selection {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin: 15px 0;
+      display: none; /* Başlangıçta gizli */
+    }
+    
+    .size-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 12px 15px;
+      background: var(--light);
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: var(--transition);
+      border: 2px solid transparent;
+      min-width: 80px;
+    }
+    
+    .size-btn:hover {
+      background: #e0e6ed;
+      transform: translateY(-3px);
+    }
+    
+    .size-btn.selected {
+      border-color: var(--primary);
+      background: var(--primary-light);
+      transform: scale(1.05);
+      box-shadow: 0 4px 8px rgba(90, 103, 216, 0.2);
+    }
+    
+    .size-btn i {
+      font-size: 24px;
+      margin-bottom: 8px;
+      color: #a97443;
+    }
+    
+    .size-btn .size-name {
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--dark);
+    }
+    
+    .size-btn .size-price {
+      font-weight: 700;
+      color: var(--success);
+      font-size: 13px;
+      margin-top: 4px;
+    }
+    
     .quantity-container {
       display: flex;
       gap: 15px;
@@ -921,6 +974,15 @@
         min-width: 140px;
       }
       
+      .size-selection {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      
+      .size-btn {
+        min-width: 70px;
+      }
+      
       .action-buttons {
         flex-direction: column;
         gap: 15px;
@@ -964,6 +1026,11 @@
       <label>Ürün Seçimi:</label>
       <div id="kahveListesi" class="coffee-selection" role="list" aria-label="Ürün seçenekleri">
         <div class="no-product-message">Kategori seçin veya ürün seçin</div>
+      </div>
+      
+      <!-- Boyut Seçim Alanı -->
+      <div id="sizeSelection" class="size-selection">
+        <!-- Boyut seçenekleri buraya dinamik olarak eklenecek -->
       </div>
       
       <div class="form-group">
@@ -1130,6 +1197,61 @@
     let selectedOrderForRefund = null;
     let currentCustomerName = "";
     let currentNoteIndex = -1;
+    let selectedSize = ""; // Seçilen boyutu saklamak için
+
+    // Boyut seçimi
+    function selectSize(size) {
+      selectedSize = size;
+      document.querySelectorAll('.size-btn').forEach(btn => {
+        btn.classList.remove('selected');
+      });
+      event.currentTarget.classList.add('selected');
+      
+      // Seçilen boyutun fiyatını göster
+      const product = productSpecs[selectedProduct];
+      if (product && product.sizes && product.sizes[size]) {
+        const price = product.sizes[size].price.toFixed(2);
+        document.querySelector('.size-btn.selected .size-price').textContent = `${price}₺`;
+      }
+    }
+
+    // Boyut seçeneklerini oluştur
+    function createSizeOptions(product) {
+      const sizeContainer = document.getElementById('sizeSelection');
+      sizeContainer.innerHTML = '';
+      
+      if (!product || !product.sizes || Object.keys(product.sizes).length === 0) {
+        sizeContainer.style.display = 'none';
+        return;
+      }
+      
+      sizeContainer.style.display = 'flex';
+      
+      Object.entries(product.sizes).forEach(([sizeName, sizeData]) => {
+        const sizeBtn = document.createElement('div');
+        sizeBtn.className = 'size-btn';
+        sizeBtn.onclick = (e) => selectSize(sizeName);
+        
+        let icon = 'fa-mug-hot';
+        if (sizeName === 'küçük') icon = 'fa-mug-saucer';
+        if (sizeName === 'büyük') icon = 'fa-mug-hot';
+        if (sizeName === 'orta') icon = 'fa-mug';
+        
+        sizeBtn.innerHTML = `
+          <i class="fas ${icon}"></i>
+          <div class="size-name">${sizeName.charAt(0).toUpperCase() + sizeName.slice(1)}</div>
+          <div class="size-price">${sizeData.price.toFixed(2)}₺</div>
+        `;
+        
+        sizeContainer.appendChild(sizeBtn);
+      });
+      
+      // İlk boyutu otomatik seç
+      if (sizeContainer.children.length > 0) {
+        sizeContainer.children[0].classList.add('selected');
+        selectedSize = Object.keys(product.sizes)[0];
+      }
+    }
 
     // İsim ekle butonu fonksiyonu
     window.addCustomerName = function () {
@@ -1329,20 +1451,28 @@
       div.tabIndex = 0;
       div.setAttribute("role", "button");
       div.setAttribute("aria-pressed", "false");
-      
+
+
+      const price = product.price?.toFixed?.(2) || "0.00";
+
       div.innerHTML = `
-        <img src="${product.resim}" 
-             alt="${product.ad}" 
-             onerror="this.onerror=null; this.src='img/placeholder.jpg'" />
-        <p>${product.ad}</p>
-        <div class="price">${product.price.toFixed(2)}₺</div>
-      `;
+    <img src="${product.resim}" 
+         alt="${product.ad}" 
+         onerror="this.onerror=null; this.src='img/placeholder.jpg'" />
+    <p>${product.ad}</p>
+    <div class="price">${price}₺</div>
+  `;
       
-      div.addEventListener("click", () => selectProduct(div, product.ad));
+      div.addEventListener("click", () => {
+        selectProduct(div, product.ad);
+        createSizeOptions(productSpecs[product.ad]); // Boyut seçeneklerini oluştur
+      });
+      
       div.addEventListener("keydown", e => {
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
           selectProduct(div, product.ad);
+          createSizeOptions(productSpecs[product.ad]); // Boyut seçeneklerini oluştur
         }
       });
       
@@ -1358,6 +1488,7 @@
       div.classList.add("selected");
       div.setAttribute("aria-pressed", "true");
       selectedProduct = productName;
+      selectedSize = ""; // Boyut seçimini sıfırla
     }
 
     // Doğrudan ana kategori ürünü seçildiğinde
@@ -1383,6 +1514,7 @@
           div.classList.add("selected");
           div.setAttribute("aria-pressed", "true");
           productListDiv.appendChild(div);
+          createSizeOptions(productSpecs[productName]); // Boyut seçeneklerini oluştur
           break;
         }
       }
@@ -1404,9 +1536,21 @@
         alert("Lütfen bir ürün seçin ve adet belirtin.");
         return;
       }
+      
+      // Fiyatı belirle
+       let price = productSpecs[selectedProduct]?.price || 0;
+      let sizeInfo = "";
+      
+      // Eğer boyut seçilmişse, o boyutun fiyatını kullan
+      if (selectedSize && productSpecs[selectedProduct]?.sizes?.[selectedSize]) {
+        price = productSpecs[selectedProduct].sizes[selectedSize].price;
+        sizeInfo = ` (${selectedSize.charAt(0).toUpperCase() + selectedSize.slice(1)})`;
+      }
 
       // Ürün zaten sepette mi kontrol et
-      const existingIndex = currentOrder.findIndex(item => item.product === selectedProduct);
+      const existingIndex = currentOrder.findIndex(item => 
+        item.product === selectedProduct && item.size === selectedSize
+      );
       
       if (existingIndex !== -1) {
         // Ürün zaten varsa adetini güncelle
@@ -1416,7 +1560,8 @@
         currentOrder.push({ 
           product: selectedProduct, 
           qty,
-          price: productSpecs[selectedProduct]?.price || 0,
+          price: price,
+          size: selectedSize,
           image: productSpecs[selectedProduct]?.image || "",
           note: "" // Not alanı eklendi
         });
@@ -1424,11 +1569,13 @@
       
       updateOrderDisplay();
       selectedProduct = "";
+      selectedSize = "";
       document.querySelectorAll(".coffee-option").forEach(opt => {
         opt.classList.remove("selected");
         opt.setAttribute("aria-pressed", "false");
       });
       document.getElementById("quantity").value = 1;
+      document.getElementById("sizeSelection").style.display = "none";
 
       saveActiveOrder();
     }
@@ -1459,10 +1606,12 @@
 
       currentOrder.forEach((item, index) => {
         const price = item.price.toFixed(2) || "0.00";
+        const sizeInfo = item.size ? ` (${item.size.charAt(0).toUpperCase() + item.size.slice(1)})` : '';
+        
         htmlList += `
           <div class="order-item">
             <div class="item-details">
-              <div>${item.qty} x ${item.product} (${price}₺)</div>
+              <div>${item.qty} x ${item.product}${sizeInfo} (${price}₺)</div>
               ${item.note ? `<div class="order-note">${item.note}</div>` : ''}
             </div>
             <div class="item-actions">
@@ -1503,6 +1652,7 @@
           await addDoc(collection(db, "tickets"), {
             orderId,
             product: item.product,
+            size: item.size || "",
             customerName,
             note: item.note || "", // Notu kaydet
             timestamp: serverTimestamp(),
@@ -1669,7 +1819,11 @@
           }
           
           // Ürün listesi
-          const products = data.items.map(i => `${i.qty}x ${i.product}`).join(', ');
+          const products = data.items.map(i => {
+            let productText = `${i.qty}x ${i.product}`;
+            if (i.size) productText += ` (${i.size})`;
+            return productText;
+          }).join(', ');
           
           // Durum bilgisi
           let status = "Tamamlandı";
@@ -1717,33 +1871,45 @@
 
     // Ürünleri yükle
     async function loadProducts() {
-      productMenu = {};
-      productSpecs = {};
+  productMenu = {};
+  productSpecs = {};
 
-      const snapshot = await getDocs(collection(db, "products"));
-      snapshot.forEach(doc => {
-        const data = doc.data();
-        if (data.category) {
-          if (!productMenu[data.category]) {
-            productMenu[data.category] = [];
-          }
+  const snapshot = await getDocs(collection(db, "products"));
+  snapshot.forEach(doc => {
+    const data = doc.data();
+    if (data.category) {
+      if (!productMenu[data.category]) {
+        productMenu[data.category] = [];
+      }
 
-          const imagePath = data.image || `img/${data.name.toLowerCase().replace(/\s/g, '')}.jpg`;
+      const imagePath = data.image || `img/${data.name.toLowerCase().replace(/\s/g, '')}.jpg`;
+      const price = data.hasSizes ? 
+        Object.values(data.sizes)[0]?.price || 0 : // İlk boyutun fiyatını al
+        data.price || 0;
 
-          productMenu[data.category].push({
-            ad: data.name,
-            resim: imagePath,
-            price: data.price
-          });
 
-          productSpecs[data.name] = {
-            ...data.ingredients,
-            price: data.price,
-            image: imagePath 
-          };
-        }
+      productMenu[data.category].push({
+        ad: data.name,
+        resim: imagePath,
+        price: price // Düzeltilmiş fiyat
       });
+
+      // Ürün özelliklerini eklerken sizes alanını da dahil edin
+      productSpecs[data.name] = {
+        ...data,
+        image: imagePath,
+        price: price // Düzeltilmiş fiyat
+      };
     }
+  });
+
+  console.log("Loaded product:", {
+  name: data.name,
+  price: price,
+  hasSizes: data.hasSizes,
+  sizes: data.sizes
+});
+}
 
     // Stokları yükle
     async function loadStocks() {
@@ -1795,10 +1961,13 @@
         const spec = productSpecs[item.product];
         if (!spec) continue;
 
-        totalPrice += item.qty * spec.price;
+        totalPrice += item.qty * item.price;
 
-        for (const [ingredient, amount] of Object.entries(spec)) {
-          if (ingredient === 'price') continue;
+        // Eğer boyut seçilmişse, o boyutun içeriklerini kullan
+        const sizeSpec = item.size && spec.sizes?.[item.size] ? spec.sizes[item.size] : spec;
+        
+        for (const [ingredient, amount] of Object.entries(sizeSpec)) {
+          if (ingredient === 'price' || ingredient === 'sizes') continue;
           requiredStocks[ingredient] = (requiredStocks[ingredient] || 0) + (item.qty * amount);
         }
       }
@@ -1914,7 +2083,7 @@
           item.dataset.id = doc.id;
           item.innerHTML = `
             <div class="order-id">Sipariş #${doc.id.slice(0, 6)}</div>
-            <div class="items">${data.items.map(i => `${i.qty}x ${i.product}`).join(', ')}</div>
+            <div class="items">${data.items.map(i => `${i.qty}x ${i.product}${i.size ? ` (${i.size})` : ''}`).join(', ')}</div>
             <div class="total">${data.total}₺</div>
             <div class="date">${date}</div>
           `;
@@ -1946,8 +2115,8 @@
             <label>
               <input type="checkbox" class="refund-item-checkbox" 
                      data-index="${index}" data-product="${item.product}" 
-                     data-qty="${item.qty}" data-price="${item.price}">
-              ${item.qty}x ${item.product} (${item.price}₺)
+                     data-qty="${item.qty}" data-price="${item.price}" data-size="${item.size || ''}">
+              ${item.qty}x ${item.product}${item.size ? ` (${item.size})` : ''} (${item.price}₺)
             </label>
           </div>
         `;
@@ -1962,7 +2131,8 @@
             index: parseInt(this.dataset.index),
             product: this.dataset.product,
             qty: parseInt(this.dataset.qty),
-            price: parseFloat(this.dataset.price)
+            price: parseFloat(this.dataset.price),
+            size: this.dataset.size
           };
           
           if (this.checked) {
@@ -2002,8 +2172,11 @@
             const spec = productSpecs[item.product];
             if (!spec) continue;
             
-            for (const [ingredient, amount] of Object.entries(spec)) {
-              if (ingredient === 'price') continue;
+            // Boyutlu ürün için doğru içerikleri kullan
+            const sizeSpec = item.size && spec.sizes?.[item.size] ? spec.sizes[item.size] : spec;
+            
+            for (const [ingredient, amount] of Object.entries(sizeSpec)) {
+              if (ingredient === 'price' || ingredient === 'sizes') continue;
               
               const stockAmount = item.qty * amount;
               const currentStock = stockData[ingredient] || 0;
@@ -2121,6 +2294,7 @@
     window.openNoteModal = openNoteModal;
     window.saveNote = saveNote;
     window.closeNoteModal = closeNoteModal;
+    window.selectSize = selectSize;
   </script>
 </body>
 </html>
