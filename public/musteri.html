@@ -2,102 +2,79 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <title>Müşteri Sipariş Takip</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sipariş Takip</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="icon" href="data:;base64,iVBORw0KGgo="> <!-- Favicon hatası çözümü -->
   <style>
+    :root {
+      --background-opacity: 0.55;
+    }
+    
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
     
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #f5f7fa 0%, #e4edfb 100%);
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-    }
-    
-    .container {
-      background: white;
-      border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    html, body {
+      height: 100%;
       width: 100%;
-      max-width: 800px;              /* enlemesine genişlik*/
       overflow: hidden;
     }
     
-    header {
-      background: #128da8;
-      color: white;
-      padding: 15px 30px;
-      text-align: center;
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      height: 100vh;
+      display: flex;
+      padding: 0;
+      background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
       position: relative;
     }
     
+    .container {
+      background: rgba(255, 255, 255, 0.95);
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    header {
+      background: linear-gradient(135deg, #128da8 0%, #0a5c70 100%);
+      color: white;
+      padding: 20px 30px;
+      text-align: center;
+      position: relative;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      flex-shrink: 0;
+      z-index: 10;
+    }
+    
     header h1 {
-      font-size: 22px;
-      margin-bottom: 8px;
+      font-size: 32px;
+      margin-bottom: 5px;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 12px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      font-weight: 700;
     }
     
-    .order-id {
-      background: rgba(255,255,255,0.2);
-      padding: 8px 20px;
-      border-radius: 30px;
+    .subtitle {
       font-size: 18px;
-      margin-top: 10px;
-      display: inline-block;
-    }
-    
-    .status-container {
-      display: flex;
-      justify-content: center;
-      margin-top: 20px;
-      gap: 15px;
-    }
-    
-    .status {
-      background: white;
-      border-radius: 12px;
-      padding: 15px 25px;
-      text-align: center;
-      min-width: 160px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    }
-    
-    .status i {
-      font-size: 28px;
-      margin-bottom: 10px;
-      display: block;
-    }
-    
-    .status.preparing i { color: #4a89dc; }
-    .status.ready i { color: #27ae60; }
-    
-    .status h3 {
-      font-size: 18px;
-      color: #333;
-      margin-bottom: 5px;
-    }
-    
-    .status p {
-      font-size: 14px;
-      color: #777;
+      opacity: 0.9;
+      margin-top: 5px;
     }
     
     .order-details {
-      padding: 30px;
-    }
-    
-    .order-section {
-      margin-bottom: 30px;
+      padding: 20px 30px;
+      flex-grow: 1;
+      overflow-y: auto;
+      position: relative;
+      z-index: 2;
     }
     
     .order-section h2 {
@@ -105,68 +82,122 @@
       align-items: center;
       gap: 10px;
       color: #0a4694;
-      padding-bottom: 20px;
+      padding-bottom: 15px;
       margin-bottom: 20px;
-      border-bottom: 4px solid #eee;
+      border-bottom: 3px solid #f0f5ff;
+      font-size: 24px;
+      font-weight: 700;
     }
     
-    .items-list {
-      display: grid;
-      gap: 20px;
-    }
-    
-    .item {
+    .customer-name {
+      text-align: center;
+      font-size: 22px;
+      font-weight: 600;
+      color: #0a4694;
+      padding: 15px;
+      background: rgba(10, 70, 148, 0.05);
+      border-radius: 10px;
+      margin-bottom: 20px;
       display: flex;
       align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+    }
+    
+    .order-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0 12px;
+      margin-top: 10px;
+      table-layout: fixed;
+    }
+    
+    .order-table th {
+      text-align: left;
+      padding: 12px 15px;
+      background: #f1f8ff;
+      color: #0a4694;
+      font-weight: 700;
+      font-size: 18px;
+    }
+    
+    .order-table td {
       padding: 15px;
       background: #f9fbfd;
-      border-radius: 12px;
-      border-left: 4px solid #4a89dc;
+      border-left: 5px solid #4a89dc;
+      font-size: 18px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+      vertical-align: top;
     }
     
     .item-image {
-      width: 60px;
-      height: 60px;
-      border-radius: 10px;
+      width: 90px;
+      height: 70px;
+      border-radius: 8px;
       object-fit: cover;
-      margin-right: 15px;
       border: 1px solid #e0e6ed;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      color: #4a89dc;
     }
     
     .item-info {
-      flex: 1;
+      padding-left: 15px;
+      word-break: break-word;
     }
     
     .item-name {
-      font-weight: 600;
-      font-size: 16px;
-      color: #333;
+      font-weight: 700;
+      color: #222;
+      font-size: 19px;
       margin-bottom: 5px;
     }
     
-    .item-qty {
-      font-size: 14px;
-      color: #777;
+    .unit-price {
+      color: #666;
+      font-size: 16px;
+      margin-bottom: 8px;
+    }
+    
+    .item-note {
+      font-style: italic;
+      color: #e67e22;
+      padding: 6px 10px;
+      background: rgba(230, 126, 34, 0.1);
+      border-radius: 5px;
+      display: inline-block;
+      font-size: 15px;
+      margin-top: 5px;
     }
     
     .item-price {
       font-weight: bold;
-      font-size: 16px;
+      color: #27ae60;
+      font-size: 19px;
+      text-align: right;
+      white-space: nowrap;
     }
     
     .total-section {
-      background: #f1f8ff;
-      padding: 20px;
+      background: linear-gradient(135deg, #f1f8ff 0%, #e3f2fd 100%);
+      padding: 20px 25px;
       border-radius: 12px;
       text-align: right;
-      font-size: 20px;
+      font-size: 24px;
       font-weight: bold;
-      margin-top: 20px;
+      margin-top: 15px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+      border: 1px solid rgba(74, 137, 220, 0.2);
     }
     
     .total-section span {
       color: #27ae60;
-      font-size: 24px;
+      font-size: 28px;
+      text-shadow: 0 2px 4px rgba(39, 174, 96, 0.2);
     }
     
     .notification {
@@ -174,17 +205,20 @@
       bottom: 20px;
       right: 20px;
       background: #5ce193;
-      color: rgb(109, 105, 105);
+      color: #333;
       padding: 15px 25px;
       border-radius: 10px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
       display: flex;
       align-items: center;
       gap: 10px;
-      transform: translateY(100px);
+      transform: translateY(120px);
       opacity: 0;
-      transition: all 0.3s ease;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       z-index: 1000;
+      font-size: 17px;
+      font-weight: 600;
+      border: 1px solid rgba(255, 255, 255, 0.3);
     }
     
     .notification.show {
@@ -192,19 +226,136 @@
       opacity: 1;
     }
     
+    .empty-order {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 5;
+    }
+    
+    .waiting-media {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 1;
+    }
+    
+    .waiting-message {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      color: white;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 25px;
+      border-radius: 15px;
+      max-width: 90%;
+      margin-top: 20px;
+    }
+    
+    .waiting-message i {
+      font-size: 42px;
+      margin-bottom: 15px;
+      color: #fff;
+    }
+    
+    .video-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    /* Sütun genişlikleri */
+    .image-col {
+      width: 130px;
+    }
+    
+    .info-col {
+      width: auto;
+    }
+    
+    .price-col {
+      width: 140px;
+    }
+    
     @media (max-width: 768px) {
-      .status-container {
-        flex-direction: column;
-        align-items: center;
+      header {
+        padding: 15px 10px;
       }
       
-      .status {
-        width: 100%;
-        max-width: 300px;
+      header h1 {
+        font-size: 26px;
+      }
+      
+      .subtitle {
+        font-size: 15px;
       }
       
       .order-details {
-        padding: 20px;
+        padding: 15px 10px;
+      }
+      
+      .order-table th,
+      .order-table td {
+        padding: 12px;
+        font-size: 15px;
+      }
+      
+      .item-image {
+        width: 55px;
+        height: 55px;
+      }
+      
+      .item-name {
+        font-size: 17px;
+      }
+      
+      .total-section {
+        font-size: 20px;
+        padding: 15px 20px;
+      }
+      
+      .total-section span {
+        font-size: 24px;
+      }
+      
+      .customer-name {
+        font-size: 20px;
+        padding: 12px;
+      }
+      
+      .order-section h2 {
+        font-size: 22px;
+      }
+      
+      /* Mobilde sütun genişlikleri */
+      .image-col {
+        width: 70px;
+      }
+      
+      .price-col {
+        width: 100px;
+      }
+
+      .waiting-message {
+        padding: 15px;
+        font-size: 16px;
+      }
+      
+      .waiting-message i {
+        font-size: 32px;
       }
     }
   </style>
@@ -213,27 +364,50 @@
   <div class="container">
     <header>
       <h1><i class="fas fa-mug-hot"></i> Sipariş Takip</h1>
-      
-      
-      
+      <div class="subtitle">Canlı sipariş durumunuz</div>
     </header>
     
     <div class="order-details">
       <div class="order-section">
         <h2><i class="fas fa-list"></i> Sipariş Detayları</h2>
-        <div class="items-list" id="orderItems">
-          <div class="item">
-            <div class="item-image">
-              <i class="fas fa-sync fa-spin"></i>
+        
+        <div id="customerName" class="customer-name" style="display: none;">
+          <i class="fas fa-user"></i>
+          <span id="customerNameText"></span>
+        </div>
+        
+        <div id="orderItems">
+          <div class="empty-order" id="waitingMediaContainer">
+            <div class="video-container" id="videoContainer">
+              <!-- Video buraya eklenecek -->
             </div>
-            <div class="item-info">
-              <div class="item-name">Siparişiniz yükleniyor...</div>
+            <div class="waiting-message">
+              <i class="fas fa-coffee"></i>
+              <div>Henüz siparişiniz bulunmuyor</div>
+              <div class="subtitle" style="margin-top: 12px; font-size: 16px;">
+                Siparişiniz alındığında burada görünecektir
+              </div>
             </div>
           </div>
         </div>
         
-        <div class="total-section">
-          Toplam Tutar: <span id="totalAmount">0₺</span>
+        <div id="orderSummary" style="display: none;">
+          <table class="order-table">
+            <thead>
+              <tr>
+                <th class="image-col">Fotoğraf</th>
+                <th class="info-col">Ürün Bilgisi</th>
+                <th class="price-col">Tutar</th>
+              </tr>
+            </thead>
+            <tbody id="orderItemsBody">
+              <!-- Sipariş öğeleri buraya eklenecek -->
+            </tbody>
+          </table>
+          
+          <div class="total-section">
+            Toplam Tutar: <span id="totalAmount">0₺</span>
+          </div>
         </div>
       </div>
     </div>
@@ -249,8 +423,7 @@
     import { 
       getFirestore, 
       doc, 
-      onSnapshot,
-      getDoc
+      onSnapshot
     } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -265,66 +438,100 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-   
-
     // DOM elementleri
-    const orderNumberEl = document.getElementById('orderNumber');
     const orderItemsEl = document.getElementById('orderItems');
+    const orderItemsBodyEl = document.getElementById('orderItemsBody');
+    const orderSummaryEl = document.getElementById('orderSummary');
     const totalAmountEl = document.getElementById('totalAmount');
     const notificationEl = document.getElementById('notification');
     const notificationMessageEl = document.getElementById('notificationMessage');
-    const preparingTimeEl = document.getElementById('preparingTime');
-    const readyStatusEl = document.getElementById('readyStatus');
+    const customerNameEl = document.getElementById('customerName');
+    const customerNameTextEl = document.getElementById('customerNameText');
+    const videoContainerEl = document.getElementById('videoContainer');
+    const waitingMediaContainer = document.getElementById('waitingMediaContainer');
 
-    // Debug için konsol bilgisi
-    console.log("Müşteri takip sayfası yüklendi, sipariş dinleniyor...");
+    // Video elementini oluştur
+    function createVideoElement() {
+      const video = document.createElement('video');
+      video.id = 'waitingVideo';
+      video.className = 'waiting-media';
+      video.autoplay = true;
+      video.muted = true;
+      video.loop = true;
+      video.playsInline = true;
+      video.style.width = '100%';
+      video.style.height = '100%';
+      video.style.objectFit = 'cover';
+      
+      const source = document.createElement('source');
+      source.src = 'https://assets.mixkit.co/videos/preview/mixkit-coffee-beans-on-a-white-background-1218-large.mp4';
+      source.type = 'video/mp4';
+      
+      video.appendChild(source);
+      videoContainerEl.appendChild(video);
+      
+      return video;
+    }
 
-
-    listenForOrderChanges();
-   
+    // Video oynatma işlemini başlat
+    function playVideo() {
+      let video = document.getElementById('waitingVideo');
+      
+      // Video elementini oluştur
+      if (!video) {
+        video = createVideoElement();
+      }
+      
+      // Video oynatma işlemi
+      const playPromise = video.play();
+      
+      if (playPromise !== undefined) {
+        playPromise.catch(error => {
+          console.log('Video oynatma hatası:', error);
+          // Hata durumunda alternatif video yolu deneyelim
+          const source = video.querySelector('source');
+          source.src = 'https://assets.mixkit.co/videos/preview/mixkit-coffee-beans-on-a-white-background-1218-large.mp4';
+          video.load();
+          video.play().catch(e => console.log('Alternatif video oynatılamadı:', e));
+        });
+      }
+    }
 
     // Sipariş değişikliklerini dinle
     function listenForOrderChanges() {
-  const orderRef = doc(db, "active_orders", "tekSiparis");
+      const orderRef = doc(db, "active_orders", "tekSiparis");
 
-  const unsubscribe = onSnapshot(orderRef, async (snapshot) => {
-    if (snapshot.exists()) {
-      const orderData = snapshot.data();
-      updateOrderDisplay(orderData);
-
-      // Durum
-      if (orderData.status === "draft") {
-        preparingTimeEl.textContent = "Sipariş hazırlanıyor...";
-        readyStatusEl.textContent = "Henüz onaylanmadı.";
-      } else if (orderData.status === "preparing") {
-        preparingTimeEl.textContent = "Hazırlanıyor...";
-        readyStatusEl.textContent = "Hazır olunca burada görünecek";
-      } else if (orderData.status === "ready") {
-        preparingTimeEl.textContent = "Hazırlandı";
-        readyStatusEl.textContent = "Almaya hazır!";
-        showNotification("Siparişiniz hazır!");
-      }
-
-        
-    } else {
-      orderItemsEl.innerHTML = `
-        <div class="item">
-          <div class="item-image">
-            <i class="fas fa-info-circle"></i>
-          </div>
-          <div class="item-info">
-            <div class="item-name">Henüz sipariş eklenmedi</div>
-          </div>
-        </div>`;
+      const unsubscribe = onSnapshot(orderRef, async (snapshot) => {
+        if (snapshot.exists()) {
+          const orderData = snapshot.data();
+          
+          // Sipariş varsa:
+          orderSummaryEl.style.display = 'block';
+          orderItemsEl.style.display = 'none';
+          customerNameEl.style.display = 'none';
+          
+          // Müşteri adı varsa göster
+          if (orderData.customerName) {
+            customerNameTextEl.textContent = orderData.customerName;
+            customerNameEl.style.display = 'flex';
+          }
+          
+          updateOrderDisplay(orderData);
+          showNotification('Yeni sipariş geldi!');
+        } else {
+          // Sipariş YOKSA:
+          orderSummaryEl.style.display = 'none';
+          orderItemsEl.style.display = 'block';
+          customerNameEl.style.display = 'none';
+          
+          // Video oynatmayı başlat
+          playVideo();
+        }
+      });
     }
-  });
-}
-
 
     // Sipariş bilgilerini güncelle
     function updateOrderDisplay(orderData) {
-      console.log("Sipariş güncelleniyor:", orderData);
-      
       let itemsHTML = '';
       let total = 0;
       
@@ -334,46 +541,60 @@
           total += itemTotal;
           
           itemsHTML += `
-            <div class="item">
-              <img src="${item.image || 'img/placeholder.jpg'}" 
-                alt="${item.product}" 
-                class="item-image"
-                onerror="this.onerror=null; this.src='img/placeholder.jpg'">
-              <div class="item-info">
-                <div class="item-name">${item.product}</div>
-                <div class="item-qty">${item.qty} adet × ${item.price}₺</div>
-              </div>
-              <div class="item-price">${itemTotal}₺</div>
-            </div>
+            <tr>
+              <td class="image-col">
+                <div class="item-image">
+                  <img src="${item.image || 'img/placeholder.jpg'}" 
+                    alt="${item.product}" 
+                    style="width:100%; height:100%; object-fit:cover; border-radius:8px;"
+                    onerror="this.onerror=null; this.src='img/placeholder.jpg'">
+                </div>
+              </td>
+              <td class="info-col">
+                <div class="item-info">
+                  <div class="item-name">${item.qty} x ${item.product}</div>
+                  <div class="unit-price">Birim Fiyat: ${item.price.toFixed(2)}₺</div>
+                  ${item.note ? `<div class="item-note">${item.note}</div>` : ''}
+                </div>
+              </td>
+              <td class="price-col">
+                <div class="item-price">${itemTotal.toFixed(2)}₺</div>
+              </td>
+            </tr>
           `;
         });
-      } else {
-        itemsHTML = `
-          <div class="item">
-            <div class="item-image">
-              <i class="fas fa-info-circle"></i>
-            </div>
-            <div class="item-info">
-              <div class="item-name">Sipariş detayları yüklenemedi</div>
-            </div>
-          </div>
-        `;
       }
       
-      orderItemsEl.innerHTML = itemsHTML;
-      totalAmountEl.textContent = `${total}₺`;
+      orderItemsBodyEl.innerHTML = itemsHTML;
+      totalAmountEl.textContent = `${total.toFixed(2)}₺`;
     }
 
     // Bildirim göster
     function showNotification(message) {
-      console.log("Bildirim gösteriliyor:", message);
       notificationMessageEl.textContent = message;
       notificationEl.classList.add('show');
       
       setTimeout(() => {
         notificationEl.classList.remove('show');
-      }, 3000);
+      }, 4000);
     }
+
+    // Sayfa yüklendiğinde çalıştır
+    document.addEventListener("DOMContentLoaded", () => {
+      // Favicon hatası çözümü
+      const link = document.createElement('link');
+      link.rel = 'icon';
+      link.href = 'data:;base64,iVBORw0KGgo=';
+      document.head.appendChild(link);
+      
+      // Sipariş değişikliklerini dinle
+      listenForOrderChanges();
+      
+      console.log("Sipariş takip sistemi aktif");
+      
+      // Test amaçlı: sayfa yüklendiğinde video oynat
+      setTimeout(playVideo, 1000);
+    });
   </script>
 </body>
 </html>
