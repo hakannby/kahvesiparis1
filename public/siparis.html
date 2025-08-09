@@ -1391,104 +1391,115 @@ function createSizeOptions(product) {
 
     // Kategori yükleme fonksiyonu
     async function loadCategories() {
-      const container = document.getElementById('mainCategories');
-      const contentArea = document.getElementById('categoryContent');
-      container.innerHTML = '';
-      contentArea.innerHTML = '';
+  const container = document.getElementById('mainCategories');
+  const contentArea = document.getElementById('categoryContent');
+  container.innerHTML = '';
+  contentArea.innerHTML = '';
+  
+  try {
+    // SIRALI KATEGORİ ÇEKME (order alanına göre)
+    const querySnapshot = await getDocs(
+      query(
+        collection(db, "categories"),
+        orderBy("order")  // Sıralama eklendi
+      )
+    );
+    
+    const allCats = [];
+    querySnapshot.forEach(doc => {
+      allCats.push({ id: doc.id, ...doc.data() });
+    });
+
+    // Ana ve alt kategorileri ayır
+    const mainCategories = allCats
+      .filter(cat => !cat.parent)
+      .sort((a, b) => (a.order || 0) - (b.order || 0)); // Sıralama garantisi
+
+    const subCategories = allCats
+      .filter(cat => cat.parent)
+      .sort((a, b) => (a.order || 0) - (b.order || 0)); // Alt kategoriler de sıralı
+
+    // Ana kategorileri oluştur
+    mainCategories.forEach((mainCat, index) => {
+      const btn = document.createElement('button');
+      btn.className = 'main-category-btn';
+      if (index === 0) btn.classList.add('active');
+      btn.dataset.id = mainCat.id;
+      btn.dataset.slug = mainCat.slug;
       
-      try {
-        const querySnapshot = await getDocs(collection(db, "categories"));
-        const allCats = [];
-        
-        querySnapshot.forEach(doc => {
-          allCats.push({ id: doc.id, ...doc.data() });
+      btn.innerHTML = `
+        <i class="fas ${mainCat.icon || 'fa-utensils'}"></i>
+        ${mainCat.name}
+      `;
+      
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.main-category-btn').forEach(b => {
+          b.classList.remove('active');
         });
-
-        const mainCategories = allCats.filter(cat => !cat.parent);
-        const subCategories = allCats.filter(cat => cat.parent);
-        
-        // Ana kategorileri oluştur
-        mainCategories.forEach((mainCat, index) => {
-          const btn = document.createElement('button');
-          btn.className = 'main-category-btn';
-          if (index === 0) btn.classList.add('active');
-          btn.dataset.id = mainCat.id;
-          btn.dataset.slug = mainCat.slug;
-          
-          btn.innerHTML = `
-            <i class="fas ${mainCat.icon || 'fa-utensils'}"></i>
-            ${mainCat.name}
-          `;
-          
-          btn.addEventListener('click', () => {
-            // Tüm butonlardan active classını kaldır
-            document.querySelectorAll('.main-category-btn').forEach(b => {
-              b.classList.remove('active');
-            });
-            
-            // Tıklanan butonu aktif yap
-            btn.classList.add('active');
-            
-            // İlgili içeriği göster
-            showCategoryContent(mainCat, subCategories);
-          });
-          
-          container.appendChild(btn);
-          
-          // İlk kategoriyi otomatik aç
-          if (index === 0) {
-            showCategoryContent(mainCat, subCategories);
-          }
-        });
-
-      } catch (error) {
-        console.error("Kategoriler yüklenemedi:", error);
+        btn.classList.add('active');
+        showCategoryContent(mainCat, subCategories);
+      });
+      
+      container.appendChild(btn);
+      
+      // İlk kategoriyi otomatik aç
+      if (index === 0) {
+        showCategoryContent(mainCat, subCategories);
       }
-    }
+    });
+
+  } catch (error) {
+    console.error("Kategoriler yüklenemedi:", error);
+  }
+}
     
     // Kategori içeriğini göster
     function showCategoryContent(mainCat, allSubCategories) {
-      const contentArea = document.getElementById('categoryContent');
-      const subCategories = allSubCategories.filter(subCat => subCat.parent === mainCat.id);
-      
-      // İçerik oluştur
-      let contentHTML = '';
-      
-      // Alt kategoriler varsa göster
-      if (subCategories.length > 0) {
-        contentHTML += `
-          <div class="subcategories">
-            ${subCategories.map(subCat => `
-              <button class="subcategory-btn" data-slug="${subCat.slug}">
-                ${subCat.name}
-              </button>
-            `).join('')}
-          </div>
-        `;
-      }
-      
-      // İçeriği güncelle ve göster
-      contentArea.innerHTML = contentHTML;
-      contentArea.classList.add('active');
-      
-      // Alt kategori butonlarına event ekle
-      contentArea.querySelectorAll('.subcategory-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-          selectSubCategory(this.dataset.slug);
-        });
-      });
-      
-      // İlk alt kategoriyi otomatik seç VEYA doğrudan ürünleri listele
-      if (subCategories.length > 0) {
-        const firstSubBtn = contentArea.querySelector('.subcategory-btn');
-        if (firstSubBtn) {
-          selectSubCategory(firstSubBtn.dataset.slug);
-        }
-      } else {
-        // Alt kategori yoksa ana kategorinin ürünlerini doğrudan listele
-        listProducts(mainCat.slug);
-      }
+  const contentArea = document.getElementById('categoryContent');
+  
+  // İlgili alt kategorileri filtrele ve SIRALA
+  const subCategories = allSubCategories
+    .filter(subCat => subCat.parent === mainCat.id)
+    .sort((a, b) => (a.order || 0) - (b.order || 0)); // Sıralama eklendi
+
+  // İçerik oluştur
+  let contentHTML = '';
+  
+  // Alt kategoriler varsa göster
+  if (subCategories.length > 0) {
+    contentHTML += `
+      <div class="subcategories">
+        ${subCategories.map(subCat => `
+          <button class="subcategory-btn" data-slug="${subCat.slug}">
+            ${subCat.name}
+          </button>
+        `).join('')}
+      </div>
+    `;
+  }
+  
+  // İçeriği güncelle ve göster
+  contentArea.innerHTML = contentHTML;
+  contentArea.classList.add('active');
+  
+  // Alt kategori butonlarına event ekle
+  contentArea.querySelectorAll('.subcategory-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      selectSubCategory(this.dataset.slug);
+    });
+  });
+  
+  // İlk alt kategoriyi otomatik seç VEYA doğrudan ürünleri listele
+  if (subCategories.length > 0) {
+    const firstSubBtn = contentArea.querySelector('.subcategory-btn');
+    if (firstSubBtn) {
+      selectSubCategory(firstSubBtn.dataset.slug);
     }
+  } else {
+    // Alt kategori yoksa ana kategorinin ürünlerini doğrudan listele
+    listProducts(mainCat.slug);
+  }
+}
 
     // Alt kategori seçimi
     function selectSubCategory(slug) {
@@ -1509,26 +1520,31 @@ function createSizeOptions(product) {
 
     // Ürünleri listele
     function listProducts(category) {
-      const productListDiv = document.getElementById("kahveListesi");
-      productListDiv.innerHTML = "";
-      selectedProduct = "";
-      
-      if (!productMenu[category]) {
-        productListDiv.innerHTML = '<div class="no-product-message">Bu kategoride ürün bulunamadı.</div>';
-        return;
-      }
-      
-      // Tüm ürün seçeneklerini kaldır
-      document.querySelectorAll(".coffee-option").forEach(opt => {
-        opt.classList.remove("selected");
-        opt.setAttribute("aria-pressed", "false");
-      });
-      
-      productMenu[category].forEach(product => {
-        const div = createProductElement(product);
-        productListDiv.appendChild(div);
-      });
-    }
+  const productListDiv = document.getElementById("kahveListesi");
+  productListDiv.innerHTML = "";
+  selectedProduct = "";
+  
+  if (!productMenu[category]) {
+    productListDiv.innerHTML = '<div class="no-product-message">Bu kategoride ürün bulunamadı.</div>';
+    return;
+  }
+  
+  // Ürünleri sıralı göster (Firestore'daki sıraya göre)
+  const sortedProducts = [...productMenu[category]].sort((a, b) => 
+    (a.order || 0) - (b.order || 0)
+  );
+
+  // Tüm ürün seçeneklerini kaldır
+  document.querySelectorAll(".coffee-option").forEach(opt => {
+    opt.classList.remove("selected");
+    opt.setAttribute("aria-pressed", "false");
+  });
+  
+  sortedProducts.forEach(product => {
+    const div = createProductElement(product);
+    productListDiv.appendChild(div);
+  });
+}
 
     // Ürün elemanı oluşturma fonksiyonu
     function createProductElement(product) {
@@ -2017,35 +2033,61 @@ async function loadProducts() {
   productMenu = {};
   productSpecs = {};
   try {
-    const snapshot = await getDocs(collection(db, "products"));
+    const snapshot = await getDocs(
+      query(
+        collection(db, "products"),
+        orderBy("order")
+      )
+    );
+    
     snapshot.forEach(docSnap => {
       const data = docSnap.data();
       if (!data || !data.name) return;
 
-      const category = data.category || "Diğer";
+      // categorySlug'e göre grupla, eğer yoksa category'ye göre
+      const category = data.categorySlug || data.category || "Diğer";
+      
       if (!productMenu[category]) productMenu[category] = [];
 
-      const imagePath = data.image || `img/${data.name.toLowerCase().replace(/\s/g, '')}.jpg`;
-      const price = data.hasSizes
-        ? Object.values(data.sizes || {})[0]?.price || 0
-        : data.price || 0;
+      let imagePath = data.image || `img/${data.name.toLowerCase().replace(/\s/g, '')}.jpg`;
+      if (!imagePath.startsWith('http') && !imagePath.startsWith('img/')) {
+        imagePath = 'img/' + imagePath;
+      }
 
-      productMenu[category].push({
-        ad: data.name,
-        resim: imagePath,
-        price: price
-      });
+      // Boyutlu ürün kontrolü
+      if (data.hasSizes && data.sizes) {
+        productMenu[category].push({
+          ad: data.name,
+          resim: imagePath,
+          price: Object.values(data.sizes)[0]?.price || 0,
+          order: data.order || 0
+        });
 
-      // store full spec keyed by product.name
-      productSpecs[data.name] = {
-        ...data,
-        image: imagePath,
-        price: price
-      };
+        productSpecs[data.name] = {
+          ...data,
+          image: imagePath,
+          price: Object.values(data.sizes)[0]?.price || 0
+        };
+      } else {
+        // Standart ürün
+        productMenu[category].push({
+          ad: data.name,
+          resim: imagePath,
+          price: data.price || 0,
+          order: data.order || 0
+        });
+
+        productSpecs[data.name] = {
+          ...data,
+          image: imagePath,
+          price: data.price || 0
+        };
+      }
     });
-    console.log("loadProducts: ürünler yüklendi. Kategori sayısı:", Object.keys(productMenu).length);
+    console.log("Ürünler yüklendi. Kategori sayısı:", Object.keys(productMenu).length);
+    console.log("Ürün menüsü:", productMenu); // Ekstra log
   } catch (err) {
-    console.error("loadProducts error:", err);
+    console.error("Ürün yükleme hatası:", err);
   }
 }
 
@@ -2657,7 +2699,9 @@ async function refundConfirm(restock) {
     window.clearSearch = clearSearch;
     window.addCustomerName = addCustomerName;
     window.submitName = submitName;
-    window.closeNameModal = closeNameModal;
+    window.closeNameModal = function() {
+        document.getElementById("nameModal").style.display = "none";
+    };
     window.openNoteModal = openNoteModal;
     window.saveNote = saveNote;
     window.closeNoteModal = closeNoteModal;

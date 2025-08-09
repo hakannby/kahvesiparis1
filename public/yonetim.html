@@ -498,7 +498,26 @@
   color: #a97443;
 }
 
+    .sortable-list {
+  cursor: grab;
+}
 
+.sortable-item {
+  transition: transform 0.2s;
+}
+
+.sortable-item.dragging {
+  opacity: 0.5;
+  background: #e3f2fd;
+  border: 1px dashed #3498db;
+}
+
+.sortable-placeholder {
+  height: 40px;
+  background: #f0f7ff;
+  border: 2px dashed #3498db;
+  margin: 5px 0;
+}
 
     
   </style>
@@ -791,8 +810,10 @@
     <div>
       <h3>Kategori Hierarşisi</h3>
       <div id="categoryTree">
-        <ul id="categoryList" style="list-style-type: none; padding-left: 0;"></ul>
-      </div>
+  <ul id="categoryList" style="list-style-type: none; padding-left: 0;" class="sortable-list">
+    <!-- Kategoriler buraya eklenecek -->
+  </ul>
+</div>
       
       <h3 style="margin-top: 20px;">Yeni Ürün Ekle</h3>
       <div class="form-group">
@@ -1360,7 +1381,12 @@ document.querySelectorAll('#expenseArchive .tab[data-subtab]').forEach(tab => {
           window.location.href = "index.html";
         }
       });
-    });
+
+       // Sıralama özelliğini başlat - DÜZELTİLDİ (setTimeout eklendi)
+  setTimeout(() => {
+    initSortableCategories();
+  }, 1000);
+});
 
     async function initPage() {
       await loadStocks();
@@ -1382,6 +1408,66 @@ document.querySelectorAll('#expenseArchive .tab[data-subtab]').forEach(tab => {
         }
       });
     }
+
+
+
+
+      // SortableJS kütüphanesini yükle
+function loadSortableJS() {
+  return new Promise((resolve) => {
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js';
+    script.onload = resolve;
+    document.head.appendChild(script);
+  });
+}
+
+// Kategori sıralamasını başlat
+async function initSortableCategories() {
+  await loadSortableJS();
+  
+  new Sortable(document.getElementById('categoryList'), {
+    animation: 150,
+    ghostClass: 'sortable-item',
+    dragClass: 'dragging',
+    handle: '.category-item',
+    onEnd: async function() {
+      await updateCategoryOrder();
+    }
+  });
+}
+
+// Firestore'da sıralamayı güncelle
+async function updateCategoryOrder() {
+  const categories = [];
+  const items = document.querySelectorAll('#categoryList > li');
+  
+  items.forEach((item, index) => {
+    const categoryId = item.getAttribute('data-id');
+    if (categoryId) {
+      categories.push({
+        id: categoryId,
+        order: index
+      });
+    }
+  });
+
+  try {
+    const batch = db.batch();
+    categories.forEach(cat => {
+      const ref = db.collection("categories").doc(cat.id);
+      batch.update(ref, { order: cat.order });
+    });
+    
+    await batch.commit();
+    showMessage('categoryMessage', '✔️ Kategori sıralaması güncellendi', 'success');
+  } catch (error) {
+    console.error("Sıralama güncelleme hatası:", error);
+    showMessage('categoryMessage', '❌ Hata: ' + error.message, 'error');
+  }
+}
+
+
 
 
 
@@ -1871,126 +1957,145 @@ function updateCariTable(snapshot) {
     return;
   }
 
-  // Standart içerikleri topla
-  const ingredients = {};
-  let hasError = false;
-  
-  document.querySelectorAll("#ingredientList .ingredient-row").forEach(row => {
-    const ingName = row.querySelector("select").value;
-    const amount = parseInt(row.querySelector("input").value);
-    
-    if (!ingName) {
-      showMessage(messageDiv, "Lütfen tüm içerikleri seçin", 'error');
-      hasError = true;
-      return;
-    }
-    if (isNaN(amount) || amount <= 0) {
-      showMessage(messageDiv, "Lütfen geçerli miktar girin", 'error');
-      hasError = true;
-      return;
-    }
-    
-    ingredients[ingName] = amount;
-  });
-  
-  if (hasError) return;
-
-  // Boyut bilgilerini topla
-  const sizes = {};
-  if (hasSizes) {
-    // Küçük boy
-    if (document.getElementById("sizeSmall").checked) {
-      const smallPrice = parseFloat(document.getElementById("priceSmall").value);
-      if (isNaN(smallPrice) || smallPrice <= 0) {
-        showMessage(messageDiv, "Küçük boy için geçerli fiyat girin", 'error');
-        return;
-      }
-      
-      const smallIngredients = {};
-      document.querySelectorAll("#smallIngredientList .ingredient-row").forEach(row => {
-        const ingName = row.querySelector("select").value;
-        const amount = parseInt(row.querySelector("input").value);
-        smallIngredients[ingName] = amount;
-      });
-      
-      sizes.küçük = {
-        price: smallPrice,
-        ingredients: smallIngredients
-      };
-    }
-    
-    // Orta boy
-    if (document.getElementById("sizeMedium").checked) {
-      const mediumPrice = parseFloat(document.getElementById("priceMedium").value);
-      if (isNaN(mediumPrice) || mediumPrice <= 0) {
-        showMessage(messageDiv, "Orta boy için geçerli fiyat girin", 'error');
-        return;
-      }
-      
-      const mediumIngredients = {};
-      document.querySelectorAll("#mediumIngredientList .ingredient-row").forEach(row => {
-        const ingName = row.querySelector("select").value;
-        const amount = parseInt(row.querySelector("input").value);
-        mediumIngredients[ingName] = amount;
-      });
-      
-      sizes.orta = {
-        price: mediumPrice,
-        ingredients: mediumIngredients
-      };
-    }
-    
-    // Büyük boy
-    if (document.getElementById("sizeLarge").checked) {
-      const largePrice = parseFloat(document.getElementById("priceLarge").value);
-      if (isNaN(largePrice) || largePrice <= 0) {
-        showMessage(messageDiv, "Büyük boy için geçerli fiyat girin", 'error');
-        return;
-      }
-      
-      const largeIngredients = {};
-      document.querySelectorAll("#largeIngredientList .ingredient-row").forEach(row => {
-        const ingName = row.querySelector("select").value;
-        const amount = parseInt(row.querySelector("input").value);
-        largeIngredients[ingName] = amount;
-      });
-      
-      sizes.büyük = {
-        price: largePrice,
-        ingredients: largeIngredients
-      };
-    }
-    
-    // En az bir boyut seçilmiş mi kontrolü
-    if (Object.keys(sizes).length === 0) {
-      showMessage(messageDiv, "En az bir boyut seçmelisiniz", 'error');
-      return;
-    }
-  } else {
-    // Boyutsuz ürün için fiyat kontrolü
-    if (isNaN(price) || price <= 0) {
-      showMessage(messageDiv, "Geçerli bir fiyat girin", 'error');
-      return;
-    }
-    
-    // En az bir içerik kontrolü
-    if (Object.keys(ingredients).length === 0) {
-      showMessage(messageDiv, "En az bir içerik eklemelisiniz", 'error');
-      return;
-    }
-  }
-
   try {
+    // Kategori bilgisini al (slug ile birlikte)
+    const categoryQuery = await db.collection("categories").where("slug", "==", category).get();
+    if (categoryQuery.empty) {
+      showMessage(messageDiv, "Geçersiz kategori", 'error');
+      return;
+    }
+    
+    const categoryDoc = categoryQuery.docs[0];
+    const categoryData = categoryDoc.data();
+
+    // Standart içerikleri topla
+    const ingredients = {};
+    let hasError = false;
+    
+    document.querySelectorAll("#ingredientList .ingredient-row").forEach(row => {
+      const ingName = row.querySelector("select").value;
+      const amount = parseFloat(row.querySelector("input").value);
+      
+      if (!ingName) {
+        showMessage(messageDiv, "Lütfen tüm içerikleri seçin", 'error');
+        hasError = true;
+        return;
+      }
+      if (isNaN(amount) || amount <= 0) {
+        showMessage(messageDiv, "Lütfen geçerli miktar girin", 'error');
+        hasError = true;
+        return;
+      }
+      
+      ingredients[ingName] = amount;
+    });
+    
+    if (hasError) return;
+
+    // Boyut bilgilerini topla
+    const sizes = {};
+    if (hasSizes) {
+      // Küçük boy
+      if (document.getElementById("sizeSmall").checked) {
+        const smallPrice = parseFloat(document.getElementById("priceSmall").value);
+        if (isNaN(smallPrice) || smallPrice <= 0) {
+          showMessage(messageDiv, "Küçük boy için geçerli fiyat girin", 'error');
+          return;
+        }
+        
+        const smallIngredients = {};
+        document.querySelectorAll("#smallIngredientList .ingredient-row").forEach(row => {
+          const ingName = row.querySelector("select").value;
+          const amount = parseFloat(row.querySelector("input").value);
+          smallIngredients[ingName] = amount;
+        });
+        
+        sizes.küçük = {
+          price: smallPrice,
+          ingredients: smallIngredients
+        };
+      }
+      
+      // Orta boy
+      if (document.getElementById("sizeMedium").checked) {
+        const mediumPrice = parseFloat(document.getElementById("priceMedium").value);
+        if (isNaN(mediumPrice) || mediumPrice <= 0) {
+          showMessage(messageDiv, "Orta boy için geçerli fiyat girin", 'error');
+          return;
+        }
+        
+        const mediumIngredients = {};
+        document.querySelectorAll("#mediumIngredientList .ingredient-row").forEach(row => {
+          const ingName = row.querySelector("select").value;
+          const amount = parseFloat(row.querySelector("input").value);
+          mediumIngredients[ingName] = amount;
+        });
+        
+        sizes.orta = {
+          price: mediumPrice,
+          ingredients: mediumIngredients
+        };
+      }
+      
+      // Büyük boy
+      if (document.getElementById("sizeLarge").checked) {
+        const largePrice = parseFloat(document.getElementById("priceLarge").value);
+        if (isNaN(largePrice) || largePrice <= 0) {
+          showMessage(messageDiv, "Büyük boy için geçerli fiyat girin", 'error');
+          return;
+        }
+        
+        const largeIngredients = {};
+        document.querySelectorAll("#largeIngredientList .ingredient-row").forEach(row => {
+          const ingName = row.querySelector("select").value;
+          const amount = parseFloat(row.querySelector("input").value);
+          largeIngredients[ingName] = amount;
+        });
+        
+        sizes.büyük = {
+          price: largePrice,
+          ingredients: largeIngredients
+        };
+      }
+      
+      // En az bir boyut seçilmiş mi kontrolü
+      if (Object.keys(sizes).length === 0) {
+        showMessage(messageDiv, "En az bir boyut seçmelisiniz", 'error');
+        return;
+      }
+    } else {
+      // Boyutsuz ürün için fiyat kontrolü
+      if (isNaN(price) || price <= 0) {
+        showMessage(messageDiv, "Geçerli bir fiyat girin", 'error');
+        return;
+      }
+      
+      // En az bir içerik kontrolü
+      if (Object.keys(ingredients).length === 0) {
+        showMessage(messageDiv, "En az bir içerik eklemelisiniz", 'error');
+        return;
+      }
+    }
+
+    // Mevcut ürün sayısını al (order için)
+    const snapshot = await db.collection("products").get();
+    const productCount = snapshot.size;
+
     const productData = {
       name: name,
-      category: category,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      category: categoryData.name, // Kategori adını kaydediyoruz
+      categorySlug: category,
+      order: productCount,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     };
 
     // Boyutlu ürün mü?
     if (hasSizes && Object.keys(sizes).length > 0) {
       productData.sizes = sizes;
       productData.hasSizes = true;
+      // Boyutlu ürünler için temel fiyatı ilk boyuttan al
+      productData.price = Object.values(sizes)[0].price;
     } else {
       // Standart ürün
       productData.price = price;
@@ -1998,10 +2103,12 @@ function updateCariTable(snapshot) {
       productData.hasSizes = false;
     }
 
-    await db.collection("products").add(productData);
+    // Firestore'a kaydet
+    const docRef = await db.collection("products").add(productData);
+    console.log("Ürün başarıyla eklendi, ID:", docRef.id);
 
-        // Formu temizle
-         document.getElementById("newProductName").value = "";
+    // Formu temizle
+    document.getElementById("newProductName").value = "";
     document.getElementById("newProductPrice").value = "";
     document.getElementById("ingredientList").innerHTML = "";
     document.getElementById("enableSizes").checked = false;
@@ -2012,8 +2119,8 @@ function updateCariTable(snapshot) {
     showMessage(messageDiv, "✔️ Ürün başarıyla eklendi", 'success');
     await loadProducts();
   } catch (err) {
-    showMessage(messageDiv, "❌ Hata: " + err.message, 'error');
     console.error("Ürün ekleme hatası:", err);
+    showMessage(messageDiv, "❌ Hata: " + err.message, 'error');
   }
 }
 
@@ -2138,108 +2245,135 @@ function updateCariTable(snapshot) {
 
     // Kategori yönetimi
     async function loadCategories() {
-      try {
-        const querySnapshot = await db.collection("categories").get();
-        const allCats = [];
-        
-        querySnapshot.forEach(doc => {
-          allCats.push({ id: doc.id, ...doc.data() });
-        });
+  try {
+    // Sıralı şekilde kategorileri çek - DÜZELTİLDİ
+    const querySnapshot = await db.collection("categories")
+      .orderBy("order")
+      .get();
+    
+    const allCats = [];
+    querySnapshot.forEach(doc => {
+      allCats.push({ id: doc.id, ...doc.data() });
+    });
 
-        // Ana kategorileri bul (parent'ı olmayanlar)
-        const mainCategories = allCats.filter(cat => !cat.parent);
-        
-        // Her ana kategori için alt kategorileri ata
-        mainCategories.forEach(mainCat => {
-          mainCat.subcategories = allCats.filter(subCat => 
-            subCat.parent === mainCat.id
-          );
-        });
+    // Ana kategorileri bul (parent'ı olmayanlar)
+    const mainCategories = allCats.filter(cat => !cat.parent);
+    
+    // Her ana kategori için alt kategorileri ata
+    mainCategories.forEach(mainCat => {
+      mainCat.subcategories = allCats.filter(subCat => 
+        subCat.parent === mainCat.id
+      );
+    });
 
-        // Kategori ağacını render et
-        renderCategoryTree(mainCategories);
-        
-        // Kategori dropdown'larını güncelle
-        updateCategoryDropdowns(mainCategories);
+    // Kategori ağacını render et
+    renderCategoryTree(mainCategories);
+    
+    // Kategori dropdown'larını güncelle
+    updateCategoryDropdowns(mainCategories);
 
-      } catch (error) {
-        console.error("Kategoriler yüklenirken hata:", error);
-        showMessage('categoryMessage', "Kategoriler yüklenirken hata: " + error.message, 'error');
-      }
-    }
+  } catch (error) {
+    console.error("Kategoriler yüklenirken hata:", error);
+    showMessage('categoryMessage', "Kategoriler yüklenirken hata: " + error.message, 'error');
+  }
+}
 
     // Kategori ağacını görselleştirme
     function renderCategoryTree(categories) {
-      const container = document.getElementById("categoryList");
-      container.innerHTML = '';
+  const container = document.getElementById("categoryList");
+  container.innerHTML = '';
 
-      if (!categories || categories.length === 0) {
-        container.innerHTML = "<p>Kategori bulunamadı</p>";
-        return;
-      }
+  if (!categories || categories.length === 0) {
+    container.innerHTML = "<p>Kategori bulunamadı</p>";
+    return;
+  }
 
-      categories.forEach(category => {
-        const li = document.createElement('li');
-        li.innerHTML = `
-          <div class="category-item">
-            <strong>${category.name}</strong>
-            <span style="float:right; color:#666">${category.slug}</span>
-            <button class="btn-danger" onclick="deleteCategory('${category.id}', '${category.name}')" 
+  // Sıralama yap
+  categories.sort((a, b) => (a.order || 0) - (b.order || 0));
+
+  categories.forEach(category => {
+    const li = document.createElement('li');
+    li.setAttribute('data-id', category.id);
+    li.className = 'sortable-item';
+    
+    li.innerHTML = `
+      <div class="category-item">
+        <strong>${category.name}</strong>
+        <span style="float:right; color:#666">${category.slug}</span>
+        <button class="btn-danger" onclick="deleteCategory('${category.id}', '${category.name}')" 
+                style="margin-left: 10px; padding: 5px 8px; font-size: 12px;">
+          <i class="fas fa-trash"></i> Sil
+        </button>
+      </div>
+    `;
+
+    // Alt kategoriler
+    if (category.subcategories && category.subcategories.length > 0) {
+      const subUl = document.createElement('ul');
+      subUl.style.paddingLeft = '20px';
+      
+      category.subcategories.sort((a, b) => (a.order || 0) - (b.order || 0)).forEach(subCat => {
+        const subLi = document.createElement('li');
+        subLi.setAttribute('data-id', subCat.id);
+        subLi.className = 'sortable-item';
+        
+        subLi.innerHTML = `
+          <div class="subcategory-item">
+            → ${subCat.name}
+            <span style="float:right; color:#666">${subCat.slug}</span>
+            <button class="btn-danger" onclick="deleteCategory('${subCat.id}', '${subCat.name}')" 
                     style="margin-left: 10px; padding: 5px 8px; font-size: 12px;">
               <i class="fas fa-trash"></i> Sil
             </button>
           </div>
         `;
-
-        // Alt kategoriler varsa
-        if (category.subcategories && category.subcategories.length > 0) {
-          const subUl = document.createElement('ul');
-          subUl.style.paddingLeft = '20px';
-          category.subcategories.forEach(subCat => {
-            const subLi = document.createElement('li');
-            subLi.innerHTML = `
-              <div class="subcategory-item">
-                → ${subCat.name}
-                <span style="float:right; color:#666">${subCat.slug}</span>
-                <button class="btn-danger" onclick="deleteCategory('${subCat.id}', '${subCat.name}')" 
-                        style="margin-left: 10px; padding: 5px 8px; font-size: 12px;">
-                  <i class="fas fa-trash"></i> Sil
-                </button>
-              </div>
-            `;
-            subUl.appendChild(subLi);
-          });
-          li.appendChild(subUl);
-        }
-
-        container.appendChild(li);
+        subUl.appendChild(subLi);
       });
+      li.appendChild(subUl);
     }
+
+    container.appendChild(li);
+  });
+}
+
+
+// Mevcut kategorilere order alanı ekle (bir kerelik çalıştırılacak)
+async function addOrderFieldToCategories() {
+  const snapshot = await db.collection("categories").get();
+  const batch = db.batch();
+  
+  snapshot.docs.forEach((doc, index) => {
+    batch.update(doc.ref, { order: index });
+  });
+  
+  await batch.commit();
+  console.log("Order alanları eklendi");
+}
 
     // Kategori dropdown'larını güncelleme
     function updateCategoryDropdowns(mainCategories) {
-      const productCategorySelect = document.getElementById("newProductCategory");
-      productCategorySelect.innerHTML = '<option value="">-- Kategori seçin --</option>';
-      
-      mainCategories.forEach(category => {
-        // Ana kategori
-        productCategorySelect.innerHTML += `<option value="${category.slug}">${category.name}</option>`;
-        
-        // Alt kategoriler (varsa)
-        if (category.subcategories && category.subcategories.length > 0) {
-          category.subcategories.forEach(subCat => {
-            productCategorySelect.innerHTML += `<option value="${subCat.slug}">${category.name} → ${subCat.name}</option>`;
-          });
-        }
-      });
-
-      // Modal için ana kategori seçeneklerini güncelle
-      const parentCategorySelect = document.getElementById("parentCategorySelect");
-      parentCategorySelect.innerHTML = '<option value="">-- Üst kategori seçin --</option>';
-      mainCategories.forEach(category => {
-        parentCategorySelect.innerHTML += `<option value="${category.id}">${category.name}</option>`;
+  const productCategorySelect = document.getElementById("newProductCategory");
+  productCategorySelect.innerHTML = '<option value="">-- Kategori seçin --</option>';
+  
+  mainCategories.forEach(category => {
+    // Ana kategori
+    productCategorySelect.innerHTML += `<option value="${category.slug}">${category.name}</option>`;
+    
+    // Alt kategoriler (varsa)
+    if (category.subcategories && category.subcategories.length > 0) {
+      category.subcategories.forEach(subCat => {
+        productCategorySelect.innerHTML += `<option value="${subCat.slug}">${category.name} → ${subCat.name}</option>`;
       });
     }
+  });
+
+  // Modal için ana kategori seçeneklerini güncelle
+  const parentCategorySelect = document.getElementById("parentCategorySelect");
+  parentCategorySelect.innerHTML = '<option value="">-- Üst kategori seçin --</option>';
+  mainCategories.forEach(category => {
+    parentCategorySelect.innerHTML += `<option value="${category.id}">${category.name}</option>`;
+  });
+}
 
     // Kategori türü seçimine göre üst kategori seçimini göster/gizle
     function toggleParentSelect() {
@@ -2249,62 +2383,123 @@ function updateCariTable(snapshot) {
 
     // Kategori kaydetme fonksiyonu
     async function saveCategory() {
-      const name = document.getElementById('modalCategoryName').value.trim();
-      const isMain = document.querySelector('input[name="categoryType"]:checked').value === 'main';
-      const parentId = isMain ? null : document.getElementById('parentCategorySelect').value;
-      const messageDiv = document.getElementById('modalCategoryMessage');
-      
-      if(!name) {
-          showMessage(messageDiv, "Kategori adı boş olamaz", 'error');
-          return;
-      }
+  const name = document.getElementById('modalCategoryName').value.trim();
+  const isMain = document.querySelector('input[name="categoryType"]:checked').value === 'main';
+  const parentId = isMain ? null : document.getElementById('parentCategorySelect').value;
+  const messageDiv = document.getElementById('modalCategoryMessage');
+  
+  if(!name) {
+      showMessage(messageDiv, "Kategori adı boş olamaz", 'error');
+      return;
+  }
 
-      try {
-          const slug = name.toLowerCase().replace(/\s/g, '_');
-          const categoryData = {
-              name: name,
-              slug: slug,
-              createdAt: firebase.firestore.FieldValue.serverTimestamp()
-          };
+  try {
+      // Slug oluştur (Türkçe karakterleri düzelt)
+      const slug = name.toLowerCase()
+          .replace(/ /g, '_')
+          .replace(/[ğ]/g, 'g')
+          .replace(/[ü]/g, 'u')
+          .replace(/[ş]/g, 's')
+          .replace(/[ı]/g, 'i')
+          .replace(/[ö]/g, 'o')
+          .replace(/[ç]/g, 'c');
 
-          if(!isMain) {
-              if(!parentId) {
-                  showMessage(messageDiv, "Alt kategori için üst kategori seçmelisiniz", 'error');
-                  return;
-              }
-              categoryData.parent = parentId;
+      // Mevcut kategori sayısını al (order için) - DÜZELTİLDİ
+      const snapshot = await db.collection("categories").get();
+      const categoryCount = snapshot.size;
+
+      const categoryData = {
+          name: name,
+          slug: slug,
+          order: categoryCount, // Yeni eklenen kategori en sona gelsin
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
+
+      if(!isMain) {
+          if(!parentId) {
+              showMessage(messageDiv, "Alt kategori için üst kategori seçmelisiniz", 'error');
+              return;
           }
-
-          await db.collection("categories").add(categoryData);
+          categoryData.parent = parentId;
           
-          showMessage(messageDiv, "✔️ Kategori başarıyla eklendi", 'success');
-          closeModal('categoryModal');
-          await loadCategories();
-      } catch(err) {
-          showMessage(messageDiv, "❌ Hata: " + err.message, 'error');
+          // Üst kategorinin bilgilerini al
+          const parentCategory = await db.collection("categories").doc(parentId).get();
+          if (parentCategory.exists) {
+              categoryData.parentSlug = parentCategory.data().slug;
+          }
       }
-    }
+
+      // Kategoriyi ekle
+      await db.collection("categories").add(categoryData);
+      
+      showMessage(messageDiv, "✔️ Kategori başarıyla eklendi", 'success');
+      
+      // Modalı kapat ve kategorileri yenile
+      closeModal('categoryModal');
+      document.getElementById('modalCategoryName').value = '';
+      await loadCategories();
+      
+      // 2 saniye sonra mesajı gizle
+      setTimeout(() => {
+          messageDiv.style.display = 'none';
+      }, 2000);
+  } catch(err) {
+      console.error("Kategori ekleme hatası:", err);
+      showMessage(messageDiv, "❌ Hata: " + err.message, 'error');
+  }
+}
 
     async function deleteCategory(categoryId, categoryName) {
-      if (!confirm(`"${categoryName}" kategorisini silmek istediğinize emin misiniz?`)) return;
-      
-      const messageDiv = document.getElementById("categoryMessage");
-      
-      try {
-        // Kategoride ürün var mı kontrol et
-        const productsInCategory = allProducts.filter(p => p.category === categoryName);
-        if (productsInCategory.length > 0) {
-          showMessage(messageDiv, "Bu kategoride ürünler var, önce onları silmelisiniz", 'error');
-          return;
-        }
-        
-        await db.collection("categories").doc(categoryId).delete();
-        await loadCategories(); 
-        showMessage(messageDiv, "✔️ Kategori başarıyla silindi", 'success');
-      } catch (err) {
-        showMessage(messageDiv, "❌ Hata: " + err.message, 'error');
-      }
+  if (!confirm(`"${categoryName}" kategorisini silmek istediğinize emin misiniz?`)) return;
+  
+  // Mesaj div'ini bul (sayfadaki herhangi bir message div'i kullanılabilir)
+  const messageDiv = document.getElementById('productMessage') || document.createElement('div');
+  
+  try {
+    // 1. Bu kategoride ürün var mı kontrol et
+    const productsInCategory = await db.collection("products")
+      .where("category", "==", categoryName)
+      .limit(1)
+      .get();
+    
+    if (!productsInCategory.empty) {
+      showMessage(messageDiv, "Bu kategoride ürünler var, önce onları silmelisiniz", 'error');
+      return;
     }
+    
+    // 2. Alt kategorileri kontrol et
+    const subCategories = await db.collection("categories")
+      .where("parent", "==", categoryId)
+      .limit(1)
+      .get();
+    
+    if (!subCategories.empty) {
+      showMessage(messageDiv, "Bu kategorinin alt kategorileri var, önce onları silmelisiniz", 'error');
+      return;
+    }
+    
+    // 3. Kategoriyi sil
+    await db.collection("categories").doc(categoryId).delete();
+    
+    showMessage(messageDiv, "✔️ Kategori başarıyla silindi", 'success');
+    
+    // Kategorileri yenile
+    await loadCategories();
+    
+    // 2 saniye sonra mesajı gizle
+    setTimeout(() => {
+      if (messageDiv.style) messageDiv.style.display = 'none';
+    }, 2000);
+  } catch (err) {
+    console.error("Kategori silme hatası:", err);
+    showMessage(messageDiv, "❌ Hata: " + err.message, 'error');
+    
+    // Hata mesajını da 5 saniye sonra gizle
+    setTimeout(() => {
+      if (messageDiv.style) messageDiv.style.display = 'none';
+    }, 5000);
+  }
+}
 
     // Stok geçmişi
     async function loadProductStockHistory(productId) {
