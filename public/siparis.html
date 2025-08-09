@@ -1702,52 +1702,73 @@ function createSizeOptions(product) {
 
     // Yeni eklenen fonksiyon - Toplam satış adetlerini hesaplar
     async function updateSalesCounts() {
-      const salesCountsDiv = document.getElementById('salesCounts');
-      try {
-        // İade edilen sipariş ID'lerini al
-        const refundsSnapshot = await getDocs(collection(db, "refunds"));
-        const refundedOrderIds = refundsSnapshot.docs.map(doc => doc.data().orderId);
+  const salesCountsDiv = document.getElementById('salesCounts');
+  try {
+    // Bugünün başlangıcını ve sonunu al
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
 
-        // Tüm satışları al
-        const salesSnapshot = await getDocs(collection(db, "sales"));
-        const productCounts = {};
+    // İade edilen sipariş ID'lerini al
+    const refundsSnapshot = await getDocs(collection(db, "refunds"));
+    const refundedOrderIds = refundsSnapshot.docs.map(doc => doc.data().orderId);
 
-        // Satışları işle
-        salesSnapshot.forEach(doc => {
-          // İade edilen siparişleri atla
-          if (refundedOrderIds.includes(doc.id)) return;
+    // Bugünkü satışları sorgula
+    const q = query(
+      collection(db, "sales"),
+      where("timestamp", ">=", today),
+      where("timestamp", "<", tomorrow)
+    );
 
-          const order = doc.data();
-          order.items.forEach(item => {
-            if (!productCounts[item.product]) {
-              productCounts[item.product] = 0;
-            }
-            productCounts[item.product] += item.qty;
-          });
-        });
+    const salesSnapshot = await getDocs(q);
+    const productCounts = {};
 
-        // HTML oluştür
-        if (Object.keys(productCounts).length === 0) {
-          salesCountsDiv.innerHTML = "<p>Henüz satış yok.</p>";
-          return;
+    // Satışları işle
+    salesSnapshot.forEach(doc => {
+      if (refundedOrderIds.includes(doc.id)) return;
+
+      const order = doc.data();
+      order.items.forEach(item => {
+        if (!productCounts[item.product]) {
+          productCounts[item.product] = 0;
         }
+        productCounts[item.product] += item.qty;
+      });
+    });
 
-        let html = '<ul style="list-style-type:none; padding:0;">';
-        for (const [product, count] of Object.entries(productCounts)) {
-          html += `<li style="padding:10px; border-bottom:1px solid #eee; display:flex; justify-content:space-between;">
-                    <span>${product}:</span> 
-                    <span><strong>${count} adet</strong></span>
-                  </li>`;
-        }
-        html += '</ul>';
-
-        salesCountsDiv.innerHTML = html;
-
-      } catch (error) {
-        console.error("Toplam satış adetleri yüklenirken hata:", error);
-        salesCountsDiv.innerHTML = `<p>Hata: ${error.message}</p>`;
-      }
+    // HTML oluştür
+    if (Object.keys(productCounts).length === 0) {
+      salesCountsDiv.innerHTML = "<p>Bugün henüz satış yok.</p>";
+      return;
     }
+
+    let html = `
+      <div style="margin-bottom: 10px; font-weight: bold; text-align: center;">
+        ${today.toLocaleDateString('tr-TR')} Satışları
+      </div>
+      <ul style="list-style-type:none; padding:0; margin-top:10px;">
+    `;
+    
+    // Ürünleri adetlerine göre sırala (çoktan aza)
+    const sortedProducts = Object.entries(productCounts)
+      .sort((a, b) => b[1] - a[1]);
+
+    for (const [product, count] of sortedProducts) {
+      html += `
+        <li style="padding:8px 10px; border-bottom:1px solid #eee; display:flex; justify-content:space-between;">
+          <span>${product}:</span> 
+          <span><strong>${count} adet</strong></span>
+        </li>`;
+    }
+    html += '</ul>';
+
+    salesCountsDiv.innerHTML = html;
+  } catch (error) {
+    console.error("Günlük satış adetleri yüklenirken hata:", error);
+    salesCountsDiv.innerHTML = `<p>Hata: ${error.message}</p>`;
+  }
+}
 
     async function saveActiveOrder() {
       const activeOrder = {
@@ -1962,10 +1983,14 @@ async function loadProducts() {
 
     // Stok bilgisi al
     async function getStockDoc(itemName) {
-      const q = query(collection(db, "stocks"), where("name", "==", itemName));
-      const querySnapshot = await getDocs(q);
-      return querySnapshot.docs[0]?.data();
-    }
+  const normalized = normalizeName(itemName);
+  const q = query(collection(db, "stocks"), 
+               where("name", ">=", normalized),
+               where("name", "<=", normalized + "\uf8ff"));
+  
+  const snapshot = await getDocs(q);
+  return snapshot.docs[0]?.data(); // İlk eşleşmeyi döndür
+}
 
     // Stok güncelle
     async function updateStock(itemName, newQuantity) {
@@ -2128,10 +2153,18 @@ function printReceipt(orderId, items, total, customerName = "") {
   const now = new Date();
   const dateStr = now.toLocaleString("tr-TR");
 
+  // Logo URL'si - img klasöründeki logo dosyası
+  const logoUrl = "img/fis_logo.jpg"; // veya tam yolunu yazın
+
   // Fiş HTML'i oluştur
   const receiptHtml = `
-    <div style="font-family: Arial, sans-serif; width: 80mm; padding: 10px; line-height: 1.5;">
-      <h2 style="text-align: center; margin-bottom: 10px;">Kahve Dükkanı</h2>
+    <div style="font-family: Arial, sans-serif; width: 80mm; padding: 3px; line-height: 1.3;">
+      <!-- Logo ekleme -->
+      
+      <div style="text-align: center; margin-bottom: 5px; margin-top: 0;">
+  <img src="${logoUrl}" alt="Logo" style="max-width: 60mm; height: auto; margin-bottom: 5px;">
+  <h2 style="margin: 5px 0; font-size: 18px;">LUMA COFFEE</h2>
+</div>                                                
       <p style="text-align: center;">Sipariş ID: ${orderId}</p>
       <p style="text-align: center;">Tarih: ${dateStr}</p>
       ${customerName ? `<p style="text-align: center;">Müşteri: ${customerName}</p>` : ""}
@@ -2356,43 +2389,55 @@ function renderSizeButtons(spec, container, selectSizeFn) {
     /***********************
  * refundConfirm
  ***********************/
-async function refundConfirm(orderId, items) {
+async function refundConfirm(restock) {
   try {
-    // satış kaydını sil
-    if (orderId) {
-      await deleteDoc(doc(db, "sales", orderId));
-    }
+    console.log("Seçilen iade öğeleri:", selectedRefundItems); // DEBUG
+    console.log("Sipariş verisi:", selectedOrderForRefund); // DEBUG
 
-    // stoklara geri ekle
-    for (const item of items || []) {
-      const spec = productSpecs[item.product];
-      if (!spec) continue;
+    // 1. İade kaydı oluştur
+    const refundRef = await addDoc(collection(db, "refunds"), {
+      orderId: selectedOrderForRefund.id,
+      items: selectedRefundItems,
+      timestamp: serverTimestamp(),
+      user: currentUserEmail,
+      restock: restock
+    });
+    console.log("İade kaydı oluşturuldu ID:", refundRef.id); // DEBUG
 
-      const rawSizeSpec = item.size && spec.sizes && spec.sizes[item.size]
-        ? spec.sizes[item.size]
-        : spec;
+    // 2. Stok güncelleme (restock true ise)
+    if (restock) {
+      for (const item of selectedRefundItems) {
+        const spec = productSpecs[item.product];
+        if (!spec) {
+          console.warn("Ürün spesifikasyonu bulunamadı:", item.product);
+          continue;
+        }
 
-      const ingredients = extractIngredientMap(rawSizeSpec);
+        const sizeSpec = item.size ? spec.sizes?.[item.size] : spec;
+        const ingredients = extractIngredientMap(sizeSpec || spec);
+        console.log("Ürün malzemeleri:", ingredients); // DEBUG
 
-      for (const [ingredient, amount] of Object.entries(ingredients)) {
-        const ingName = normalizeName(ingredient);
-        const stockAmount = (item.qty || 0) * amount;
-        const currentStock = stockData[ingName] || stockData[ingredient] || 0;
-        const newStock = currentStock + stockAmount;
-        const ok = await updateStock(ingredient, newStock);
-        if (!ok) {
-          console.warn("refundConfirm: stok güncellenemedi:", ingredient);
-        } else {
-          stockData[ingName] = newStock;
+        for (const [ingredient, amount] of Object.entries(ingredients)) {
+          const stockDoc = await getStockDoc(ingredient);
+          if (!stockDoc) {
+            console.error("Stok bulunamadı:", ingredient);
+            continue;
+          }
+
+          const newQty = stockDoc.quantity + (amount * item.qty);
+          await updateStock(ingredient, newQty);
+          console.log(`Stok güncellendi: ${ingredient} -> ${newQty}`); // DEBUG
         }
       }
     }
 
-    updateSalesDisplays && typeof updateSalesDisplays === "function" && updateSalesDisplays();
-    alert("İade işlemi tamamlandı.");
-  } catch (err) {
-    console.error("refundConfirm hata:", err);
-    alert("İade sırasında hata oluştu.");
+    alert("✅ İade işlemi başarıyla tamamlandı");
+    closeModal('refundModal');
+    updateSalesDisplays();
+
+  } catch (error) {
+    console.error("‼️ İade hatası:", error); // Detaylı hata logu
+    alert(`İade sırasında hata: ${error.message}`);
   }
 }
 

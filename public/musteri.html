@@ -273,7 +273,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      z-index: 1;
+      z-index: 0;
       overflow: hidden;
       background: #000;
     }
@@ -358,6 +358,30 @@
       .waiting-message i {
         font-size: 32px;
       }
+
+      .waiting-state header {
+    display: none !important;
+  }
+  
+  .waiting-state .container {
+    background: transparent !important;
+  }
+  
+  .waiting-state .order-details {
+    padding: 0 !important;
+  }
+  
+  .waiting-message {
+    background: rgba(0, 0, 0, 0.3) !important; /* Daha saydam arkaplan */
+    backdrop-filter: blur(5px); /* Hafif blur efekti */
+  }
+  
+  .video-container {
+    z-index: 0 !important;
+  }
+
+
+
     }
   </style>
 </head>
@@ -538,42 +562,38 @@
 
     // Sipariş değişikliklerini dinle
     function listenForOrderChanges() {
-      const orderRef = doc(db, "active_orders", "tekSiparis");
+  const orderRef = doc(db, "active_orders", "tekSiparis");
 
-      const unsubscribe = onSnapshot(orderRef, async (snapshot) => {
-        if (snapshot.exists()) {
-          const orderData = snapshot.data();
-          
-          // Sipariş varsa:
-          isWaitingState = false;
-          orderSummaryEl.style.display = 'block';
-          orderItemsEl.style.display = 'none';
-          customerNameEl.style.display = 'none';
-          
-          // Video oynatmayı durdur
-          pauseVideo();
-          
-          // Müşteri adı varsa göster
-          if (orderData.customerName) {
-            customerNameTextEl.textContent = orderData.customerName;
-            customerNameEl.style.display = 'flex';
-          }
-          
-          updateOrderDisplay(orderData);
-          showNotification('Yeni sipariş geldi!');
-        } else {
-          // Sipariş YOKSA:
-          isWaitingState = true;
-          orderSummaryEl.style.display = 'none';
-          orderItemsEl.style.display = 'block';
-          customerNameEl.style.display = 'none';
-          waitingMessageEl.style.display = 'block';
-          
-          // Video oynatmayı başlat
-          playVideo();
-        }
-      });
+  const unsubscribe = onSnapshot(orderRef, async (snapshot) => {
+    if (snapshot.exists()) {
+      // Normal sipariş durumu
+      document.body.classList.remove('waiting-state');
+      const orderData = snapshot.data();
+      isWaitingState = false;
+      orderSummaryEl.style.display = 'block';
+      orderItemsEl.style.display = 'none';
+      customerNameEl.style.display = 'none';
+      pauseVideo();
+      
+      if (orderData.customerName) {
+        customerNameTextEl.textContent = orderData.customerName;
+        customerNameEl.style.display = 'flex';
+      }
+      
+      updateOrderDisplay(orderData);
+      showNotification('Yeni sipariş geldi!');
+    } else {
+      // Bekleme durumu
+      document.body.classList.add('waiting-state');
+      isWaitingState = true;
+      orderSummaryEl.style.display = 'none';
+      orderItemsEl.style.display = 'block';
+      customerNameEl.style.display = 'none';
+      waitingMessageEl.style.display = 'block';
+      playVideo();
     }
+  });
+}
 
     // Sipariş bilgilerini güncelle
     function updateOrderDisplay(orderData) {
