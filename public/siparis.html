@@ -1020,7 +1020,23 @@
     }
   }
 
+      .toggle-button {
+  padding: 12px 20px;
+  background-color: var(--success);
+  color: white;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 
+.toggle-button.off {
+  background-color: var(--danger);
+}
 
 
     }
@@ -1070,7 +1086,7 @@
         <button id="addOrderBtn" onclick="addToOrder()">
           <i class="fas fa-plus"></i> Siparişe Ekle
         </button>
-        <button id="confirmBtn" onclick="confirmOrder()">
+        <button id="confirmBtn" onclick="window.confirmOrder()">
           <i class="fas fa-check"></i> Siparişi Onayla
         </button>
         <button id="refundBtn" onclick="openRefundModal()">
@@ -1173,6 +1189,38 @@
     </div>
   </div>
 
+  <!--payment method modal-->
+  <div id="paymentModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Ödeme Yöntemi</h3>
+      <button class="close-btn" onclick="closeModal('paymentModal')">&times;</button>
+    </div>
+    <p style="text-align: center; font-size: 18px; margin: 20px 0;">
+      Toplam Tutar: <span id="paymentTotalAmount">0.00</span>₺
+    </p>
+    <div class="modal-btn-container">
+      <button class="modal-btn btn-primary" onclick="completeOrder('cash')">
+        <i class="fas fa-money-bill-wave"></i> Nakit
+      </button>
+      <button class="modal-btn btn-primary" onclick="completeOrder('card')">
+        <i class="fas fa-credit-card"></i> Kart
+      </button>
+      <button class="modal-btn btn-cancel" onclick="closeModal('paymentModal')">
+        <i class="fas fa-times"></i> İptal
+      </button>
+    </div>
+  </div>
+</div>
+
+        <!--fiş yazdırma toggle button-->
+  <div id="receiptToggleContainer" style="position:fixed; bottom:20px; right:20px;">
+  <button id="receiptToggle" class="toggle-button">
+    <i class="fas fa-receipt"></i> Fiş Yazdırma: Açık
+  </button>
+</div>
+
+
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js";
     import {
@@ -1190,7 +1238,9 @@
       where,
       orderBy,
       limit,
-      getDoc
+      getDoc,
+      runTransaction
+    
     } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
     import { 
       getAuth, 
@@ -1222,6 +1272,8 @@
     let currentCustomerName = "";
     let currentNoteIndex = -1;
     let selectedSize = ""; // Seçilen boyutu saklamak için
+    let printReceiptEnabled = true;  // Fiş yazdırma özelliği başlangıçta açık
+    let paymentMethod = ''; // Ödeme yöntemi
 
     // Boyut seçimi
     function selectSize(size) {
@@ -1307,8 +1359,8 @@ function createSizeOptions(product) {
     };
 
     // Modalı kapatır
-    window.closeNameModal = function () {
-      document.getElementById("nameModal").style.display = "none";
+    window.closeModal = function(modalId) {
+  document.getElementById(modalId).style.display = 'none';
     };
 
     // Not ekle butonu fonksiyonu
@@ -1681,24 +1733,55 @@ function createSizeOptions(product) {
       saveActiveOrder(); 
     }
 
-    async function printTickets(orderId, items, customerName = "") {  // Varsayılan değer: ""
-      try {
+  async function printTickets(orderId, items, customerName = "", paymentMethod = "") {
+  try {
     for (const item of items) {
       await addDoc(collection(db, "tickets"), {
         orderId,
         product: item.product,
-        size: item.size || "", 
-        customerName,  // İsim yoksa boş kaydeder
+        size: item.size || "",
+        customerName,
         note: item.note || "",
         timestamp: serverTimestamp(),
         price: item.price,
-        qty: item.qty
+        qty: item.qty,
+        paymentMethod: paymentMethod // Ödeme yöntemini ekledik
       });
     }
-      } catch (error) {
+  } catch (error) {
     console.error("Fiş oluşturma hatası:", error);
-    }
   }
+}
+
+
+// Günlük fiş numarası almak için fonksiyon
+async function getDailyReceiptNumber() {
+  try {
+    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD formatında bugünün tarihi
+    const counterRef = doc(db, "dailyReceiptCounters", today);
+    
+    // Sayacı artırmak için transaction kullanıyoruz
+    const newNumber = await runTransaction(db, async (transaction) => {
+      const counterDoc = await transaction.get(counterRef);
+      
+      if (counterDoc.exists()) {
+        // Belge varsa sayacı 1 artır
+        const newCount = counterDoc.data().count + 1;
+        transaction.update(counterRef, { count: newCount });
+        return newCount;
+      } else {
+        // Belge yoksa oluştur ve 1 ile başlat
+        transaction.set(counterRef, { count: 1 });
+        return 1;
+      }
+    });
+    
+    return newNumber;
+  } catch (error) {
+    console.error("Fiş numarası alınırken hata:", error);
+    return 0; // Hata durumunda 0 döndür
+  }
+}
 
     // Yeni eklenen fonksiyon - Toplam satış adetlerini hesaplar
     async function updateSalesCounts() {
@@ -2050,35 +2133,41 @@ function normalizeName(name) {
     /***********************
  * confirmOrder
  ***********************/
-async function confirmOrder() {
+window.confirmOrder = function() {
   if (!Array.isArray(currentOrder) || currentOrder.length === 0) {
     alert("Siparişiniz boş.");
     return;
   }
 
-  const requiredStocks = {};
-  let totalPrice = 0;
+  const totalPrice = currentOrder.reduce((sum, item) => sum + (item.qty * item.price), 0);
+  document.getElementById('paymentTotalAmount').textContent = totalPrice.toFixed(2);
+  document.getElementById('paymentModal').style.display = 'flex';
+};
 
-  // hesapla requiredStocks (normalize edilmiş isimlerle)
-  for (const item of currentOrder) {
-    const spec = productSpecs[item.product];
-    if (!spec) continue;
-
-    totalPrice += (item.qty || 0) * (item.price || 0);
-
-    const rawSizeSpec = item.size && spec.sizes && spec.sizes[item.size]
-      ? spec.sizes[item.size]
-      : spec;
-
-    const ingredients = extractIngredientMap(rawSizeSpec);
-
-    for (const [ingredient, amount] of Object.entries(ingredients)) {
-      const ingName = normalizeName(ingredient);
-      requiredStocks[ingName] = (requiredStocks[ingName] || 0) + ((item.qty || 0) * amount);
-    }
-  }
-
+// completeOrder fonksiyonunu global yapın
+window.completeOrder = async function(paymentMethod) {
   try {
+    const requiredStocks = {};
+    let totalPrice = 0;
+
+    for (const item of currentOrder) {
+      const spec = productSpecs[item.product];
+      if (!spec) continue;
+
+      totalPrice += (item.qty || 0) * (item.price || 0);
+
+      const rawSizeSpec = item.size && spec.sizes && spec.sizes[item.size]
+        ? spec.sizes[item.size]
+        : spec;
+
+      const ingredients = extractIngredientMap(rawSizeSpec);
+
+      for (const [ingredient, amount] of Object.entries(ingredients)) {
+        const ingName = normalizeName(ingredient);
+        requiredStocks[ingName] = (requiredStocks[ingName] || 0) + ((item.qty || 0) * amount);
+      }
+    }
+
     // Ön kontrol: yeterli stok var mı?
     for (const [name, required] of Object.entries(requiredStocks)) {
       const available = stockData[normalizeName(name)] || stockData[name] || 0;
@@ -2087,32 +2176,37 @@ async function confirmOrder() {
       }
     }
 
-    if (!confirm(`Toplam Tutar: ${totalPrice}₺\nOnaylıyor musunuz?`)) return;
-
-    // Siparişi kaydet
+    // Siparişi kaydet (ödeme yöntemi ile birlikte)
     const newOrderRef = await addDoc(collection(db, "sales"), {
       items: currentOrder,
       total: totalPrice,
       timestamp: serverTimestamp(),
       user: currentUserEmail || null,
-      customerName: currentCustomerName || null
+      customerName: currentCustomerName || null,
+      paymentMethod: paymentMethod // "cash" veya "card"
     });
 
-       // FİŞ YAZDIRMA EKLENDİ
-    printReceipt(
-      newOrderRef.id, // Sipariş ID
-      currentOrder,   // Ürünler
-      totalPrice,     // Toplam
-      currentCustomerName // Müşteri adı (varsa)
-    );
+    const receiptNumber = await getDailyReceiptNumber();
 
+    // Fiş yazdırma (eğer aktifse)
+    if (printReceiptEnabled) {
+      printReceipt(
+        newOrderRef.id,
+        currentOrder,
+        totalPrice,
+        currentCustomerName,
+        paymentMethod
+      );
+    }
 
     // Müşteri adı OLMASA BİLE tickets oluştur:
-    try { 
-    await printTickets(newOrderRef.id, currentOrder, currentCustomerName || ""); 
-  } catch(e) { 
-    console.warn("printTickets hata:", e); 
-  }
+    try {
+      await printTickets(newOrderRef.id, currentOrder, currentCustomerName || "", paymentMethod);
+    } catch (e) {
+      console.warn("printTickets hata:", e);
+    }
+
+
 
     // Stok güncelleme
     for (const [name, required] of Object.entries(requiredStocks)) {
@@ -2121,50 +2215,54 @@ async function confirmOrder() {
       const newStock = current - required;
       const ok = await updateStock(name, newStock);
       if (!ok) {
-        // Kritik: stok güncellenemediyse kullanıcıyı uyar ve logla
         alert(`Uyarı: "${name}" stok güncellenemedi. Lütfen stokları kontrol et.`);
-        console.error("confirmOrder: updateStock başarısız:", name);
-        // Eğer istersen burada rollback (satışı silme) veya admin uyarısı ekleyebilirsin.
+        console.error("completeOrder: updateStock başarısız:", name);
       } else {
         stockData[key] = newStock;
       }
     }
 
-    // Aktif siparişi temizle (eğer kullanıyorsan)
-    try { await deleteDoc(doc(db, "active_orders", "tekSiparis")); } catch(e) { /* opsiyonel */ }
+    // Aktif siparişi temizle
+    try {
+      await deleteDoc(doc(db, "active_orders", "tekSiparis"));
+    } catch (e) {
+      console.warn("Aktif sipariş silinirken hata:", e);
+    }
 
     window.activeOrderId = null;
     currentOrder = [];
     currentCustomerName = "";
-    updateOrderDisplay && typeof updateOrderDisplay === "function" && updateOrderDisplay();
-    updateSalesDisplays && typeof updateSalesDisplays === "function" && updateSalesDisplays();
+    updateOrderDisplay();
+    updateSalesDisplays();
 
     alert("Sipariş başarıyla tamamlandı.");
+    closeModal('paymentModal');
   } catch (err) {
-    console.error("confirmOrder hata:", err);
+    console.error("completeOrder hata:", err);
     alert(err.message || "Sipariş tamamlanırken hata oluştu.");
   }
 }
 
 
+
       // Yeni fonksiyon: Fiş yazdırma
-function printReceipt(orderId, items, total, customerName = "") {
-  // Tarih formatı
+async function printReceipt(orderId, items, total, customerName = "", paymentMethod = "") {
   const now = new Date();
   const dateStr = now.toLocaleString("tr-TR");
+  const logoUrl = "img/fis_logo.jpg";
+  const receiptNumber = await getDailyReceiptNumber(); // Günlük fiş numarasını al
 
-  // Logo URL'si - img klasöründeki logo dosyası
-  const logoUrl = "img/fis_logo.jpg"; // veya tam yolunu yazın
+  // Ödeme yöntemi metni
+  const paymentMethodText = paymentMethod === 'cash' ? 'Nakit' : 
+                          paymentMethod === 'card' ? 'Kart' : 
+                          'Ödeme Yöntemi Belirtilmedi';
 
-  // Fiş HTML'i oluştur
-  const receiptHtml = `
+   const receiptHtml = `
     <div style="font-family: Arial, sans-serif; width: 80mm; padding: 3px; line-height: 1.3;">
-      <!-- Logo ekleme -->
-      
       <div style="text-align: center; margin-bottom: 5px; margin-top: 0;">
-  <img src="${logoUrl}" alt="Logo" style="max-width: 60mm; height: auto; margin-bottom: 5px;">
-  <h2 style="margin: 5px 0; font-size: 18px;">LUMA COFFEE</h2>
-</div>                                                
+        <img src="${logoUrl}" alt="Logo" style="max-width: 60mm; height: auto; margin-bottom: 5px;">
+        <h2 style="margin: 5px 0; font-size: 18px;">LUMA COFFEE</h2>
+      </div>
       <p style="text-align: center;">Sipariş ID: ${orderId}</p>
       <p style="text-align: center;">Tarih: ${dateStr}</p>
       ${customerName ? `<p style="text-align: center;">Müşteri: ${customerName}</p>` : ""}
@@ -2182,19 +2280,23 @@ function printReceipt(orderId, items, total, customerName = "") {
         <span>TOPLAM:</span>
         <span>${total.toFixed(2)}₺</span>
       </div>
-      <p style="text-align: center; margin-top: 20px;">Teşekkür ederiz!</p>
+      <div style="margin-top: 5px; text-align: right;">
+        <small>Ödeme: ${paymentMethodText}</small>
+      </div>
+      <div style="position: absolute; bottom: 5px; left: 5px; font-size: 12px;">
+        Fiş No: ${receiptNumber.toString().padStart(4, '0')} <!-- 4 haneli format: 0001 -->
+      </div>
+      <p style="text-align: center; margin-top: 15px;">Teşekkür ederiz!</p>
     </div>
   `;
 
-  // Yeni pencere aç ve HTML'i yükle
   const printWindow = window.open("", "_blank");
   printWindow.document.write(receiptHtml);
   printWindow.document.close();
 
-  // Yazdırma diyaloğunu aç (tarayıcıya bağlı)
   setTimeout(() => {
     printWindow.print();
-    printWindow.close(); // Yazdırdıktan sonra pencereyi kapat
+    printWindow.close();
   }, 500);
 }
 
@@ -2391,8 +2493,8 @@ function renderSizeButtons(spec, container, selectSizeFn) {
  ***********************/
 async function refundConfirm(restock) {
   try {
-    console.log("Seçilen iade öğeleri:", selectedRefundItems); // DEBUG
-    console.log("Sipariş verisi:", selectedOrderForRefund); // DEBUG
+    console.log("Seçilen iade öğeleri:", selectedRefundItems);
+    console.log("Sipariş verisi:", selectedOrderForRefund);
 
     // 1. İade kaydı oluştur
     const refundRef = await addDoc(collection(db, "refunds"), {
@@ -2402,7 +2504,7 @@ async function refundConfirm(restock) {
       user: currentUserEmail,
       restock: restock
     });
-    console.log("İade kaydı oluşturuldu ID:", refundRef.id); // DEBUG
+    console.log("İade kaydı oluşturuldu ID:", refundRef.id);
 
     // 2. Stok güncelleme (restock true ise)
     if (restock) {
@@ -2415,7 +2517,7 @@ async function refundConfirm(restock) {
 
         const sizeSpec = item.size ? spec.sizes?.[item.size] : spec;
         const ingredients = extractIngredientMap(sizeSpec || spec);
-        console.log("Ürün malzemeleri:", ingredients); // DEBUG
+        console.log("Ürün malzemeleri:", ingredients);
 
         for (const [ingredient, amount] of Object.entries(ingredients)) {
           const stockDoc = await getStockDoc(ingredient);
@@ -2426,17 +2528,18 @@ async function refundConfirm(restock) {
 
           const newQty = stockDoc.quantity + (amount * item.qty);
           await updateStock(ingredient, newQty);
-          console.log(`Stok güncellendi: ${ingredient} -> ${newQty}`); // DEBUG
+          console.log(`Stok güncellendi: ${ingredient} -> ${newQty}`);
         }
       }
     }
 
     alert("✅ İade işlemi başarıyla tamamlandı");
     closeModal('refundModal');
+    closeModal('refundConfirmModal'); // Bu satırı ekledik
     updateSalesDisplays();
 
   } catch (error) {
-    console.error("‼️ İade hatası:", error); // Detaylı hata logu
+    console.error("‼️ İade hatası:", error);
     alert(`İade sırasında hata: ${error.message}`);
   }
 }
@@ -2513,15 +2616,42 @@ async function refundConfirm(restock) {
           }
         });
       });
+
+      const toggleBtn = document.getElementById('receiptToggle');
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', () => {
+      printReceiptEnabled = !printReceiptEnabled;
+      localStorage.setItem('printReceiptEnabled', printReceiptEnabled);
+      
+      if (printReceiptEnabled) {
+        toggleBtn.innerHTML = '<i class="fas fa-receipt"></i> Fiş Yazdırma: Açık';
+        toggleBtn.classList.remove('off');
+      } else {
+        toggleBtn.innerHTML = '<i class="fas fa-receipt"></i> Fiş Yazdırma: Kapalı';
+        toggleBtn.classList.add('off');
+      }
     });
+    
+    // Başlangıç durumunu yükle
+    const savedSetting = localStorage.getItem('printReceiptEnabled');
+    if (savedSetting !== null) {
+      printReceiptEnabled = savedSetting === 'true';
+    }
+    
+    if (!printReceiptEnabled) {
+      toggleBtn.innerHTML = '<i class="fas fa-receipt"></i> Fiş Yazdırma: Kapalı';
+      toggleBtn.classList.add('off');
+    }
+  }
+});
 
     // Global fonksiyonlar
     window.changeQty = changeQty;
     window.addToOrder = addToOrder;
     window.removeFromOrder = removeFromOrder;
-    window.confirmOrder = confirmOrder;
+   
     window.openRefundModal = openRefundModal;
-    window.closeModal = closeModal;
+    
     window.processRefund = processRefund;
     window.refundConfirm = refundConfirm;
     window.clearSearch = clearSearch;
