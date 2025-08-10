@@ -348,16 +348,17 @@
     }
     
     .size-btn:hover {
-      background: #e0e6ed;
+      background: #f8fbff;
       transform: translateY(-3px);
     }
     
     .size-btn.selected {
-      border-color: var(--primary);
-      background: var(--primary-light);
-      transform: scale(1.05);
-      box-shadow: 0 4px 8px rgba(90, 103, 216, 0.2);
-    }
+  border-color: var(--primary);
+  background: var(--primary);
+  color: var(--white);
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(90, 103, 216, 0.2);
+}
     
     .size-btn i {
       font-size: 24px;
@@ -1043,7 +1044,12 @@
   </style>
 </head>
 <body>
-  <h2><i class="fas fa-coffee"></i> Personel Paneli - Kahve Siparişi</h2>
+  <h2>
+    <i class="fas fa-coffee"></i> Personel Paneli - Kahve Siparişi
+  <button id="refreshBtn" style="margin-left: 15px; padding: 5px 10px; background: var(--primary); color: white; border: none; border-radius: 5px; cursor: pointer;">
+    <i class="fas fa-sync-alt"></i> Sayfayı Yenile
+  </button>
+  </h2>
   
   <div class="search-container">
     <input type="text" id="productSearch" placeholder="Ürün ara..." />
@@ -1275,25 +1281,32 @@
     let printReceiptEnabled = true;  // Fiş yazdırma özelliği başlangıçta açık
     let paymentMethod = ''; // Ödeme yöntemi
 
-    // Boyut seçimi
-    function selectSize(size) {
-      selectedSize = size;
-      document.querySelectorAll('.size-btn').forEach(btn => {
-        btn.classList.remove('selected');
-      });
-      event.currentTarget.classList.add('selected');
-      
-      // Seçilen boyutun fiyatını göster
-      const product = productSpecs[selectedProduct];
-      if (product && product.sizes && product.sizes[size]) {
-        const price = product.sizes[size].price.toFixed(2);
-        document.querySelector('.size-btn.selected .size-price').textContent = `${price}₺`;
-      }
-    }
+
+
+    //BOYUT SEÇİMİ
+    function selectSize(size, event) {
+  event?.preventDefault();
+  selectedSize = size;
+  
+  document.querySelectorAll('.size-btn').forEach(btn => {
+    btn.classList.remove('selected');
+  });
+  
+  if (event) {
+    event.currentTarget.classList.add('selected');
+  }
+  
+  // Fiyat güncelleme
+  const product = productSpecs[selectedProduct];
+  if (product && product.sizes && product.sizes[size]) {
+    const price = product.sizes[size].price.toFixed(2);
+    document.querySelector('.size-btn.selected .size-price').textContent = `${price}₺`;
+  }
+}
+
 
     // Boyut seçeneklerini oluştur
-    // Boyut seçeneklerini oluştur
-function createSizeOptions(product) {
+ function createSizeOptions(product) {
   const sizeContainer = document.getElementById('sizeSelection');
   sizeContainer.innerHTML = '';
   
@@ -1304,7 +1317,6 @@ function createSizeOptions(product) {
   
   sizeContainer.style.display = 'flex';
   
-  // Boyut sıralamasını düzelt
   const sizeOrder = ["küçük", "orta", "büyük"];
   const sortedSizes = Object.keys(product.sizes).sort((a, b) => {
     const ai = sizeOrder.indexOf(a.toLowerCase());
@@ -1319,7 +1331,7 @@ function createSizeOptions(product) {
     const sizeData = product.sizes[sizeName];
     const sizeBtn = document.createElement('div');
     sizeBtn.className = 'size-btn';
-    sizeBtn.onclick = (e) => selectSize(sizeName);
+    sizeBtn.onclick = (e) => selectSize(sizeName, e);
     
     let icon = 'fa-mug-hot';
     if (sizeName.toLowerCase() === 'küçük') icon = 'fa-mug-saucer';
@@ -2095,30 +2107,38 @@ async function loadProducts() {
 
     // Stokları yükle
     async function loadStocks() {
-      try {
-        const querySnapshot = await getDocs(collection(db, "stocks"));
-        stockData = {};
-        querySnapshot.forEach(doc => {
-          stockData[doc.data().name] = doc.data().quantity;
-        });
-      } catch (error) {
-        console.error("Stok yüklenirken hata:", error);
-      }
-    }
-
+  try {
+    const querySnapshot = await getDocs(collection(db, "stocks"));
+    stockData = {};
+    querySnapshot.forEach(doc => {
+      const data = doc.data();
+      const normalized = normalizeName(data.name);
+      stockData[normalized] = {
+        quantity: data.quantity,
+        docId: doc.id, // Belge ID'sini sakla
+        name: data.name // Orijinal ismi sakla
+      };
+    });
+  } catch (error) {
+    console.error("Stok yüklenirken hata:", error);
+  }
+}
     // Stok bilgisi al
     async function getStockDoc(itemName) {
   const normalized = normalizeName(itemName);
-  const q = query(collection(db, "stocks"), 
-               where("name", ">=", normalized),
-               where("name", "<=", normalized + "\uf8ff"));
-  
+  const q = query(collection(db, "stocks"), where("name", "==", normalized));
   const snapshot = await getDocs(q);
-  return snapshot.docs[0]?.data(); // İlk eşleşmeyi döndür
+  return snapshot.docs[0]?.data();
 }
+
 
     // Stok güncelle
     async function updateStock(itemName, newQuantity) {
+
+      if (newQuantity < 0) {
+    throw new Error(`"${itemName}" stoğu negatif olamaz!`);
+  }
+
   if (!itemName) return false;
   try {
     // 1) Direct equality attempt
@@ -2126,7 +2146,7 @@ async function loadProducts() {
     let qs = await getDocs(q);
     if (!qs.empty) {
       const docRef = qs.docs[0].ref;
-      await updateDoc(docRef, { quantity: newQuantity, updatedAt: serverTimestamp() });
+      await updateDoc(docRef, { name: name.toLowerCase(),quantity: newQuantity, updatedAt: serverTimestamp() });
       return true;
     }
 
@@ -2152,8 +2172,20 @@ async function loadProducts() {
 
     // İsimleri standartlaştır (case-insensitive ve boşluk temizleme)
 function normalizeName(name) {
-  return name.trim().toLowerCase();
+  if (!name) return '';
+  return name
+    .toString()
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, '')
+    .replace(/[ıİ]/g, 'i')
+    .replace(/[şŞ]/g, 's')
+    .replace(/[ğĞ]/g, 'g')
+    .replace(/[üÜ]/g, 'u')
+    .replace(/[çÇ]/g, 'c')
+    .replace(/[öÖ]/g, 'o');
 }
+
 
       function extractIngredientMap(obj) {
   if (!obj || typeof obj !== 'object') return {};
@@ -2192,6 +2224,7 @@ window.completeOrder = async function(paymentMethod) {
     const requiredStocks = {};
     let totalPrice = 0;
 
+    // 1. Stok gereksinimlerini hesapla
     for (const item of currentOrder) {
       const spec = productSpecs[item.product];
       if (!spec) continue;
@@ -2203,18 +2236,23 @@ window.completeOrder = async function(paymentMethod) {
         : spec;
 
       const ingredients = extractIngredientMap(rawSizeSpec);
-
       for (const [ingredient, amount] of Object.entries(ingredients)) {
         const ingName = normalizeName(ingredient);
-        requiredStocks[ingName] = (requiredStocks[ingName] || 0) + ((item.qty || 0) * amount);
+        requiredStocks[ingName] = (requiredStocks[ingName] || 0) + (item.qty * amount);
       }
     }
-
-    // Ön kontrol: yeterli stok var mı?
+    // 2. STOK KONTROLÜ: Yeterli stok var mı?
     for (const [name, required] of Object.entries(requiredStocks)) {
-      const available = stockData[normalizeName(name)] || stockData[name] || 0;
-      if (available < required) {
-        throw new Error(`Yeterli ${name} stoğu yok. Gereken: ${required}, Mevcut: ${available}`);
+      const normalized = normalizeName(name);
+      const stockInfo = stockData[normalized];
+      
+      if (!stockInfo) {
+        throw new Error(`"${name}" malzemesi stokta bulunamadı!`);
+      }
+      
+      // Eğer stok yetersizse uyarı ver
+      if (stockInfo.quantity < required) {
+        throw new Error(`Yeterli ${name} stoğu yok! Gereken: ${required}, Mevcut: ${stockInfo.quantity}`);
       }
     }
 
@@ -2225,7 +2263,7 @@ window.completeOrder = async function(paymentMethod) {
       timestamp: serverTimestamp(),
       user: currentUserEmail || null,
       customerName: currentCustomerName || null,
-      paymentMethod: paymentMethod // "cash" veya "card"
+      paymentMethod: paymentMethod
     });
 
     const receiptNumber = await getDailyReceiptNumber();
@@ -2248,22 +2286,26 @@ window.completeOrder = async function(paymentMethod) {
       console.warn("printTickets hata:", e);
     }
 
+    // Stok güncelleme işlemi
+   for (const [name, required] of Object.entries(requiredStocks)) {
+  const normalized = normalizeName(name);
+  const stockInfo = stockData[normalized];
+  
+  if (!stockInfo) {
+    console.warn(`"${name}" malzemesi stok verisinde bulunamadı`);
+    continue;
+  }
 
-
-    // Stok güncelleme
-    for (const [name, required] of Object.entries(requiredStocks)) {
-      const key = normalizeName(name);
-      const current = stockData[key] || stockData[name] || 0;
-      const newStock = current - required;
-      const ok = await updateStock(name, newStock);
-      if (!ok) {
-        alert(`Uyarı: "${name}" stok güncellenemedi. Lütfen stokları kontrol et.`);
-        console.error("completeOrder: updateStock başarısız:", name);
-      } else {
-        stockData[key] = newStock;
-      }
-    }
-
+  const newQty = stockInfo.quantity - required;
+  const docRef = doc(db, "stocks", stockInfo.docId);
+  
+  await updateDoc(docRef, {
+    quantity: newQty,
+    updatedAt: serverTimestamp()
+  });
+  
+  console.log(`Stok güncellendi: ${name} -> ${newQty}`);
+}
     // Aktif siparişi temizle
     try {
       await deleteDoc(doc(db, "active_orders", "tekSiparis"));
@@ -2292,43 +2334,45 @@ async function printReceipt(orderId, items, total, customerName = "", paymentMet
   const now = new Date();
   const dateStr = now.toLocaleString("tr-TR");
   const logoUrl = "img/fis_logo.jpg";
-  const receiptNumber = await getDailyReceiptNumber(); // Günlük fiş numarasını al
+  const receiptNumber = await getDailyReceiptNumber();
 
   // Ödeme yöntemi metni
   const paymentMethodText = paymentMethod === 'cash' ? 'Nakit' : 
-                          paymentMethod === 'card' ? 'Kart' : 
-                          'Ödeme Yöntemi Belirtilmedi';
+                         paymentMethod === 'card' ? 'Kart' : 
+                         'Ödeme Yöntemi Belirtilmedi';
 
-   const receiptHtml = `
-    <div style="font-family: Arial, sans-serif; width: 80mm; padding: 3px; line-height: 1.3;">
+  // Fiş içeriğini oluştur
+  const receiptHtml = `
+    <div style="font-family: Arial, sans-serif; width: 80mm; padding: 3px; line-height: 1.3; font-size: 18px;">
       <div style="text-align: center; margin-bottom: 5px; margin-top: 0;">
         <img src="${logoUrl}" alt="Logo" style="max-width: 60mm; height: auto; margin-bottom: 5px;">
-        <h2 style="margin: 5px 0; font-size: 18px;">LUMA COFFEE</h2>
+        <h2 style="margin: 5px 0; font-size: 22px;">LUMA COFFEE</h2>
       </div>
-      <p style="text-align: center;">Sipariş ID: ${orderId}</p>
-      <p style="text-align: center;">Tarih: ${dateStr}</p>
-      ${customerName ? `<p style="text-align: center;">Müşteri: ${customerName}</p>` : ""}
+      <div style="text-align: center;">
+        <p style="margin: 5px 0; font-size: 16px;">Sipariş ID: ${orderId}</p>
+        <p style="margin: 5px 0; font-size: 16px;">Fiş No: ${receiptNumber.toString().padStart(4, '0')}</p>
+      </div>
+      <p style="text-align: center; font-size: 16px;">Tarih: ${dateStr}</p>
+      ${customerName ? `<p style="text-align: center; font-weight: bold; text-transform: uppercase; font-size: 18px;">${customerName}</p>` : ""}
       <hr style="border-top: 1px dashed #000; margin: 10px 0;">
       <div style="margin-bottom: 15px;">
         ${items.map(item => `
-          <div style="display: flex; justify-content: space-between;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
             <span>${item.qty}x ${item.product}${item.size ? ` (${item.size})` : ""}</span>
             <span>${(item.qty * item.price).toFixed(2)}₺</span>
           </div>
+          ${item.note ? `<div style="font-style: italic; font-size: 16px; padding-left: 10px; margin-bottom: 8px;">${item.note}</div>` : ''}
         `).join("")}
       </div>
       <hr style="border-top: 1px dashed #000; margin: 10px 0;">
-      <div style="display: flex; justify-content: space-between; font-weight: bold;">
+      <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 20px;">
         <span>TOPLAM:</span>
         <span>${total.toFixed(2)}₺</span>
       </div>
-      <div style="margin-top: 5px; text-align: right;">
-        <small>Ödeme: ${paymentMethodText}</small>
+      <div style="margin-top: 5px; text-align: right; font-size: 16px;">
+        <span>Ödeme: ${paymentMethodText}</span>
       </div>
-      <div style="position: absolute; bottom: 5px; left: 5px; font-size: 12px;">
-        Fiş No: ${receiptNumber.toString().padStart(4, '0')} <!-- 4 haneli format: 0001 -->
-      </div>
-      <p style="text-align: center; margin-top: 15px;">Teşekkür ederiz!</p>
+      <p style="text-align: center; margin-top: 15px; margin-bottom: 5px; font-size: 16px;">Teşekkür ederiz!</p>
     </div>
   `;
 
@@ -2429,6 +2473,13 @@ async function printReceipt(orderId, items, total, customerName = "", paymentMet
         console.error("Son siparişler yüklenirken hata:", error);
       }
     }
+
+
+        // yenileme butonu ile ilgili
+    document.getElementById('refreshBtn').addEventListener('click', () => {
+  location.reload();
+});
+
 
     // Sipariş seçildiğinde ürünleri listele
     function selectOrderForRefund(orderId, orderData) {
@@ -2623,9 +2674,10 @@ async function refundConfirm(restock) {
         
         // Önce ürünleri yükle, sonra kategorileri yükle
         try {
-          await loadProducts();
+          // Önce tüm verileri yükle
+          await Promise.all([loadProducts(), loadStocks()]);
+          // Sonra kategorileri yükle (ürünlere bağımlı)
           await loadCategories();
-          await loadStocks();
           updateSalesDisplays();
           updateSalesCounts();
           
@@ -2677,7 +2729,7 @@ async function refundConfirm(restock) {
     // Başlangıç durumunu yükle
     const savedSetting = localStorage.getItem('printReceiptEnabled');
     if (savedSetting !== null) {
-      printReceiptEnabled = savedSetting === 'true';
+      printReceiptEnabled = JSON.parse(savedSetting);
     }
     
     if (!printReceiptEnabled) {
