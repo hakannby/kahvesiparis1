@@ -5,7 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Personel Paneli - Sipariş Al</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
+  <!-- CSS kısımları buraya gelecek -->
+
+ <style>
     :root {
       --primary: #5a67d8;
       --primary-light: #7e8de3;
@@ -657,39 +659,108 @@
       overflow-y: auto;
     }
     
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.75);
-      z-index: 1000;
-      align-items: center;
-      justify-content: center;
-      backdrop-filter: blur(3px);
-    }
+
     
-    .modal-content {
-      background: white;
-      padding: 30px;
-      border-radius: var(--radius);
-      width: 90%;
-      max-width: 500px;
-      max-height: 90vh;
-      overflow-y: auto;
-      box-shadow: 0 15px 40px rgba(0,0,0,0.25);
-    }
+      /* Modal sistemini tamamen yeniden düzenleyin - mevcut modal CSS'lerini silin ve bunlarla değiştirin */
+
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.75);
+  z-index: 10000; /* Sabit ve yüksek değer */
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(3px);
+}
+
+.modal-content {
+  background: white;
+  padding: 30px;
+  border-radius: var(--radius);
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+  position: relative;
+  z-index: 10001;
+}
+
+
+.modal-content input[type="text"], 
+.modal-content textarea,
+#nameInput, 
+#noteInput {
+  width: 100%;
+  padding: 15px;
+  margin: 20px 0;
+  font-size: 16px;
+  border: 2px solid #ddd;
+  border-radius: var(--radius);
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+  background: white !important;
+  position: relative;
+  z-index: auto;
+  pointer-events: auto;
+  outline: none;
+}
+
+.modal-content input[type="text"]:focus, 
+.modal-content textarea:focus,
+#nameInput:focus, 
+#noteInput:focus {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 3px rgba(90, 103, 216, 0.25) !important;
+  outline: none !important;
+}
+
+.modal-btn {
+  position: relative;
+  z-index: auto;
+  pointer-events: auto;
+  flex: 1;
+  padding: 15px;
+  border-radius: var(--radius);
+  font-weight: 700;
+  font-size: 17px;
+  cursor: pointer;
+  transition: var(--transition);
+  text-align: center;
+  user-select: none;
+  touch-action: manipulation;
+  border: none;
+}
+
+
+
+
+
+
+
+
+@keyframes modalFadeIn {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+
+/* Input ve textarea için temel stiller */
+#nameInput, #noteInput {
+  transition: all 0.3s ease;
+  min-height: 40px;
+}
+
+#nameInput:focus, #noteInput:focus {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 3px rgba(90, 103, 216, 0.25) !important;
+  outline: none;
+}
     
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-      padding-bottom: 15px;
-      border-bottom: 1px solid #eee;
-    }
     
     .close-btn {
       background: none;
@@ -887,28 +958,24 @@
       background-color: #f0f7ff;
     }
     
-    /* YENİ MODAL STİLLERİ */
-    .modal-btn-container {
-      display: flex;
-      gap: 15px;
-      margin-top: 25px;
-    }
+   
+
+   
+
+
+@keyframes ripple {
+  0% {
+    transform: scale(0, 0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(20, 20);
+    opacity: 0;
+  }
+}
+
+
     
-    .modal-btn {
-      flex: 1;
-      padding: 15px;
-      border-radius: var(--radius);
-      font-weight: 700;
-      font-size: 17px;
-      cursor: pointer;
-      transition: var(--transition);
-      text-align: center;
-    }
-    
-    .modal-btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    }
     
     .btn-yes {
       background: var(--success);
@@ -925,15 +992,7 @@
       color: white;
     }
     
-    .note-input {
-      width: 100%;
-      padding: 15px;
-      margin: 20px 0;
-      font-size: 16px;
-      border: 2px solid #ddd;
-      border-radius: var(--radius);
-      transition: var(--transition);
-    }
+    
     
     .note-input:focus {
       border-color: var(--primary);
@@ -998,9 +1057,11 @@
         max-height: 300px;
       }
       
-      .modal-content {
-        padding: 20px;
-      }
+    
+      .btn-gift {
+  background-color: #9c27b0 !important;
+  color: white !important;
+}
 
 
         @media print {
@@ -1040,15 +1101,72 @@
 }
 
 
+
+
+    #nameInput, #noteInput {
+      transition: all 0.2s ease;
     }
+    
+
+
+
+
+
+
+.loader {
+  border: 5px solid #f3f3f3;
+  border-top: 5px solid #5a67d8;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+  margin: 20px auto;
+  display: none; /* Başlangıçta gizli */
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255,255,255,0.8);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  display: none; /* Başlangıçta gizli */
+}
+
+
+    }
+
+
   </style>
+
+
+
+
+  
 </head>
 <body>
+
+  <div id="loadingOverlay" class="loading-overlay">
+    <div class="loader"></div>
+    <p style="margin-top: 20px; font-weight: bold;">Yükleniyor...</p>
+  </div>
+
   <h2>
     <i class="fas fa-coffee"></i> Personel Paneli - Kahve Siparişi
-  <button id="refreshBtn" style="margin-left: 15px; padding: 5px 10px; background: var(--primary); color: white; border: none; border-radius: 5px; cursor: pointer;">
-    <i class="fas fa-sync-alt"></i> Sayfayı Yenile
-  </button>
+    <button id="refreshBtn" style="margin-left: 15px; padding: 5px 10px; background: var(--primary); color: white; border: none; border-radius: 5px; cursor: pointer;">
+      <i class="fas fa-sync-alt"></i> Sayfayı Yenile
+    </button>
   </h2>
   
   <div class="search-container">
@@ -1174,11 +1292,15 @@
   <!-- Müşteri İsmi Modal -->
   <div id="nameModal" class="modal">
     <div class="modal-content">
-      <h3>Müşteri İsmi</h3>
-      <input type="text" id="nameInput" placeholder="İsim giriniz..." class="note-input" />
+      <div class="modal-header">
+        <h3>Müşteri İsmi</h3>
+        <button class="close-btn" onclick="closeModal('nameModal')">&times;</button>
+      </div>
+      <input type="text" id="nameInput" placeholder="İsim giriniz..." class="note-input" 
+             autocomplete="off" autocorrect="off" spellcheck="false" />
       <div class="modal-btn-container">
         <button class="modal-btn btn-primary" onclick="submitName()">Kaydet</button>
-        <button class="modal-btn btn-cancel" onclick="closeNameModal()">İptal</button>
+        <button class="modal-btn btn-cancel" onclick="closeModal('nameModal')">İptal</button>
       </div>
     </div>
   </div>
@@ -1186,46 +1308,52 @@
   <!-- Not Ekleme Modal -->
   <div id="noteModal" class="modal">
     <div class="modal-content">
-      <h3>Sipariş Notu</h3>
-      <textarea id="noteInput" placeholder="Not giriniz..." class="note-input" rows="4"></textarea>
+      <div class="modal-header">
+        <h3>Sipariş Notu</h3>
+        <button class="close-btn" onclick="closeModal('noteModal')">&times;</button>
+      </div>
+      <textarea id="noteInput" placeholder="Not giriniz..." class="note-input" rows="4"
+                autocomplete="off" autocorrect="off" spellcheck="false"></textarea>
       <div class="modal-btn-container">
         <button class="modal-btn btn-primary" onclick="saveNote()">Kaydet</button>
-        <button class="modal-btn btn-cancel" onclick="closeNoteModal()">İptal</button>
+        <button class="modal-btn btn-cancel" onclick="closeModal('noteModal')">İptal</button>
       </div>
     </div>
   </div>
 
-  <!--payment method modal-->
+  <!-- Ödeme Yöntemi Modal -->
   <div id="paymentModal" class="modal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h3>Ödeme Yöntemi</h3>
-      <button class="close-btn" onclick="closeModal('paymentModal')">&times;</button>
-    </div>
-    <p style="text-align: center; font-size: 18px; margin: 20px 0;">
-      Toplam Tutar: <span id="paymentTotalAmount">0.00</span>₺
-    </p>
-    <div class="modal-btn-container">
-      <button class="modal-btn btn-primary" onclick="completeOrder('cash')">
-        <i class="fas fa-money-bill-wave"></i> Nakit
-      </button>
-      <button class="modal-btn btn-primary" onclick="completeOrder('card')">
-        <i class="fas fa-credit-card"></i> Kart
-      </button>
-      <button class="modal-btn btn-cancel" onclick="closeModal('paymentModal')">
-        <i class="fas fa-times"></i> İptal
-      </button>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Ödeme Yöntemi</h3>
+        <button class="close-btn" onclick="closeModal('paymentModal')">&times;</button>
+      </div>
+      <p style="text-align: center; font-size: 18px; margin: 20px 0;">
+        Toplam Tutar: <span id="paymentTotalAmount">0.00</span>₺
+      </p>
+      <div class="modal-btn-container">
+        <button class="modal-btn btn-primary" onclick="completeOrder('cash')">
+          <i class="fas fa-money-bill-wave"></i> Nakit
+        </button>
+        <button class="modal-btn btn-primary" onclick="completeOrder('card')">
+          <i class="fas fa-credit-card"></i> Kart
+        </button>
+        <button class="modal-btn btn-gift" onclick="completeOrder('gift')">
+          <i class="fas fa-gift"></i> İkram
+        </button>
+        <button class="modal-btn btn-cancel" onclick="closeModal('paymentModal')">
+          <i class="fas fa-times"></i> İptal
+        </button>
+      </div>
     </div>
   </div>
-</div>
 
-        <!--fiş yazdırma toggle button-->
+  <!-- Fiş Yazdırma Toggle Butonu -->
   <div id="receiptToggleContainer" style="position:fixed; bottom:20px; right:20px;">
-  <button id="receiptToggle" class="toggle-button">
-    <i class="fas fa-receipt"></i> Fiş Yazdırma: Açık
-  </button>
-</div>
-
+    <button id="receiptToggle" class="toggle-button">
+      <i class="fas fa-receipt"></i> Fiş Yazdırma: Açık
+    </button>
+  </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js";
@@ -1240,13 +1368,13 @@
       updateDoc,
       onSnapshot,
       getDocs,
+      startAfter,
       query,
       where,
       orderBy,
       limit,
       getDoc,
       runTransaction
-    
     } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
     import { 
       getAuth, 
@@ -1277,286 +1405,356 @@
     let selectedOrderForRefund = null;
     let currentCustomerName = "";
     let currentNoteIndex = -1;
-    let selectedSize = ""; // Seçilen boyutu saklamak için
-    let printReceiptEnabled = true;  // Fiş yazdırma özelliği başlangıçta açık
-    let paymentMethod = ''; // Ödeme yöntemi
+    let selectedSize = "";
+    let printReceiptEnabled = true;
+    let paymentMethod = '';
+    let unsubscribeOrder = null;
+
+    // Modal yönetimi
+  function openModal(modalId) {
+      console.log('Modal açılıyor:', modalId);
+      
+      // Önce tüm modalları kapat
+      document.querySelectorAll('.modal').forEach(modal => {
+        modal.style.display = 'none';
+      });
+      
+      const modal = document.getElementById(modalId);
+      if (!modal) {
+        console.error('Modal bulunamadı:', modalId);
+        return;
+      }
+      
+      // Body scroll'unu engelle
+      document.body.style.overflow = 'hidden';
+      
+      // Modal'ı göster
+      modal.style.display = 'flex';
+      
+      // Input'a odaklan
+      setTimeout(() => {
+        const input = modal.querySelector('input, textarea');
+        if (input) {
+          input.focus();
+          if (input.value) input.select();
+        }
+      }, 100);
+    }
 
 
+   function closeModal(modalId) {
+      console.log('Modal kapatılıyor:', modalId);
+      const modal = document.getElementById(modalId);
+      if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+        
+        // Inputları temizle
+        if (modalId === 'noteModal') {
+          const noteInput = document.getElementById('noteInput');
+          if (noteInput) noteInput.value = '';
+          currentNoteIndex = -1;
+        }
+        
+        if (modalId === 'nameModal') {
+          const nameInput = document.getElementById('nameInput');
+          if (nameInput) nameInput.value = '';
+        }
+      }
+    }
 
-    //BOYUT SEÇİMİ
+    // Global modal event listener'ı
+    document.addEventListener('click', (e) => {
+      // Dışarı tıklayarak kapatma
+      if (e.target.classList.contains('modal')) {
+        e.target.style.display = 'none';
+        document.body.style.overflow = '';
+      }
+    });
+
+    // ESC tuşu ile kapatma
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        document.querySelectorAll('.modal').forEach(modal => {
+          modal.style.display = 'none';
+        });
+        document.body.style.overflow = '';
+      }
+    });
+
+    // Modal içeriği için event bubbling önleme
+    document.querySelectorAll('.modal-content').forEach(content => {
+      content.addEventListener('click', (e) => {
+        e.stopPropagation();
+      });
+    });
+
+    // BOYUT SEÇİMİ
     function selectSize(size, event) {
-  event?.preventDefault();
-  selectedSize = size;
-  
-  document.querySelectorAll('.size-btn').forEach(btn => {
-    btn.classList.remove('selected');
-  });
-  
-  if (event) {
-    event.currentTarget.classList.add('selected');
-  }
-  
-  // Fiyat güncelleme
-  const product = productSpecs[selectedProduct];
-  if (product && product.sizes && product.sizes[size]) {
-    const price = product.sizes[size].price.toFixed(2);
-    document.querySelector('.size-btn.selected .size-price').textContent = `${price}₺`;
-  }
-}
-
+      event?.preventDefault();
+      selectedSize = size;
+      
+      document.querySelectorAll('.size-btn').forEach(btn => {
+        btn.classList.remove('selected');
+      });
+      
+      if (event) {
+        event.currentTarget.classList.add('selected');
+      }
+      
+      // Fiyat güncelleme
+      const product = productSpecs[selectedProduct];
+      if (product && product.sizes && product.sizes[size]) {
+        const price = product.sizes[size].price.toFixed(2);
+        document.querySelector('.size-btn.selected .size-price').textContent = `${price}₺`;
+      }
+    }
 
     // Boyut seçeneklerini oluştur
- function createSizeOptions(product) {
-  const sizeContainer = document.getElementById('sizeSelection');
-  sizeContainer.innerHTML = '';
-  
-  if (!product || !product.sizes || Object.keys(product.sizes).length === 0) {
-    sizeContainer.style.display = 'none';
-    return;
-  }
-  
-  sizeContainer.style.display = 'flex';
-  
-  const sizeOrder = ["küçük", "orta", "büyük"];
-  const sortedSizes = Object.keys(product.sizes).sort((a, b) => {
-    const ai = sizeOrder.indexOf(a.toLowerCase());
-    const bi = sizeOrder.indexOf(b.toLowerCase());
-    if (ai === -1 && bi === -1) return a.localeCompare(b);
-    if (ai === -1) return 1;
-    if (bi === -1) return -1;
-    return ai - bi;
-  });
+    function createSizeOptions(product) {
+      const sizeContainer = document.getElementById('sizeSelection');
+      sizeContainer.innerHTML = '';
+      
+      if (!product || !product.sizes || Object.keys(product.sizes).length === 0) {
+        sizeContainer.style.display = 'none';
+        return;
+      }
+      
+      sizeContainer.style.display = 'flex';
+      
+      const sizeOrder = ["küçük", "orta", "büyük"];
+      const sortedSizes = Object.keys(product.sizes).sort((a, b) => {
+        const ai = sizeOrder.indexOf(a.toLowerCase());
+        const bi = sizeOrder.indexOf(b.toLowerCase());
+        if (ai === -1 && bi === -1) return a.localeCompare(b);
+        if (ai === -1) return 1;
+        if (bi === -1) return -1;
+        return ai - bi;
+      });
 
-  sortedSizes.forEach(sizeName => {
-    const sizeData = product.sizes[sizeName];
-    const sizeBtn = document.createElement('div');
-    sizeBtn.className = 'size-btn';
-    sizeBtn.onclick = (e) => selectSize(sizeName, e);
-    
-    let icon = 'fa-mug-hot';
-    if (sizeName.toLowerCase() === 'küçük') icon = 'fa-mug-saucer';
-    if (sizeName.toLowerCase() === 'orta') icon = 'fa-mug';
-    
-    sizeBtn.innerHTML = `
-      <i class="fas ${icon}"></i>
-      <div class="size-name">${sizeName.charAt(0).toUpperCase() + sizeName.slice(1)}</div>
-      <div class="size-price">${sizeData.price.toFixed(2)}₺</div>
-    `;
-    
-    sizeContainer.appendChild(sizeBtn);
-  });
-  
-  // İlk boyutu otomatik seç
-  if (sizeContainer.children.length > 0) {
-    sizeContainer.children[0].classList.add('selected');
-    selectedSize = sortedSizes[0];
-  }
-}
-    // İsim ekle butonu fonksiyonu
-    window.addCustomerName = function () {
-      document.getElementById("nameModal").style.display = "flex";
-      document.getElementById("nameInput").value = "";
-      setTimeout(() => document.getElementById("nameInput").focus(), 100);
+      sortedSizes.forEach(sizeName => {
+        const sizeData = product.sizes[sizeName];
+        const sizeBtn = document.createElement('div');
+        sizeBtn.className = 'size-btn';
+        sizeBtn.onclick = (e) => selectSize(sizeName, e);
+        
+        let icon = 'fa-mug-hot';
+        if (sizeName.toLowerCase() === 'küçük') icon = 'fa-mug-saucer';
+        if (sizeName.toLowerCase() === 'orta') icon = 'fa-mug';
+        
+        sizeBtn.innerHTML = `
+          <i class="fas ${icon}"></i>
+          <div class="size-name">${sizeName.charAt(0).toUpperCase() + sizeName.slice(1)}</div>
+          <div class="size-price">${sizeData.price.toFixed(2)}₺</div>
+        `;
+        
+        sizeContainer.appendChild(sizeBtn);
+      });
+      
+      // İlk boyutu otomatik seç
+      if (sizeContainer.children.length > 0) {
+        sizeContainer.children[0].classList.add('selected');
+        selectedSize = sortedSizes[0];
+      }
+    }
+
+    // İsim ekleme fonksiyonları
+    window.addCustomerName = function() {
+      console.log('İsim ekleme modalı açılıyor');
+      const nameInput = document.getElementById('nameInput');
+      if (nameInput) {
+        nameInput.value = currentCustomerName || '';
+      }
+      openModal('nameModal');
     };
 
-    // Kaydet butonuna tıklanınca çalışır
-    window.submitName = function () {
-      const name = document.getElementById("nameInput").value.trim();
+
+   window.submitName = function() {
+      const nameInput = document.getElementById('nameInput');
+      if (!nameInput) {
+        console.error('Name input bulunamadı');
+        return;
+      }
+      
+      const name = nameInput.value.trim();
       if (name) {
         currentCustomerName = name;
         updateOrderDisplay();
-        saveActiveOrder();
+        saveActiveOrder().catch(console.error);
       }
-      closeNameModal();
+      
+      closeModal('nameModal');
     };
 
-    // Modalı kapatır
-    window.closeModal = function(modalId) {
-  document.getElementById(modalId).style.display = 'none';
-    };
-
-    // Not ekle butonu fonksiyonu
-    window.openNoteModal = function (index) {
+    // Not ekleme fonksiyonları
+    window.openNoteModal = function(index) {
       currentNoteIndex = index;
-      const note = currentOrder[index].note || "";
-      document.getElementById("noteInput").value = note;
-      document.getElementById("noteModal").style.display = "flex";
-      setTimeout(() => document.getElementById("noteInput").focus(), 100);
+      const noteInput = document.getElementById('noteInput');
+      if (noteInput && currentOrder[index]) {
+        noteInput.value = currentOrder[index].note || '';
+      }
+      openModal('noteModal');
     };
 
-    // Notu kaydetme fonksiyonu
-    window.saveNote = function () {
-      const note = document.getElementById("noteInput").value.trim();
-      if (currentNoteIndex !== -1) {
+
+     window.saveNote = function() {
+      const noteInput = document.getElementById('noteInput');
+      if (!noteInput) {
+        console.error('Note input bulunamadı');
+        return;
+      }
+      
+      const note = noteInput.value.trim();
+      if (currentNoteIndex !== -1 && currentOrder[currentNoteIndex]) {
         currentOrder[currentNoteIndex].note = note;
         updateOrderDisplay();
-        saveActiveOrder();
+        saveActiveOrder().catch(console.error);
       }
-      closeNoteModal();
+      
+      closeModal('noteModal');
     };
 
-    // Not modalını kapat
-    window.closeNoteModal = function () {
-      document.getElementById("noteModal").style.display = "none";
-      currentNoteIndex = -1;
-    };
 
     // Kategori yükleme fonksiyonu
     async function loadCategories() {
-  const container = document.getElementById('mainCategories');
-  const contentArea = document.getElementById('categoryContent');
-  container.innerHTML = '';
-  contentArea.innerHTML = '';
-  
-  try {
-    // SIRALI KATEGORİ ÇEKME (order alanına göre)
-    const querySnapshot = await getDocs(
-      query(
-        collection(db, "categories"),
-        orderBy("order")  // Sıralama eklendi
-      )
-    );
-    
-    const allCats = [];
-    querySnapshot.forEach(doc => {
-      allCats.push({ id: doc.id, ...doc.data() });
-    });
-
-    // Ana ve alt kategorileri ayır
-    const mainCategories = allCats
-      .filter(cat => !cat.parent)
-      .sort((a, b) => (a.order || 0) - (b.order || 0)); // Sıralama garantisi
-
-    const subCategories = allCats
-      .filter(cat => cat.parent)
-      .sort((a, b) => (a.order || 0) - (b.order || 0)); // Alt kategoriler de sıralı
-
-    // Ana kategorileri oluştur
-    mainCategories.forEach((mainCat, index) => {
-      const btn = document.createElement('button');
-      btn.className = 'main-category-btn';
-      if (index === 0) btn.classList.add('active');
-      btn.dataset.id = mainCat.id;
-      btn.dataset.slug = mainCat.slug;
+      const container = document.getElementById('mainCategories');
+      const contentArea = document.getElementById('categoryContent');
+      container.innerHTML = '';
+      contentArea.innerHTML = '';
       
-      btn.innerHTML = `
-        <i class="fas ${mainCat.icon || 'fa-utensils'}"></i>
-        ${mainCat.name}
-      `;
-      
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.main-category-btn').forEach(b => {
-          b.classList.remove('active');
+      try {
+        const querySnapshot = await getDocs(
+          query(
+            collection(db, "categories"),
+            orderBy("order")
+          )
+        );
+        
+        const allCats = [];
+        querySnapshot.forEach(doc => {
+          allCats.push({ id: doc.id, ...doc.data() });
         });
-        btn.classList.add('active');
-        showCategoryContent(mainCat, subCategories);
-      });
-      
-      container.appendChild(btn);
-      
-      // İlk kategoriyi otomatik aç
-      if (index === 0) {
-        showCategoryContent(mainCat, subCategories);
-      }
-    });
 
-  } catch (error) {
-    console.error("Kategoriler yüklenemedi:", error);
-  }
-}
+        const mainCategories = allCats
+          .filter(cat => !cat.parent)
+          .sort((a, b) => (a.order || 0) - (b.order || 0));
+
+        const subCategories = allCats
+          .filter(cat => cat.parent)
+          .sort((a, b) => (a.order || 0) - (b.order || 0));
+
+        mainCategories.forEach((mainCat, index) => {
+          const btn = document.createElement('button');
+          btn.className = 'main-category-btn';
+          if (index === 0) btn.classList.add('active');
+          btn.dataset.id = mainCat.id;
+          btn.dataset.slug = mainCat.slug;
+          
+          btn.innerHTML = `
+            <i class="fas ${mainCat.icon || 'fa-utensils'}"></i>
+            ${mainCat.name}
+          `;
+          
+          btn.addEventListener('click', () => {
+            document.querySelectorAll('.main-category-btn').forEach(b => {
+              b.classList.remove('active');
+            });
+            btn.classList.add('active');
+            showCategoryContent(mainCat, subCategories);
+          });
+          
+          container.appendChild(btn);
+          
+          if (index === 0) {
+            showCategoryContent(mainCat, subCategories);
+          }
+        });
+
+      } catch (error) {
+        console.error("Kategoriler yüklenemedi:", error);
+      }
+    }
     
     // Kategori içeriğini göster
     function showCategoryContent(mainCat, allSubCategories) {
-  const contentArea = document.getElementById('categoryContent');
-  
-  // İlgili alt kategorileri filtrele ve SIRALA
-  const subCategories = allSubCategories
-    .filter(subCat => subCat.parent === mainCat.id)
-    .sort((a, b) => (a.order || 0) - (b.order || 0)); // Sıralama eklendi
+      const contentArea = document.getElementById('categoryContent');
+      
+      const subCategories = allSubCategories
+        .filter(subCat => subCat.parent === mainCat.id)
+        .sort((a, b) => (a.order || 0) - (b.order || 0));
 
-  // İçerik oluştur
-  let contentHTML = '';
-  
-  // Alt kategoriler varsa göster
-  if (subCategories.length > 0) {
-    contentHTML += `
-      <div class="subcategories">
-        ${subCategories.map(subCat => `
-          <button class="subcategory-btn" data-slug="${subCat.slug}">
-            ${subCat.name}
-          </button>
-        `).join('')}
-      </div>
-    `;
-  }
-  
-  // İçeriği güncelle ve göster
-  contentArea.innerHTML = contentHTML;
-  contentArea.classList.add('active');
-  
-  // Alt kategori butonlarına event ekle
-  contentArea.querySelectorAll('.subcategory-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-      selectSubCategory(this.dataset.slug);
-    });
-  });
-  
-  // İlk alt kategoriyi otomatik seç VEYA doğrudan ürünleri listele
-  if (subCategories.length > 0) {
-    const firstSubBtn = contentArea.querySelector('.subcategory-btn');
-    if (firstSubBtn) {
-      selectSubCategory(firstSubBtn.dataset.slug);
+      let contentHTML = '';
+      
+      if (subCategories.length > 0) {
+        contentHTML += `
+          <div class="subcategories">
+            ${subCategories.map(subCat => `
+              <button class="subcategory-btn" data-slug="${subCat.slug}">
+                ${subCat.name}
+              </button>
+            `).join('')}
+          </div>
+        `;
+      }
+      
+      contentArea.innerHTML = contentHTML;
+      contentArea.classList.add('active');
+      
+      contentArea.querySelectorAll('.subcategory-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          selectSubCategory(this.dataset.slug);
+        });
+      });
+      
+      if (subCategories.length > 0) {
+        const firstSubBtn = contentArea.querySelector('.subcategory-btn');
+        if (firstSubBtn) {
+          selectSubCategory(firstSubBtn.dataset.slug);
+        }
+      } else {
+        listProducts(mainCat.slug);
+      }
     }
-  } else {
-    // Alt kategori yoksa ana kategorinin ürünlerini doğrudan listele
-    listProducts(mainCat.slug);
-  }
-}
 
     // Alt kategori seçimi
     function selectSubCategory(slug) {
-      // Tüm alt kategori butonlarını aktif olmaktan çıkar
       document.querySelectorAll('.subcategory-btn').forEach(btn => {
         btn.classList.remove("active");
       });
       
-      // Seçilen butonu aktif yap
       const activeBtn = document.querySelector(`.subcategory-btn[data-slug="${slug}"]`);
       if (activeBtn) {
         activeBtn.classList.add("active");
       }
       
-      // Ürünleri listele
       listProducts(slug);
     }
 
     // Ürünleri listele
     function listProducts(category) {
-  const productListDiv = document.getElementById("kahveListesi");
-  productListDiv.innerHTML = "";
-  selectedProduct = "";
-  
-  if (!productMenu[category]) {
-    productListDiv.innerHTML = '<div class="no-product-message">Bu kategoride ürün bulunamadı.</div>';
-    return;
-  }
-  
-  // Ürünleri sıralı göster (Firestore'daki sıraya göre)
-  const sortedProducts = [...productMenu[category]].sort((a, b) => 
-    (a.order || 0) - (b.order || 0)
-  );
+      const productListDiv = document.getElementById("kahveListesi");
+      productListDiv.innerHTML = "";
+      selectedProduct = "";
+      
+      if (!productMenu[category]) {
+        productListDiv.innerHTML = '<div class="no-product-message">Bu kategoride ürün bulunamadı.</div>';
+        return;
+      }
+      
+      const sortedProducts = [...productMenu[category]].sort((a, b) => 
+        (a.order || 0) - (b.order || 0)
+      );
 
-  // Tüm ürün seçeneklerini kaldır
-  document.querySelectorAll(".coffee-option").forEach(opt => {
-    opt.classList.remove("selected");
-    opt.setAttribute("aria-pressed", "false");
-  });
-  
-  sortedProducts.forEach(product => {
-    const div = createProductElement(product);
-    productListDiv.appendChild(div);
-  });
-}
+      document.querySelectorAll(".coffee-option").forEach(opt => {
+        opt.classList.remove("selected");
+        opt.setAttribute("aria-pressed", "false");
+      });
+      
+      sortedProducts.forEach(product => {
+        const div = createProductElement(product);
+        productListDiv.appendChild(div);
+      });
+    }
 
     // Ürün elemanı oluşturma fonksiyonu
     function createProductElement(product) {
@@ -1567,27 +1765,26 @@
       div.setAttribute("role", "button");
       div.setAttribute("aria-pressed", "false");
 
-
       const price = product.price?.toFixed?.(2) || "0.00";
 
       div.innerHTML = `
-    <img src="${product.resim}" 
-         alt="${product.ad}" 
-         onerror="this.onerror=null; this.src='img/placeholder.jpg'" />
-    <p>${product.ad}</p>
-    <div class="price">${price}₺</div>
-  `;
+        <img src="${product.resim}" 
+             alt="${product.ad}" 
+             onerror="this.onerror=null; this.src='img/placeholder.jpg'" />
+        <p>${product.ad}</p>
+        <div class="price">${price}₺</div>
+      `;
       
       div.addEventListener("click", () => {
         selectProduct(div, product.ad);
-        createSizeOptions(productSpecs[product.ad]); // Boyut seçeneklerini oluştur
+        createSizeOptions(productSpecs[product.ad]);
       });
       
       div.addEventListener("keydown", e => {
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
           selectProduct(div, product.ad);
-          createSizeOptions(productSpecs[product.ad]); // Boyut seçeneklerini oluştur
+          createSizeOptions(productSpecs[product.ad]);
         }
       });
       
@@ -1603,36 +1800,7 @@
       div.classList.add("selected");
       div.setAttribute("aria-pressed", "true");
       selectedProduct = productName;
-      selectedSize = ""; // Boyut seçimini sıfırla
-    }
-
-    // Doğrudan ana kategori ürünü seçildiğinde
-    function selectDirectProduct(productName) {
-      // Ürün seçimini güncelle
-      selectedProduct = productName;
-      
-      // Tüm ürün seçeneklerini kaldır
-      document.querySelectorAll(".coffee-option").forEach(opt => {
-        opt.classList.remove("selected");
-        opt.setAttribute("aria-pressed", "false");
-      });
-      
-      // Sadece bu ürünü göster
-      const productListDiv = document.getElementById("kahveListesi");
-      productListDiv.innerHTML = "";
-      
-      // Ürünü bul ve göster
-      for (const category in productMenu) {
-        const product = productMenu[category].find(p => p.ad === productName);
-        if (product) {
-          const div = createProductElement(product);
-          div.classList.add("selected");
-          div.setAttribute("aria-pressed", "true");
-          productListDiv.appendChild(div);
-          createSizeOptions(productSpecs[productName]); // Boyut seçeneklerini oluştur
-          break;
-        }
-      }
+      selectedSize = "";
     }
 
     // Adet değiştirme
@@ -1652,33 +1820,28 @@
         return;
       }
       
-      // Fiyatı belirle
-       let price = productSpecs[selectedProduct]?.price || 0;
+      let price = productSpecs[selectedProduct]?.price || 0;
       let sizeInfo = "";
       
-      // Eğer boyut seçilmişse, o boyutun fiyatını kullan
       if (selectedSize && productSpecs[selectedProduct]?.sizes?.[selectedSize]) {
         price = productSpecs[selectedProduct].sizes[selectedSize].price;
         sizeInfo = ` (${selectedSize.charAt(0).toUpperCase() + selectedSize.slice(1)})`;
       }
 
-      // Ürün zaten sepette mi kontrol et
       const existingIndex = currentOrder.findIndex(item => 
         item.product === selectedProduct && item.size === selectedSize
       );
       
       if (existingIndex !== -1) {
-        // Ürün zaten varsa adetini güncelle
         currentOrder[existingIndex].qty += qty;
       } else {
-        // Yeni ürün ekle
         currentOrder.push({ 
           product: selectedProduct, 
           qty,
           price: price,
           size: selectedSize,
           image: productSpecs[selectedProduct]?.image || "",
-          note: "" // Not alanı eklendi
+          note: ""
         });
       }
       
@@ -1708,7 +1871,6 @@
 
       let htmlList = "";
 
-      // Müşteri ismini en başa ekle (varsa)
       if (currentCustomerName) {
         htmlList += `
           <div class="order-item">
@@ -1761,125 +1923,115 @@
       saveActiveOrder(); 
     }
 
-  async function printTickets(orderId, items, customerName = "", paymentMethod = "") {
-  try {
-    for (const item of items) {
-      await addDoc(collection(db, "tickets"), {
-        orderId,
-        product: item.product,
-        size: item.size || "",
-        customerName,
-        note: item.note || "",
-        timestamp: serverTimestamp(),
-        price: item.price,
-        qty: item.qty,
-        paymentMethod: paymentMethod // Ödeme yöntemini ekledik
-      });
-    }
-  } catch (error) {
-    console.error("Fiş oluşturma hatası:", error);
-  }
-}
-
-
-// Günlük fiş numarası almak için fonksiyon
-async function getDailyReceiptNumber() {
-  try {
-    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD formatında bugünün tarihi
-    const counterRef = doc(db, "dailyReceiptCounters", today);
-    
-    // Sayacı artırmak için transaction kullanıyoruz
-    const newNumber = await runTransaction(db, async (transaction) => {
-      const counterDoc = await transaction.get(counterRef);
-      
-      if (counterDoc.exists()) {
-        // Belge varsa sayacı 1 artır
-        const newCount = counterDoc.data().count + 1;
-        transaction.update(counterRef, { count: newCount });
-        return newCount;
-      } else {
-        // Belge yoksa oluştur ve 1 ile başlat
-        transaction.set(counterRef, { count: 1 });
-        return 1;
-      }
-    });
-    
-    return newNumber;
-  } catch (error) {
-    console.error("Fiş numarası alınırken hata:", error);
-    return 0; // Hata durumunda 0 döndür
-  }
-}
-
-    // Yeni eklenen fonksiyon - Toplam satış adetlerini hesaplar
-    async function updateSalesCounts() {
-  const salesCountsDiv = document.getElementById('salesCounts');
-  try {
-    // Bugünün başlangıcını ve sonunu al
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-
-    // İade edilen sipariş ID'lerini al
-    const refundsSnapshot = await getDocs(collection(db, "refunds"));
-    const refundedOrderIds = refundsSnapshot.docs.map(doc => doc.data().orderId);
-
-    // Bugünkü satışları sorgula
-    const q = query(
-      collection(db, "sales"),
-      where("timestamp", ">=", today),
-      where("timestamp", "<", tomorrow)
-    );
-
-    const salesSnapshot = await getDocs(q);
-    const productCounts = {};
-
-    // Satışları işle
-    salesSnapshot.forEach(doc => {
-      if (refundedOrderIds.includes(doc.id)) return;
-
-      const order = doc.data();
-      order.items.forEach(item => {
-        if (!productCounts[item.product]) {
-          productCounts[item.product] = 0;
+    async function printTickets(orderId, items, customerName = "", paymentMethod = "") {
+      try {
+        for (const item of items) {
+          await addDoc(collection(db, "tickets"), {
+            orderId,
+            product: item.product,
+            size: item.size || "",
+            customerName,
+            note: item.note || "",
+            timestamp: serverTimestamp(),
+            price: item.price,
+            qty: item.qty,
+            paymentMethod: paymentMethod
+          });
         }
-        productCounts[item.product] += item.qty;
-      });
-    });
-
-    // HTML oluştür
-    if (Object.keys(productCounts).length === 0) {
-      salesCountsDiv.innerHTML = "<p>Bugün henüz satış yok.</p>";
-      return;
+      } catch (error) {
+        console.error("Fiş oluşturma hatası:", error);
+      }
     }
 
-    let html = `
-      <div style="margin-bottom: 10px; font-weight: bold; text-align: center;">
-        ${today.toLocaleDateString('tr-TR')} Satışları
-      </div>
-      <ul style="list-style-type:none; padding:0; margin-top:10px;">
-    `;
-    
-    // Ürünleri adetlerine göre sırala (çoktan aza)
-    const sortedProducts = Object.entries(productCounts)
-      .sort((a, b) => b[1] - a[1]);
-
-    for (const [product, count] of sortedProducts) {
-      html += `
-        <li style="padding:8px 10px; border-bottom:1px solid #eee; display:flex; justify-content:space-between;">
-          <span>${product}:</span> 
-          <span><strong>${count} adet</strong></span>
-        </li>`;
+    // Günlük fiş numarası al
+    async function getDailyReceiptNumber() {
+      try {
+        const today = new Date().toISOString().split('T')[0];
+        const counterRef = doc(db, "dailyReceiptCounters", today);
+        
+        const newNumber = await runTransaction(db, async (transaction) => {
+          const counterDoc = await transaction.get(counterRef);
+          
+          if (counterDoc.exists()) {
+            const newCount = counterDoc.data().count + 1;
+            transaction.update(counterRef, { count: newCount });
+            return newCount;
+          } else {
+            transaction.set(counterRef, { count: 1 });
+            return 1;
+          }
+        });
+        
+        return newNumber;
+      } catch (error) {
+        console.error("Fiş numarası alınırken hata:", error);
+        return 0;
+      }
     }
-    html += '</ul>';
 
-    salesCountsDiv.innerHTML = html;
-  } catch (error) {
-    console.error("Günlük satış adetleri yüklenirken hata:", error);
-    salesCountsDiv.innerHTML = `<p>Hata: ${error.message}</p>`;
-  }
-}
+    // Toplam satış adetlerini hesapla
+    async function updateSalesCounts() {
+      const salesCountsDiv = document.getElementById('salesCounts');
+      try {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+
+        const refundsSnapshot = await getDocs(collection(db, "refunds"));
+        const refundedOrderIds = refundsSnapshot.docs.map(doc => doc.data().orderId);
+
+        const q = query(
+          collection(db, "sales"),
+          where("timestamp", ">=", today),
+          where("timestamp", "<", tomorrow)
+        );
+
+        const salesSnapshot = await getDocs(q);
+        const productCounts = {};
+
+        salesSnapshot.forEach(doc => {
+          if (refundedOrderIds.includes(doc.id)) return;
+
+          const order = doc.data();
+          order.items.forEach(item => {
+            if (!productCounts[item.product]) {
+              productCounts[item.product] = 0;
+            }
+            productCounts[item.product] += item.qty;
+          });
+        });
+
+        if (Object.keys(productCounts).length === 0) {
+          salesCountsDiv.innerHTML = "<p>Bugün henüz satış yok.</p>";
+          return;
+        }
+
+        let html = `
+          <div style="margin-bottom: 10px; font-weight: bold; text-align: center;">
+            ${today.toLocaleDateString('tr-TR')} Satışları
+          </div>
+          <ul style="list-style-type:none; padding:0; margin-top:10px;">
+        `;
+        
+        const sortedProducts = Object.entries(productCounts)
+          .sort((a, b) => b[1] - a[1]);
+
+        for (const [product, count] of sortedProducts) {
+          html += `
+            <li style="padding:8px 10px; border-bottom:1px solid #eee; display:flex; justify-content:space-between;">
+              <span>${product}:</span> 
+              <span><strong>${count} adet</strong></span>
+            </li>`;
+        }
+        html += '</ul>';
+
+        salesCountsDiv.innerHTML = html;
+      } catch (error) {
+        console.error("Günlük satış adetleri yüklenirken hata:", error);
+        salesCountsDiv.innerHTML = `<p>Hata: ${error.message}</p>`;
+      }
+    }
 
     async function saveActiveOrder() {
       const activeOrder = {
@@ -1891,7 +2043,6 @@ async function getDailyReceiptNumber() {
         customerName: currentCustomerName
       };
 
-      // Firestore'da sabit bir belge adıyla (tekSiparis) belge oluştur
       const orderRef = doc(db, "active_orders", "tekSiparis");
       await setDoc(orderRef, activeOrder);
       window.activeOrderId = "tekSiparis";
@@ -1901,17 +2052,26 @@ async function getDailyReceiptNumber() {
       return currentOrder.reduce((sum, item) => sum + (item.qty * item.price), 0);
     }
 
+    // Veri yüklemeye başlarken
+    function showLoading() {
+      document.getElementById('loadingOverlay').style.display = 'flex';
+    }
+
+    // Veri yükleme tamamlanınca
+    function hideLoading() {
+      document.getElementById('loadingOverlay').style.display = 'none';
+    }
+
     // Ürün arama fonksiyonu
     function searchProducts() {
       const searchTerm = document.getElementById('productSearch').value.toLowerCase();
       if (!searchTerm.trim()) {
-        // Arama boşsa, varsayılan duruma dön
         const activeMainBtn = document.querySelector('.main-category-btn.active');
         if (activeMainBtn) {
           const mainCatId = activeMainBtn.dataset.id;
           const mainCatSlug = activeMainBtn.dataset.slug;
           const mainCat = { id: mainCatId, slug: mainCatSlug };
-          showCategoryContent(mainCat, []); // Alt kategorileri geçiyoruz
+          showCategoryContent(mainCat, []);
         }
         return;
       }
@@ -1919,21 +2079,19 @@ async function getDailyReceiptNumber() {
       const productListDiv = document.getElementById("kahveListesi");
       productListDiv.innerHTML = "";
 
-      // Tüm ürünlerde arama yap
       let foundProducts = [];
       for (const category in productMenu) {
-  const categoryProducts = productMenu[category].filter(product =>
-    product.ad.toLowerCase().includes(searchTerm)
-  );
-  foundProducts.push(...categoryProducts); 
-}
+        const categoryProducts = productMenu[category].filter(product =>
+          product.ad.toLowerCase().includes(searchTerm)
+        );
+        foundProducts.push(...categoryProducts); 
+      }
 
       if (foundProducts.length === 0) {
         productListDiv.innerHTML = '<div class="no-product-message">Aranan ürün bulunamadı.</div>';
         return;
       }
 
-      // Bulunan ürünleri göster
       foundProducts.forEach(product => {
         const div = createProductElement(product);
         productListDiv.appendChild(div);
@@ -1946,11 +2104,13 @@ async function getDailyReceiptNumber() {
     }
 
     // Satış geçmişi güncelleme
+    let lastVisibleSale = null;
+    const salesPageSize = 10;
+
     async function updateSalesDisplays() {
       const salesHistoryBody = document.getElementById("salesHistoryBody");
       
       try {
-        // İade ve iptal bilgilerini yükle
         const refundsSnapshot = await getDocs(collection(db, "refunds"));
         const canceledSnapshot = await getDocs(
           query(collection(db, "sales"), where("canceled", "==", true))
@@ -1959,16 +2119,24 @@ async function getDailyReceiptNumber() {
         const refundedOrderIds = refundsSnapshot.docs.map(doc => doc.data().orderId);
         const canceledOrderIds = canceledSnapshot.docs.map(doc => doc.id);
 
-        const q = query(collection(db, "sales"), 
-                 orderBy("timestamp", "desc"), 
-                 limit(50));
+        let q = query(
+          collection(db, "sales"), 
+          orderBy("timestamp", "desc"), 
+          limit(salesPageSize)
+        );
         
+        if (lastVisibleSale) {
+          q = query(q, startAfter(lastVisibleSale));
+        }
+
         const querySnapshot = await getDocs(q);
         
         if (querySnapshot.empty) {
           salesHistoryBody.innerHTML = `<tr><td colspan="5">Henüz sipariş yok</td></tr>`;
           return;
         }
+
+        lastVisibleSale = querySnapshot.docs[querySnapshot.docs.length-1];
 
         let tbodyContent = "";
         
@@ -1977,7 +2145,6 @@ async function getDailyReceiptNumber() {
           const isRefunded = refundedOrderIds.includes(doc.id);
           const isCanceled = canceledOrderIds.includes(doc.id);
           
-          // Tarih formatlama
           let date = "Tarih bilgisi yok";
           if (data.timestamp && typeof data.timestamp.toDate === 'function') {
             date = data.timestamp.toDate().toLocaleString("tr-TR");
@@ -1985,14 +2152,12 @@ async function getDailyReceiptNumber() {
             date = new Date(data.timestamp).toLocaleString("tr-TR");
           }
           
-          // Ürün listesi
           const products = data.items.map(i => {
             let productText = `${i.qty}x ${i.product}`;
             if (i.size) productText += ` (${i.size})`;
             return productText;
           }).join(', ');
           
-          // Durum bilgisi
           let status = "Tamamlandı";
           let statusClass = "";
           if (isRefunded) {
@@ -2003,7 +2168,6 @@ async function getDailyReceiptNumber() {
             statusClass = "status-canceled";
           }
           
-          // Satır stili
           const rowClass = isRefunded || isCanceled ? "canceled-order" : "";
           
           tbodyContent += `
@@ -2017,7 +2181,12 @@ async function getDailyReceiptNumber() {
           `;
         });
         
-        salesHistoryBody.innerHTML = tbodyContent;
+        // Yeni kayıtları ekle (sayfalandırma için)
+        if (lastVisibleSale) {
+          salesHistoryBody.innerHTML += tbodyContent;
+        } else {
+          salesHistoryBody.innerHTML = tbodyContent;
+        }
         
       } catch (error) {
         console.error("Satış geçmişi yüklenirken hata:", error);
@@ -2036,386 +2205,423 @@ async function getDailyReceiptNumber() {
       updateSalesCounts();
     });
 
+    let productsLoaded = false;
 
+    async function initializeData() {
+      showLoading();
+      try {
+        // Ürün ve kategorileri sadece bir kere yükle
+        if (!productsLoaded) {
+          await loadProducts();
+          await loadCategories();
+          productsLoaded = true;
+        }
+        
+        // Diğer başlangıç verileri
+        await loadStocks();
+        await updateSalesDisplays();
+        await updateSalesCounts();
+        
+        // Sadece aktif sipariş için realtime dinleme
+        unsubscribeOrder = onSnapshot(doc(db, "active_orders", "tekSiparis"), (doc) => {
+          if (doc.exists()) {
+            const data = doc.data();
+            currentOrder = data.items || [];
+            currentCustomerName = data.customerName || "";
+            updateOrderDisplay();
+          }
+        });
+        
+      } catch (error) {
+        console.error("Veri yükleme hatası:", error);
+        alert("Veriler yüklenirken bir hata oluştu. Lütfen sayfayı yenileyin.");
+      } finally {
+        hideLoading();
+      }
+    }
 
-/***********************
- * loadProducts
- ***********************/
-async function loadProducts() {
-  productMenu = {};
-  productSpecs = {};
-  try {
-    const snapshot = await getDocs(
-      query(
-        collection(db, "products"),
-        orderBy("order")
-      )
-    );
-    
-    snapshot.forEach(docSnap => {
-      const data = docSnap.data();
-      if (!data || !data.name) return;
-
-      // categorySlug'e göre grupla, eğer yoksa category'ye göre
-      const category = data.categorySlug || data.category || "Diğer";
+    async function loadProducts() {
+      if (Object.keys(productMenu).length > 0) return; // Zaten yüklüyse tekrar yükleme
       
-      if (!productMenu[category]) productMenu[category] = [];
+      try {
+        const snapshot = await getDocs(
+          query(
+            collection(db, "products"),
+            orderBy("order"),
+            limit(100) // Makul bir limit
+          )
+        );
+        
+        productMenu = {};
+        productSpecs = {};
+        
+        snapshot.forEach(docSnap => {
+          const data = docSnap.data();
+          if (!data || !data.name) return;
 
-      let imagePath = data.image || `img/${data.name.toLowerCase().replace(/\s/g, '')}.jpg`;
-      if (!imagePath.startsWith('http') && !imagePath.startsWith('img/')) {
-        imagePath = 'img/' + imagePath;
-      }
+          const category = data.categorySlug || data.category || "Diğer";
+          
+          if (!productMenu[category]) productMenu[category] = [];
 
-      // Boyutlu ürün kontrolü
-      if (data.hasSizes && data.sizes) {
-        productMenu[category].push({
-          ad: data.name,
-          resim: imagePath,
-          price: Object.values(data.sizes)[0]?.price || 0,
-          order: data.order || 0
+          let imagePath = data.image || `img/${data.name.toLowerCase().replace(/\s/g, '')}.jpg`;
+          if (!imagePath.startsWith('http') && !imagePath.startsWith('img/')) {
+            imagePath = 'img/' + imagePath;
+          }
+
+          if (data.hasSizes && data.sizes) {
+            productMenu[category].push({
+              ad: data.name,
+              resim: imagePath,
+              price: Object.values(data.sizes)[0]?.price || 0,
+              order: data.order || 0
+            });
+
+            productSpecs[data.name] = {
+              ...data,
+              image: imagePath,
+              price: Object.values(data.sizes)[0]?.price || 0
+            };
+          } else {
+            productMenu[category].push({
+              ad: data.name,
+              resim: imagePath,
+              price: data.price || 0,
+              order: data.order || 0
+            });
+
+            productSpecs[data.name] = {
+              ...data,
+              image: imagePath,
+              price: data.price || 0
+            };
+          }
         });
-
-        productSpecs[data.name] = {
-          ...data,
-          image: imagePath,
-          price: Object.values(data.sizes)[0]?.price || 0
-        };
-      } else {
-        // Standart ürün
-        productMenu[category].push({
-          ad: data.name,
-          resim: imagePath,
-          price: data.price || 0,
-          order: data.order || 0
-        });
-
-        productSpecs[data.name] = {
-          ...data,
-          image: imagePath,
-          price: data.price || 0
-        };
+        console.log("Ürünler yüklendi. Kategori sayısı:", Object.keys(productMenu).length);
+      } catch (err) {
+        console.error("Ürün yükleme hatası:", err);
+        throw err;
       }
-    });
-    console.log("Ürünler yüklendi. Kategori sayısı:", Object.keys(productMenu).length);
-    console.log("Ürün menüsü:", productMenu); // Ekstra log
-  } catch (err) {
-    console.error("Ürün yükleme hatası:", err);
-  }
-}
-
-
+    }
 
     // Stokları yükle
     async function loadStocks() {
-  try {
-    const querySnapshot = await getDocs(collection(db, "stocks"));
-    stockData = {};
-    querySnapshot.forEach(doc => {
-      const data = doc.data();
-      const normalized = normalizeName(data.name);
-      stockData[normalized] = {
-        quantity: data.quantity,
-        docId: doc.id, // Belge ID'sini sakla
-        name: data.name // Orijinal ismi sakla
-      };
-    });
-  } catch (error) {
-    console.error("Stok yüklenirken hata:", error);
-  }
-}
+      try {
+        const querySnapshot = await getDocs(collection(db, "stocks"));
+        stockData = {};
+        querySnapshot.forEach(doc => {
+          const data = doc.data();
+          const normalized = normalizeName(data.name);
+          stockData[normalized] = {
+            quantity: data.quantity,
+            docId: doc.id,
+            name: data.name
+          };
+        });
+      } catch (error) {
+        console.error("Stok yüklenirken hata:", error);
+      }
+    }
+
     // Stok bilgisi al
     async function getStockDoc(itemName) {
-  const normalized = normalizeName(itemName);
-  const q = query(collection(db, "stocks"), where("name", "==", normalized));
-  const snapshot = await getDocs(q);
-  return snapshot.docs[0]?.data();
-}
-
+      const normalized = normalizeName(itemName);
+      const q = query(collection(db, "stocks"), where("name", "==", normalized));
+      const snapshot = await getDocs(q);
+      return snapshot.docs[0]?.data();
+    }
 
     // Stok güncelle
     async function updateStock(itemName, newQuantity) {
-
       if (newQuantity < 0) {
-    throw new Error(`"${itemName}" stoğu negatif olamaz!`);
-  }
+        throw new Error(`"${itemName}" stoğu negatif olamaz!`);
+      }
 
-  if (!itemName) return false;
-  try {
-    // 1) Direct equality attempt
-    let q = query(collection(db, "stocks"), where("name", "==", itemName));
-    let qs = await getDocs(q);
-    if (!qs.empty) {
-      const docRef = qs.docs[0].ref;
-      await updateDoc(docRef, { name: name.toLowerCase(),quantity: newQuantity, updatedAt: serverTimestamp() });
-      return true;
-    }
+      if (!itemName) return false;
+      try {
+        let q = query(collection(db, "stocks"), where("name", "==", itemName));
+        let qs = await getDocs(q);
+        if (!qs.empty) {
+          const docRef = qs.docs[0].ref;
+          await updateDoc(docRef, { name: name.toLowerCase(),quantity: newQuantity, updatedAt: serverTimestamp() });
+          return true;
+        }
 
-    // 2) If not found, try normalized match by fetching all (or limited) stocks
-    const allStocksSnap = await getDocs(collection(db, "stocks"));
-    for (const docSnap of allStocksSnap.docs) {
-      const data = docSnap.data();
-      if (normalizeName(data?.name) === normalizeName(itemName)) {
-        await updateDoc(docSnap.ref, { quantity: newQuantity, updatedAt: serverTimestamp() });
-        return true;
+        const allStocksSnap = await getDocs(collection(db, "stocks"));
+        for (const docSnap of allStocksSnap.docs) {
+          const data = docSnap.data();
+          if (normalizeName(data?.name) === normalizeName(itemName)) {
+            await updateDoc(docSnap.ref, {
+              quantity: newQuantity,
+              updatedAt: serverTimestamp()
+            });
+            return true;
+          }
+        }
+
+        console.warn(`updateStock: '${itemName}' stok dokümanı bulunamadı.`);
+        return false;
+      } catch (err) {
+        console.error("updateStock error:", err);
+        return false;
       }
     }
 
-    // 3) Not found
-    console.warn(`updateStock: '${itemName}' stok dokümanı bulunamadı.`);
-    return false;
-  } catch (err) {
-    console.error("updateStock error:", err);
-    return false;
-  }
-}
+    // İsimleri standartlaştır
+    function normalizeName(name) {
+      if (!name) return '';
+      return name
+        .toString()
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, '')
+        .replace(/[ıİ]/g, 'i')
+        .replace(/[şŞ]/g, 's')
+        .replace(/[ğĞ]/g, 'g')
+        .replace(/[üÜ]/g, 'u')
+        .replace(/[çÇ]/g, 'c')
+        .replace(/[öÖ]/g, 'o');
+    }
 
-
-    // İsimleri standartlaştır (case-insensitive ve boşluk temizleme)
-function normalizeName(name) {
-  if (!name) return '';
-  return name
-    .toString()
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, '')
-    .replace(/[ıİ]/g, 'i')
-    .replace(/[şŞ]/g, 's')
-    .replace(/[ğĞ]/g, 'g')
-    .replace(/[üÜ]/g, 'u')
-    .replace(/[çÇ]/g, 'c')
-    .replace(/[öÖ]/g, 'o');
-}
-
-
-      function extractIngredientMap(obj) {
-  if (!obj || typeof obj !== 'object') return {};
-  if (obj.ingredients && typeof obj.ingredients === 'object') {
-    return obj.ingredients;
-  }
-  const filtered = {};
-  for (const [k, v] of Object.entries(obj)) {
-    if (typeof v === 'number') filtered[normalizeName(k)] = v;
-  }
-  return filtered;
-}
-  
-
-
-
-
-
-    /***********************
- * confirmOrder
- ***********************/
-window.confirmOrder = function() {
-  if (!Array.isArray(currentOrder) || currentOrder.length === 0) {
-    alert("Siparişiniz boş.");
-    return;
-  }
-
-  const totalPrice = currentOrder.reduce((sum, item) => sum + (item.qty * item.price), 0);
-  document.getElementById('paymentTotalAmount').textContent = totalPrice.toFixed(2);
-  document.getElementById('paymentModal').style.display = 'flex';
-};
-
-// completeOrder fonksiyonunu global yapın
-window.completeOrder = async function(paymentMethod) {
-  try {
-    const requiredStocks = {};
-    let totalPrice = 0;
-
-    // 1. Stok gereksinimlerini hesapla
-    for (const item of currentOrder) {
-      const spec = productSpecs[item.product];
-      if (!spec) continue;
-
-      totalPrice += (item.qty || 0) * (item.price || 0);
-
-      const rawSizeSpec = item.size && spec.sizes && spec.sizes[item.size]
-        ? spec.sizes[item.size]
-        : spec;
-
-      const ingredients = extractIngredientMap(rawSizeSpec);
-      for (const [ingredient, amount] of Object.entries(ingredients)) {
-        const ingName = normalizeName(ingredient);
-        requiredStocks[ingName] = (requiredStocks[ingName] || 0) + (item.qty * amount);
+    function extractIngredientMap(obj) {
+      if (!obj || typeof obj !== 'object') return {};
+      if (obj.ingredients && typeof obj.ingredients === 'object') {
+        return obj.ingredients;
       }
-    }
-    // 2. STOK KONTROLÜ: Yeterli stok var mı?
-    for (const [name, required] of Object.entries(requiredStocks)) {
-      const normalized = normalizeName(name);
-      const stockInfo = stockData[normalized];
-      
-      if (!stockInfo) {
-        throw new Error(`"${name}" malzemesi stokta bulunamadı!`);
+      const filtered = {};
+      for (const [k, v] of Object.entries(obj)) {
+        if (typeof v === 'number') filtered[normalizeName(k)] = v;
       }
-      
-      // Eğer stok yetersizse uyarı ver
-      if (stockInfo.quantity < required) {
-        throw new Error(`Yeterli ${name} stoğu yok! Gereken: ${required}, Mevcut: ${stockInfo.quantity}`);
+      return filtered;
+    }
+  
+    window.confirmOrder = function() {
+      if (!Array.isArray(currentOrder) || currentOrder.length === 0) {
+        alert("Siparişiniz boş.");
+        return;
       }
-    }
 
-    // Siparişi kaydet (ödeme yöntemi ile birlikte)
-    const newOrderRef = await addDoc(collection(db, "sales"), {
-      items: currentOrder,
-      total: totalPrice,
-      timestamp: serverTimestamp(),
-      user: currentUserEmail || null,
-      customerName: currentCustomerName || null,
-      paymentMethod: paymentMethod
-    });
+      const totalPrice = currentOrder.reduce((sum, item) => sum + (item.qty * item.price), 0);
+      document.getElementById('paymentTotalAmount').textContent = totalPrice.toFixed(2);
+      openModal('paymentModal');
+    };
 
-    const receiptNumber = await getDailyReceiptNumber();
+    window.completeOrder = async function(paymentMethod) {
+      try {
+        // Önce onay sorusunu göster
+        const confirmed = confirm(`${calculateTotal().toFixed(2)}₺ tutarındaki siparişi onaylıyor musunuz?\n\nÖdeme yöntemi: ${getPaymentMethodName(paymentMethod)}`);
+        
+        if (!confirmed) {
+          return; // Kullanıcı iptal etti
+        }
 
-    // Fiş yazdırma (eğer aktifse)
-    if (printReceiptEnabled) {
-      printReceipt(
-        newOrderRef.id,
-        currentOrder,
-        totalPrice,
-        currentCustomerName,
-        paymentMethod
-      );
-    }
+        const requiredStocks = {};
+        let totalPrice = 0;
+        let insufficientStocks = [];
 
-    // Müşteri adı OLMASA BİLE tickets oluştur:
-    try {
-      await printTickets(newOrderRef.id, currentOrder, currentCustomerName || "", paymentMethod);
-    } catch (e) {
-      console.warn("printTickets hata:", e);
-    }
+        // 1. Adım: Gerekli stok miktarlarını hesapla ve stok kontrolü yap
+        for (const item of currentOrder) {
+          const spec = productSpecs[item.product];
+          if (!spec) continue;
 
-    // Stok güncelleme işlemi
-   for (const [name, required] of Object.entries(requiredStocks)) {
-  const normalized = normalizeName(name);
-  const stockInfo = stockData[normalized];
-  
-  if (!stockInfo) {
-    console.warn(`"${name}" malzemesi stok verisinde bulunamadı`);
-    continue;
-  }
+          totalPrice += (item.qty || 0) * (item.price || 0);
 
-  const newQty = stockInfo.quantity - required;
-  const docRef = doc(db, "stocks", stockInfo.docId);
-  
-  await updateDoc(docRef, {
-    quantity: newQty,
-    updatedAt: serverTimestamp()
-  });
-  
-  console.log(`Stok güncellendi: ${name} -> ${newQty}`);
-}
-    // Aktif siparişi temizle
-    try {
-      await deleteDoc(doc(db, "active_orders", "tekSiparis"));
-    } catch (e) {
-      console.warn("Aktif sipariş silinirken hata:", e);
-    }
+          const rawSizeSpec = item.size && spec.sizes && spec.sizes[item.size]
+            ? spec.sizes[item.size]
+            : spec;
 
-    window.activeOrderId = null;
-    currentOrder = [];
-    currentCustomerName = "";
-    updateOrderDisplay();
-    updateSalesDisplays();
+          const ingredients = extractIngredientMap(rawSizeSpec);
+          for (const [ingredient, amount] of Object.entries(ingredients)) {
+            const ingName = normalizeName(ingredient);
+            const requiredAmount = item.qty * amount;
+            requiredStocks[ingName] = (requiredStocks[ingName] || 0) + requiredAmount;
 
-    alert("Sipariş başarıyla tamamlandı.");
-    closeModal('paymentModal');
-  } catch (err) {
-    console.error("completeOrder hata:", err);
-    alert(err.message || "Sipariş tamamlanırken hata oluştu.");
-  }
-}
-
-//FİŞ YAZDIRMA
-
-
-
-      async function printReceipt(orderId, items, total, customerName = "", paymentMethod = "") {
-  const now = new Date();
-  const dateStr = now.toLocaleString("tr-TR");
-  const logoUrl = "img/fis_logo.jpg";
-  const receiptNumber = await getDailyReceiptNumber();
-
-  const paymentMethodText = paymentMethod === 'cash' ? 'Nakit' : 
-                         paymentMethod === 'card' ? 'Kart' : 
-                         'Ödeme Yöntemi Belirtilmedi';
-
-  const receiptHtml = `
-    <html>
-      <head>
-        <style>
-          @media print {
-            @page {
-              margin: 0;
-              padding: 0;
-            }
-            body {
-              margin: 0 !important;
-              padding: 0 !important;
-              width: 68mm;
+            // Stok kontrolü - Artık stockData'dan direkt okuyoruz
+            const stockInfo = stockData[ingName];
+            if (stockInfo) {
+              const currentStock = stockInfo.quantity;
+              const totalRequired = requiredStocks[ingName];
+              if (currentStock < totalRequired) {
+                insufficientStocks.push({
+                  name: stockInfo.name,
+                  required: totalRequired,
+                  available: currentStock
+                });
+              }
+            } else {
+              insufficientStocks.push({
+                name: ingredient,
+                required: item.qty * amount,
+                available: 0
+              });
             }
           }
-          .receipt-container {
-            font-family: Times, sans-serif;
-            width: 68mm;
-            padding: 2px 5px;
-            line-height: 1.3;
-            font-size: 18px;
-            box-sizing: border-box;
+        }
+
+        // 2. Adım: Yetersiz stok varsa işlemi durdur
+        if (insufficientStocks.length > 0) {
+          let errorMessage = "Yetersiz stok:\n";
+          insufficientStocks.forEach(stock => {
+            errorMessage += `\n${stock.name} - Gereken: ${stock.required}, Mevcut: ${stock.available}`;
+          });
+          alert(errorMessage);
+          return;
+        }
+
+        // 3. Adım: Tüm stoklar yeterliyse siparişi kaydet
+        const paymentType = getPaymentMethodName(paymentMethod);
+
+        const newOrderRef = await addDoc(collection(db, "sales"), {
+          items: currentOrder,
+          total: totalPrice,
+          timestamp: serverTimestamp(),
+          user: currentUserEmail || null,
+          customerName: currentCustomerName || null,
+          paymentMethod: paymentType,
+          isGift: paymentMethod === 'gift'
+        });
+
+        if (printReceiptEnabled) {
+          await printReceipt(
+            newOrderRef.id,
+            currentOrder,
+            totalPrice,
+            currentCustomerName,
+            paymentType
+          );
+        }
+
+        // 4. Adım: Stokları güncelle
+        for (const [name, required] of Object.entries(requiredStocks)) {
+          const normalized = normalizeName(name);
+          const stockInfo = stockData[normalized];
+          
+          if (!stockInfo) {
+            console.warn(`"${name}" malzemesi stok verisinde bulunamadı`);
+            continue;
           }
-          .content-block {
-            margin-bottom: 8px;
-          }
-        </style>
-      </head>
-      <body>
-        <div class="receipt-container">
-          <div style="text-align: center; margin-bottom: 5px;">
-            <img src="${logoUrl}" alt="Logo" style="max-width: 60mm; height: auto; margin-bottom: 5px;">
-            <h2 style="margin: 5px 0; font-size: 20px;">LUMA COFFEE CO.</h2>
-          </div>
-          <div class="content-block" style="text-align: center;">
-            <p style="margin: 4px 0; font-size: 16px;">Sipariş ID: ${orderId}</p>
-            <p style="margin: 4px 0; font-size: 16px;">Fiş No: ${receiptNumber.toString().padStart(4, '0')}</p>
-          </div>
-          <p style="text-align: center; font-size: 16px; margin: 4px 0;">Tarih: ${dateStr}</p>
-          ${customerName ? `<p style="text-align: center; font-weight: bold; text-transform: uppercase; font-size: 18px; margin: 4px 0;">${customerName}</p>` : ""}
-          <hr style="border-top: 1px dashed #000; margin: 8px 0;">
-          <div class="content-block">
-            ${items.map(item => `
-              <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
-                <span style="flex: 3;">${item.qty}x ${item.product}${item.size ? ` (${item.size})` : ""}</span>
-                <span style="flex: 1; text-align: right;">${(item.qty * item.price).toFixed(2)}₺</span>
+
+          const newQty = stockInfo.quantity - required;
+          const docRef = doc(db, "stocks", stockInfo.docId);
+          
+          await updateDoc(docRef, {
+            quantity: newQty,
+            updatedAt: serverTimestamp()
+          });
+        }
+
+        await deleteDoc(doc(db, "active_orders", "tekSiparis"));
+        window.activeOrderId = null;
+        currentOrder = [];
+        currentCustomerName = "";
+        updateOrderDisplay();
+        updateSalesDisplays();
+        
+        closeModal('paymentModal');
+        
+        if (paymentMethod === 'gift') {
+          alert("İkram siparişi başarıyla tamamlandı.");
+        } else {
+          alert("Sipariş başarıyla tamamlandı.");
+        }
+      } catch (err) {
+        console.error("Sipariş tamamlama hatası:", err);
+        alert(err.message || "Sipariş tamamlanırken hata oluştu.");
+      }
+    };
+
+    // Ödeme yöntemi adını döndüren yardımcı fonksiyon
+    function getPaymentMethodName(method) {
+      return method === 'gift' ? 'İkram' : 
+             method === 'cash' ? 'Nakit' : 
+             method === 'card' ? 'Kart' : 
+             'Belirtilmedi';
+    }
+
+    // FİŞ YAZDIRMA
+    async function printReceipt(orderId, items, total, customerName = "", paymentMethod = "") {
+      const now = new Date();
+      const dateStr = now.toLocaleString("tr-TR");
+      const logoUrl = "img/fis_logo.jpg";
+      const receiptNumber = await getDailyReceiptNumber();
+
+      const paymentMethodText = paymentMethod === 'cash' ? 'Nakit' : 
+                             paymentMethod === 'card' ? 'Kart' : 
+                             paymentMethod === 'İkram' ? 'İKRAM' :
+                             'Ödeme Yöntemi Belirtilmedi';
+
+      const receiptHtml = `
+        <html>
+          <head>
+            <style>
+              @media print {
+                @page {
+                  margin: 0;
+                  padding: 0;
+                }
+                body {
+                  margin: 0 !important;
+                  padding: 0 !important;
+                  width: 68mm;
+                }
+              }
+              .receipt-container {
+                font-family: Times, sans-serif;
+                width: 68mm;
+                padding: 2px 5px;
+                line-height: 1.3;
+                font-size: 18px;
+                box-sizing: border-box;
+              }
+              .content-block {
+                margin-bottom: 8px;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="receipt-container">
+              <div style="text-align: center; margin-bottom: 5px;">
+                <img src="${logoUrl}" alt="Logo" style="max-width: 60mm; height: auto; margin-bottom: 5px;">
+                <h2 style="margin: 5px 0; font-size: 20px;">LUMA COFFEE CO.</h2>
               </div>
-              ${item.note ? `<div style="font-style: italic; font-size: 16px; padding-left: 10px; margin-bottom: 6px;">${item.note}</div>` : ''}
-            `).join("")}
-          </div>
-          <hr style="border-top: 1px dashed #000; margin: 8px 0;">
-          <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 18px; margin: 5px 0;">
-            <span>TOPLAM:</span>
-            <span>${total.toFixed(2)}₺</span>
-          </div>
-          <div style="margin-top: 5px; text-align: left; font-size: 16px;">
-            <span>Ödeme: ${paymentMethodText}</span>
-          </div>
-          <p style="text-align: center; margin-top: 10px; margin-bottom: 5px; font-size: 16px;">Teşekkür ederiz!</p>
-        </div>
-      </body>
-    </html>
-  `;
+              <div class="content-block" style="text-align: center;">
+                <p style="margin: 4px 0; font-size: 16px;">Sipariş ID: ${orderId}</p>
+                <p style="margin: 4px 0; font-size: 16px;">Fiş No: ${receiptNumber.toString().padStart(4, '0')}</p>
+              </div>
+              <p style="text-align: center; font-size: 16px; margin: 4px 0;">Tarih: ${dateStr}</p>
+              ${customerName ? `<p style="text-align: center; font-weight: bold; text-transform: uppercase; font-size: 18px; margin: 4px 0;">${customerName}</p>` : ""}
+              <hr style="border-top: 1px dashed #000; margin: 8px 0;">
+              <div class="content-block">
+                ${items.map(item => `
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                    <span style="flex: 3;">${item.qty}x ${item.product}${item.size ? ` (${item.size})` : ""}</span>
+                    <span style="flex: 1; text-align: right;">${(item.qty * item.price).toFixed(2)}₺</span>
+                  </div>
+                  ${item.note ? `<div style="font-style: italic; font-size: 16px; padding-left: 10px; margin-bottom: 6px;">${item.note}</div>` : ''}
+                `).join("")}
+              </div>
+              <hr style="border-top: 1px dashed #000; margin: 8px 0;">
+              <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 18px; margin: 5px 0;">
+                <span>TOPLAM:</span>
+                <span>${total.toFixed(2)}₺</span>
+              </div>
+              <div style="margin-top: 5px; text-align: left; font-size: 16px;">
+                <span>Ödeme: ${paymentMethodText}</span>
+              </div>
+              <p style="text-align: center; margin-top: 10px; margin-bottom: 5px; font-size: 16px;">Teşekkür ederiz!</p>
+            </div>
+          </body>
+        </html>
+      `;
 
-  const printWindow = window.open("", "_blank");
-  printWindow.document.write(receiptHtml);
-  printWindow.document.close();
+      const printWindow = window.open("", "_blank");
+      printWindow.document.write(receiptHtml);
+      printWindow.document.close();
 
-  setTimeout(() => {
-    printWindow.print();
-    printWindow.close();
-  }, 500);
-}
-
-
+      setTimeout(() => {
+        printWindow.print();
+        printWindow.close();
+      }, 500);
+    }
 
     // İade modalını aç
     async function openRefundModal() {
@@ -2441,14 +2647,9 @@ window.completeOrder = async function(paymentMethod) {
       `;
       
       document.querySelector('#refundModal .modal-content').innerHTML = modalContent;
-      document.getElementById('refundModal').style.display = 'flex';
+      openModal('refundModal');
       
       await loadLastOrders();
-    }
-
-    // Modalı kapat
-    function closeModal(modalId) {
-      document.getElementById(modalId).style.display = 'none';
     }
 
     // Son siparişleri yükle
@@ -2501,13 +2702,6 @@ window.completeOrder = async function(paymentMethod) {
         console.error("Son siparişler yüklenirken hata:", error);
       }
     }
-
-
-        // yenileme butonu ile ilgili
-    document.getElementById('refreshBtn').addEventListener('click', () => {
-  location.reload();
-});
-
 
     // Sipariş seçildiğinde ürünleri listele
     function selectOrderForRefund(orderId, orderData) {
@@ -2564,108 +2758,62 @@ window.completeOrder = async function(paymentMethod) {
       }
 
       // Onay modalını aç
-      document.getElementById('refundConfirmModal').style.display = 'flex';
+      openModal('refundConfirmModal');
     }
 
+    // İade onayı
+    async function refundConfirm(restock) {
+      try {
+        console.log("Seçilen iade öğeleri:", selectedRefundItems);
+        console.log("Sipariş verisi:", selectedOrderForRefund);
 
-        /***********************
- * renderSizeButtons
- * - spec.sizes içindeki boyutların her zaman "küçük, orta, büyük" sırasına
- *   göre gösterilmesini sağlar
- * - container: DOM element (butonların ekleneceği div)
- * - selectSizeFn: (size) => ... event handler
- ***********************/
-function renderSizeButtons(spec, container, selectSizeFn) {
-  if (!container) return;
-  container.innerHTML = "";
+        // 1. İade kaydı oluştur
+        const refundRef = await addDoc(collection(db, "refunds"), {
+          orderId: selectedOrderForRefund.id,
+          items: selectedRefundItems,
+          timestamp: serverTimestamp(),
+          user: currentUserEmail,
+          restock: restock
+        });
+        console.log("İade kaydı oluşturuldu ID:", refundRef.id);
 
-  const sizeOrder = ["küçük", "orta", "büyük"];
+        // 2. Stok güncelleme (restock true ise)
+        if (restock) {
+          for (const item of selectedRefundItems) {
+            const spec = productSpecs[item.product];
+            if (!spec) {
+              console.warn("Ürün spesifikasyonu bulunamadı:", item.product);
+              continue;
+            }
 
-  const sizes = spec && spec.sizes ? Object.keys(spec.sizes) : [];
-  // sort: öncelikle sizeOrder içinde olanlar, order'a göre; sonra alfabe
-  sizes.sort((a, b) => {
-    const ai = sizeOrder.indexOf(a.toLowerCase());
-    const bi = sizeOrder.indexOf(b.toLowerCase());
-    if (ai === -1 && bi === -1) return a.localeCompare(b);
-    if (ai === -1) return 1;
-    if (bi === -1) return -1;
-    return ai - bi;
-  });
+            const sizeSpec = item.size ? spec.sizes?.[item.size] : spec;
+            const ingredients = extractIngredientMap(sizeSpec || spec);
+            console.log("Ürün malzemeleri:", ingredients);
 
-  sizes.forEach(sizeKey => {
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "size-button"; // CSS ile düzenleyebilirsin (.size-button { flex:1; ... })
-    btn.textContent = sizeKey;
-    btn.addEventListener("click", () => selectSizeFn(sizeKey));
-    container.appendChild(btn);
-  });
-}
+            for (const [ingredient, amount] of Object.entries(ingredients)) {
+              const stockDoc = await getStockDoc(ingredient);
+              if (!stockDoc) {
+                console.error("Stok bulunamadı:", ingredient);
+                continue;
+              }
 
-
-
-
-
-
-
-
-    /***********************
- * refundConfirm
- ***********************/
-async function refundConfirm(restock) {
-  try {
-    console.log("Seçilen iade öğeleri:", selectedRefundItems);
-    console.log("Sipariş verisi:", selectedOrderForRefund);
-
-    // 1. İade kaydı oluştur
-    const refundRef = await addDoc(collection(db, "refunds"), {
-      orderId: selectedOrderForRefund.id,
-      items: selectedRefundItems,
-      timestamp: serverTimestamp(),
-      user: currentUserEmail,
-      restock: restock
-    });
-    console.log("İade kaydı oluşturuldu ID:", refundRef.id);
-
-    // 2. Stok güncelleme (restock true ise)
-    if (restock) {
-      for (const item of selectedRefundItems) {
-        const spec = productSpecs[item.product];
-        if (!spec) {
-          console.warn("Ürün spesifikasyonu bulunamadı:", item.product);
-          continue;
-        }
-
-        const sizeSpec = item.size ? spec.sizes?.[item.size] : spec;
-        const ingredients = extractIngredientMap(sizeSpec || spec);
-        console.log("Ürün malzemeleri:", ingredients);
-
-        for (const [ingredient, amount] of Object.entries(ingredients)) {
-          const stockDoc = await getStockDoc(ingredient);
-          if (!stockDoc) {
-            console.error("Stok bulunamadı:", ingredient);
-            continue;
+              const newQty = stockDoc.quantity + (amount * item.qty);
+              await updateStock(ingredient, newQty);
+              console.log(`Stok güncellendi: ${ingredient} -> ${newQty}`);
+            }
           }
-
-          const newQty = stockDoc.quantity + (amount * item.qty);
-          await updateStock(ingredient, newQty);
-          console.log(`Stok güncellendi: ${ingredient} -> ${newQty}`);
         }
+
+        alert("✅ İade işlemi başarıyla tamamlandı");
+        closeModal('refundModal');
+        closeModal('refundConfirmModal');
+        updateSalesDisplays();
+
+      } catch (error) {
+        console.error("‼️ İade hatası:", error);
+        alert(`İade sırasında hata: ${error.message}`);
       }
     }
-
-    alert("✅ İade işlemi başarıyla tamamlandı");
-    closeModal('refundModal');
-    closeModal('refundConfirmModal'); // Bu satırı ekledik
-    updateSalesDisplays();
-
-  } catch (error) {
-    console.error("‼️ İade hatası:", error);
-    alert(`İade sırasında hata: ${error.message}`);
-  }
-}
-
-
 
     // Collapsible bölümler
     document.querySelectorAll(".collapsible").forEach(btn => {
@@ -2684,108 +2832,70 @@ async function refundConfirm(restock) {
       });
     });
 
-    // Sayfa yüklendiğinde
-    document.addEventListener("DOMContentLoaded", () => {
-      
+    // DOM yüklendiğinde
+    document.addEventListener("DOMContentLoaded", async () => {
       // Arama input'una event listener ekle
       document.getElementById('productSearch').addEventListener('input', searchProducts);
       
       // Kullanıcı giriş kontrolü
-      onAuthStateChanged(auth, async (user) => {
-        if (!user) {
-          alert("Lütfen önce giriş yapınız.");
-          window.location.href = "index.html";
-          return;
-        }
+      //onAuthStateChanged(auth, async (user) => {
+        //if (!user) {
+         // alert("Lütfen önce giriş yapınız.");
+          //window.location.href = "index.html";
+          //return;
+       // }
         
-        currentUserEmail = user.email;
-        
-        // Önce ürünleri yükle, sonra kategorileri yükle
-        try {
-          // Önce tüm verileri yükle
-          await Promise.all([loadProducts(), loadStocks()]);
-          // Sonra kategorileri yükle (ürünlere bağımlı)
-          await loadCategories();
-          updateSalesDisplays();
-          updateSalesCounts();
-          
-          // Aktif siparişi yükle
-          const activeOrderDoc = await getDoc(doc(db, "active_orders", "tekSiparis"));
-          if (activeOrderDoc.exists()) {
-            const data = activeOrderDoc.data();
-            currentOrder = data.items || [];
-            currentCustomerName = data.customerName || "";
-            updateOrderDisplay();
-          }
-        } catch (error) {
-          console.error("Veri yükleme hatası:", error);
-        }
-        
-        // Realtime güncellemeler için listener'lar
-        onSnapshot(collection(db, "categories"), loadCategories);
-        onSnapshot(collection(db, "products"), async () => {
-          await loadProducts();
-          await loadCategories();
-        });
-        onSnapshot(collection(db, "stocks"), loadStocks);
-        onSnapshot(collection(db, "sales"), updateSalesDisplays);
-        onSnapshot(doc(db, "active_orders", "tekSiparis"), (doc) => {
-          if (doc.exists()) {
-            const data = doc.data();
-            currentOrder = data.items || [];
-            currentCustomerName = data.customerName || "";
-            updateOrderDisplay();
-          }
-        });
-      });
-
-      const toggleBtn = document.getElementById('receiptToggle');
-  if (toggleBtn) {
-    toggleBtn.addEventListener('click', () => {
-      printReceiptEnabled = !printReceiptEnabled;
-      localStorage.setItem('printReceiptEnabled', printReceiptEnabled);
+       // currentUserEmail = user.email;
+        //await initializeData();
+      //});
+await initializeData();   //giriş kontrolü kaldırıldı, veri yükleme direkt başlatılıyor. tekrar açınca sil
       
-      if (printReceiptEnabled) {
-        toggleBtn.innerHTML = '<i class="fas fa-receipt"></i> Fiş Yazdırma: Açık';
-        toggleBtn.classList.remove('off');
-      } else {
-        toggleBtn.innerHTML = '<i class="fas fa-receipt"></i> Fiş Yazdırma: Kapalı';
-        toggleBtn.classList.add('off');
+
+      // Fiş yazdırma toggle butonu
+      const toggleBtn = document.getElementById('receiptToggle');
+      if (toggleBtn) {
+        toggleBtn.addEventListener('click', () => {
+          printReceiptEnabled = !printReceiptEnabled;
+          localStorage.setItem('printReceiptEnabled', printReceiptEnabled);
+          
+          if (printReceiptEnabled) {
+            toggleBtn.innerHTML = '<i class="fas fa-receipt"></i> Fiş Yazdırma: Açık';
+            toggleBtn.classList.remove('off');
+          } else {
+            toggleBtn.innerHTML = '<i class="fas fa-receipt"></i> Fiş Yazdırma: Kapalı';
+            toggleBtn.classList.add('off');
+          }
+        });
+        
+        // Başlangıç durumunu yükle
+        const savedSetting = localStorage.getItem('printReceiptEnabled');
+        if (savedSetting !== null) {
+          printReceiptEnabled = JSON.parse(savedSetting);
+        }
+        
+        if (!printReceiptEnabled) {
+          toggleBtn.innerHTML = '<i class="fas fa-receipt"></i> Fiş Yazdırma: Kapalı';
+          toggleBtn.classList.add('off');
+        }
       }
     });
-    
-    // Başlangıç durumunu yükle
-    const savedSetting = localStorage.getItem('printReceiptEnabled');
-    if (savedSetting !== null) {
-      printReceiptEnabled = JSON.parse(savedSetting);
-    }
-    
-    if (!printReceiptEnabled) {
-      toggleBtn.innerHTML = '<i class="fas fa-receipt"></i> Fiş Yazdırma: Kapalı';
-      toggleBtn.classList.add('off');
-    }
-  }
-});
 
     // Global fonksiyonlar
-    window.changeQty = changeQty;
+ window.changeQty = changeQty;
     window.addToOrder = addToOrder;
     window.removeFromOrder = removeFromOrder;
-   
     window.openRefundModal = openRefundModal;
-    
     window.processRefund = processRefund;
     window.refundConfirm = refundConfirm;
     window.clearSearch = clearSearch;
     window.addCustomerName = addCustomerName;
     window.submitName = submitName;
-    window.closeNameModal = function() {
-        document.getElementById("nameModal").style.display = "none";
-    };
     window.openNoteModal = openNoteModal;
     window.saveNote = saveNote;
-    window.closeNoteModal = closeNoteModal;
     window.selectSize = selectSize;
+    window.completeOrder = completeOrder;
+    window.confirmOrder = confirmOrder;
+    window.closeModal = closeModal; 
   </script>
 </body>
 </html>
