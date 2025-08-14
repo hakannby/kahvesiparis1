@@ -9,6 +9,7 @@
 
  <style>
     :root {
+      /* Light Theme (Varsayılan) */
       --primary: #5a67d8;
       --primary-light: #7e8de3;
       --primary-dark: #4c51bf;
@@ -24,6 +25,34 @@
       --shadow-hover: 0 10px 25px rgba(0,0,0,0.15);
       --radius: 14px;
       --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      
+      /* Background ve Text renkleri */
+      --bg-primary: #fafafa;
+      --bg-secondary: #ffffff;
+      --bg-tertiary: #f0f2f5;
+      --text-primary: #333333;
+      --text-secondary: #666666;
+      --text-muted: #999999;
+      --border-color: #e0e6ed;
+      --border-light: #f0f0f0;
+    }
+    
+    /* Dark Theme */
+    [data-theme="dark"] {
+      --bg-primary: #1a1a1a;
+      --bg-secondary: #2d2d2d;
+      --bg-tertiary: #3a3a3a;
+      --text-primary: #ffffff;
+      --text-secondary: #cccccc;
+      --text-muted: #888888;
+      --border-color: #404040;
+      --border-light: #505050;
+      --gray-100: #2d2d2d;
+      --gray-200: #404040;
+      --light: #2d2d2d;
+      --white: #2d2d2d;
+      --shadow: 0 6px 15px rgba(0,0,0,0.3);
+      --shadow-hover: 0 10px 25px rgba(0,0,0,0.4);
     }
     
     * {
@@ -38,21 +67,26 @@
       max-width: 1600px;
       margin: 20px auto;
       padding: 15px;
-      background: #fafafa;
+      background: var(--bg-primary);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
-      color: #333;
-      background: linear-gradient(135deg, #f9f9f9 0%, #f0f2f5 100%);
+      color: var(--text-primary);
+      background: linear-gradient(135deg, var(--bg-tertiary) 0%, var(--bg-primary) 100%);
+      transition: var(--transition);
     }
     
     h2 {
       text-align: center;
       margin-bottom: 20px;
-      color: var(--dark);
+      color: var(--text-primary);
       padding-bottom: 10px;
-      border-bottom: 2px solid #e0e6ed;
+      border-bottom: 2px solid var(--border-color);
       font-weight: 700;
       font-size: 28px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
     }
     
     /* YENİ İKİ SÜTUNLU DÜZEN */
@@ -83,18 +117,19 @@
       justify-content: center;
       margin-bottom: 10px;
       padding: 10px;
-      background: var(--white);
+      background: var(--bg-secondary);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
       text-align: center;
+      border: 1px solid var(--border-color);
     }
     
     .main-category-btn {
       padding: 22px 25px;
-      background: var(--white);
+      background: var(--bg-secondary);
       border: 2px solid var(--primary-light);
       border-radius: 50px;
-      color: var(--dark);
+      color: var(--text-primary);
       font-weight: 600;
       cursor: pointer;
       transition: var(--transition);
@@ -127,12 +162,12 @@
 
     /* ALT KATEGORİ VE ÜRÜNLER ALANI */
     .category-content-area {
-      background: var(--white);
+      background: var(--bg-secondary);
       border-radius: var(--radius);
       padding: 20px;
       margin-bottom: 20px;
       box-shadow: var(--shadow);
-      border: 1px solid #3f89de;
+      border: 1px solid var(--primary-light);
       display: none;
       text-align: center;
     }
@@ -157,10 +192,10 @@
     
     .subcategory-btn {
       padding: 18px 20px;
-      background: var(--light);
+      background: var(--bg-tertiary);
       border: none;
       border-radius: 50px;
-      color: var(--dark);
+      color: var(--text-primary);
       font-weight: 600;
       cursor: pointer;
       transition: var(--transition);
@@ -227,23 +262,24 @@
       font-size: 14px;
     }
     
-    /* ÜRÜN SEÇİM ALANI */
+    /* ÜRÜN SEÇİM ALANI - GRID YAPISI */
     .coffee-selection {
       margin-top: 25px;
-      display: flex;
-      flex-wrap: nowrap;
-      overflow-x: auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
       gap: 20px;
-      padding: 15px 10px;
-      background: var(--light);
+      padding: 20px;
+      background: var(--bg-tertiary);
       border-radius: var(--radius);
       box-shadow: 0 5px 12px rgba(0,0,0,0.06);
+      max-height: 600px;
+      overflow-y: auto;
       scrollbar-width: thin;
-      scrollbar-color: var(--primary) var(--light);
+      scrollbar-color: var(--primary) var(--bg-tertiary);
     }
     
     .coffee-selection::-webkit-scrollbar {
-      height: 8px;
+      width: 8px;
     }
     
     .coffee-selection::-webkit-scrollbar-track {
@@ -262,7 +298,7 @@
       border-radius: 16px;
       padding: 15px;
       text-align: center;
-      background: white;
+      background: var(--bg-secondary);
       box-shadow: 0 5px 10px rgba(0,0,0,0.1);
       transition: var(--transition);
       user-select: none;
@@ -270,10 +306,9 @@
       flex-direction: column;
       align-items: center;
       position: relative;
-      height: 100%;
-      flex: 0 0 auto;
-      min-width: 150px;
-      max-width: 180px;
+      height: 200px;
+      width: 100%;
+      justify-content: space-between;
     }
     
     .coffee-option:hover {
@@ -288,29 +323,101 @@
     }
     
     .coffee-option img {
-      width: 85%;
-      height: 110px;
+      width: 100%;
+      height: 100px;
       object-fit: cover;
       border-radius: 12px;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
       filter: drop-shadow(0 3px 3px rgba(0,0,0,0.1));
-      background: #f5f5f5;
-      border: 1px solid #e0e6ed;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
     }
     
     .coffee-option p {
       font-weight: 700;
-      color: var(--dark);
-      font-size: 18px;
+      color: var(--text-primary);
+      font-size: 16px;
       margin: 0;
       user-select: none;
+      line-height: 1.2;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
     }
     
     .coffee-option .price {
       color: var(--success);
       font-weight: 700;
-      margin-top: 8px;
-      font-size: 16px;
+      margin-top: 5px;
+      font-size: 15px;
+    }
+    
+    /* Satış sayısı badge'i */
+    .sales-badge {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: var(--primary);
+      color: white;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      z-index: 1;
+    }
+    
+    /* Ürün yükleme göstergesi */
+    .products-loading {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-primary);
+    }
+    
+    .loading-progress {
+      width: 100%;
+      height: 8px;
+      background: var(--gray-200);
+      border-radius: 4px;
+      margin: 20px 0;
+      overflow: hidden;
+    }
+    
+    .loading-progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--primary-light));
+      border-radius: 4px;
+      transition: width 0.3s ease;
+      width: 0%;
+    }
+    
+    .loading-text {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    
+    .loading-details {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 15px;
+    }
+    
+    /* Skeleton loading */
+    .skeleton-product {
+      background: linear-gradient(90deg, var(--bg-tertiary) 25%, var(--border-color) 50%, var(--bg-tertiary) 75%);
+      background-size: 200% 100%;
+      animation: loading 1.5s infinite;
+      border-radius: 16px;
+      height: 200px;
+      margin-bottom: 20px;
+    }
+    
+    @keyframes loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
     }
     
     label {
@@ -318,9 +425,9 @@
       margin-bottom: 15px;
       font-size: 17px;
       font-weight: 600;
-      color: var(--dark);
+      color: var(--text-primary);
       user-select: none;
-      background: var(--light);
+      background: var(--bg-tertiary);
       padding: 12px 18px;
       border-radius: var(--radius);
       box-shadow: 0 3px 6px rgba(0,0,0,0.05);
@@ -341,7 +448,7 @@
       flex-direction: column;
       align-items: center;
       padding: 12px 15px;
-      background: var(--light);
+      background: var(--bg-tertiary);
       border-radius: var(--radius);
       cursor: pointer;
       transition: var(--transition);
@@ -371,7 +478,7 @@
     .size-btn .size-name {
       font-weight: 600;
       font-size: 14px;
-      color: var(--dark);
+      color: var(--text-primary);
     }
     
     .size-btn .size-price {
@@ -387,7 +494,7 @@
       align-items: center;
       max-width: 220px;
       margin: 20px auto;
-      background: var(--light);
+      background: var(--bg-tertiary);
       padding: 12px;
       border-radius: var(--radius);
       box-shadow: 0 3px 8px rgba(0,0,0,0.05);
@@ -422,7 +529,8 @@
       border: 2px solid var(--primary-dark);
       border-radius: var(--radius);
       padding: 10px 0;
-      background: white;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
       user-select: none;
     }
     
@@ -503,10 +611,11 @@
     
     /* SAĞ SÜTUN STİLLERİ */
     .right-panel-section {
-      background: var(--white);
+      background: var(--bg-secondary);
       border-radius: var(--radius);
       padding: 20px;
       box-shadow: var(--shadow);
+      border: 1px solid var(--border-color);
     }
     
     .right-panel-section h3 {
@@ -514,9 +623,9 @@
       align-items: center;
       justify-content: space-between;
       margin-bottom: 15px;
-      color: var(--dark);
+      color: var(--text-primary);
       padding-bottom: 12px;
-      border-bottom: 1px solid #e0e6ed;
+      border-bottom: 1px solid var(--border-color);
       font-size: 20px;
     }
     
@@ -530,11 +639,11 @@
       overflow-y: auto;
       padding: 15px;
       border-radius: var(--radius);
-      background: var(--white);
+      background: var(--bg-secondary);
       box-shadow: inset 0 0 10px rgba(224, 230, 237, 0.5);
       font-weight: 600;
       font-size: 17px;
-      color: var(--dark);
+      color: var(--text-primary);
       margin-bottom: 15px;
       user-select: text;
     }
@@ -598,22 +707,23 @@
     }
     
     #customerView {
-      border: 2px dashed #c7b36f;
+      border: 2px dashed var(--warning);
       min-height: 120px;
       line-height: 1.5;
-      background: var(--light);
+      background: var(--bg-tertiary);
     }
     
     .section {
       margin-top: 0;
-      background: var(--white);
+      background: var(--bg-secondary);
       padding: 15px;
       border-radius: var(--radius);
       box-shadow: 0 5px 12px rgba(0,0,0,0.06);
+      border: 1px solid var(--border-color);
     }
     
     .collapsible {
-      background-color: var(--gray-100);
+      background-color: var(--bg-tertiary);
       cursor: pointer;
       padding: 18px 22px;
       border: none;
@@ -622,7 +732,7 @@
       font-size: 19px;
       font-weight: 600;
       border-radius: var(--radius);
-      color: var(--dark);
+      color: var(--text-primary);
       user-select: none;
       box-shadow: 0 4px 8px rgba(0,0,0,0.08);
       margin-bottom: 12px;
@@ -630,12 +740,12 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border: 1px solid var(--gray-200);
+      border: 1px solid var(--border-color);
       width: 100%;
     }
     
     .collapsible:hover {
-      background-color: var(--gray-200);
+      background-color: var(--border-color);
     }
     
     .collapsible.active {
@@ -647,12 +757,12 @@
     .content {
       padding: 20px;
       display: none;
-      border: 2px solid var(--gray-200);
+      border: 2px solid var(--border-color);
       border-top: none;
       border-radius: 0 0 var(--radius) var(--radius);
-      background-color: var(--white);
+      background-color: var(--bg-secondary);
       font-size: 16px;
-      color: var(--dark);
+      color: var(--text-primary);
       font-weight: 600;
       user-select: text;
       max-height: 350px;
@@ -678,7 +788,7 @@
 }
 
 .modal-content {
-  background: white;
+  background: var(--bg-secondary);
   padding: 30px;
   border-radius: var(--radius);
   width: 90%;
@@ -688,6 +798,7 @@
   box-shadow: 0 15px 40px rgba(0,0,0,0.25);
   position: relative;
   z-index: 10001;
+  border: 1px solid var(--border-color);
 }
 
 
@@ -699,11 +810,12 @@
   padding: 15px;
   margin: 20px 0;
   font-size: 16px;
-  border: 2px solid #ddd;
+  border: 2px solid var(--border-color);
   border-radius: var(--radius);
   transition: all 0.3s ease;
   box-sizing: border-box;
-  background: white !important;
+  background: var(--bg-secondary) !important;
+  color: var(--text-primary);
   position: relative;
   z-index: auto;
   pointer-events: auto;
@@ -717,6 +829,7 @@
   border-color: var(--primary) !important;
   box-shadow: 0 0 0 3px rgba(90, 103, 216, 0.25) !important;
   outline: none !important;
+  background: var(--bg-secondary) !important;
 }
 
 .modal-btn {
@@ -779,21 +892,22 @@
     .history-item {
       padding: 18px;
       border-radius: 12px;
-      background: #f9f9f9;
+      background: var(--bg-tertiary);
       margin-bottom: 15px;
       cursor: pointer;
       transition: var(--transition);
-      border: 1px solid #eee;
+      border: 1px solid var(--border-color);
     }
     
     .history-item:hover {
-      background: #f0f7ff;
-      border-color: #c7e0ff;
+      background: var(--bg-secondary);
+      border-color: var(--primary-light);
     }
     
     .history-item.selected {
-      background: #e3f2fd;
-      border-color: #90caf9;
+      background: var(--primary-light);
+      border-color: var(--primary);
+      color: var(--white);
     }
     
     .history-item .order-id {
@@ -888,17 +1002,20 @@
     #productSearch {
       flex: 1;
       padding: 15px 20px;
-      border: 2px solid #ddd;
+      border: 2px solid var(--border-color);
       border-radius: 50px;
       font-size: 17px;
       outline: none;
       box-shadow: 0 3px 10px rgba(0,0,0,0.1);
       transition: var(--transition);
+      background: var(--bg-secondary);
+      color: var(--text-primary);
     }
     
     #productSearch:focus {
       border-color: var(--primary);
       box-shadow: 0 3px 15px rgba(90, 103, 216, 0.25);
+      background: var(--bg-secondary);
     }
     
     .search-container button {
@@ -946,16 +1063,17 @@
     }
     
     .history-table th {
-      background-color: #f5f5f5;
+      background-color: var(--bg-tertiary);
       font-weight: 700;
+      color: var(--text-primary);
     }
     
     .history-table tr:nth-child(even) {
-      background-color: #f9f9f9;
+      background-color: var(--bg-tertiary);
     }
     
     .history-table tr:hover {
-      background-color: #f0f7ff;
+      background-color: var(--bg-secondary);
     }
     
    
@@ -998,6 +1116,7 @@
       border-color: var(--primary);
       outline: none;
       box-shadow: 0 0 0 3px rgba(90, 103, 216, 0.25);
+      background: var(--bg-secondary);
     }
     
     /* MOBİL UYUMLULUK */
@@ -1027,12 +1146,31 @@
       }
       
       .coffee-selection {
-        gap: 15px;
-        padding: 15px 10px;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 12px;
+        padding: 12px;
+        max-height: 500px;
       }
       
       .coffee-option {
-        min-width: 140px;
+        height: 180px;
+        padding: 12px;
+      }
+      
+      /* Mobilde theme toggle butonunu düzenle */
+      h2 {
+        flex-direction: column;
+        gap: 15px;
+      }
+      
+      h2 > div {
+        flex-direction: column;
+        gap: 10px;
+      }
+      
+      #themeToggle, #refreshBtn {
+        width: 100%;
+        max-width: 200px;
       }
       
       .size-selection {
@@ -1096,9 +1234,29 @@
   gap: 8px;
 }
 
-.toggle-button.off {
-  background-color: var(--danger);
-}
+    .toggle-button.off {
+      background-color: var(--danger);
+    }
+    
+    /* Theme toggle button */
+    #themeToggle {
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    #themeToggle:hover {
+      transform: scale(1.05);
+      box-shadow: var(--shadow-hover);
+    }
+    
+    #themeToggle[data-theme="dark"] {
+      background: var(--warning) !important;
+    }
+    
+    #themeToggle[data-theme="dark"] i {
+      transform: rotate(180deg);
+    }
 
 
 
@@ -1164,9 +1322,14 @@
 
   <h2>
     <i class="fas fa-coffee"></i> Personel Paneli - Kahve Siparişi
-    <button id="refreshBtn" style="margin-left: 15px; padding: 5px 10px; background: var(--primary); color: white; border: none; border-radius: 5px; cursor: pointer;">
-      <i class="fas fa-sync-alt"></i> Sayfayı Yenile
-    </button>
+    <div style="display: flex; gap: 15px; align-items: center; margin-left: 15px;">
+      <button id="themeToggle" style="padding: 5px 10px; background: var(--primary); color: white; border: none; border-radius: 5px; cursor: pointer;">
+        <i class="fas fa-moon"></i> Dark Mode
+      </button>
+      <button id="refreshBtn" style="padding: 5px 10px; background: var(--primary); color: white; border: none; border-radius: 5px; cursor: pointer;">
+        <i class="fas fa-sync-alt"></i> Sayfayı Yenile
+      </button>
+    </div>
   </h2>
   
   <div class="search-container">
@@ -1409,10 +1572,79 @@
     let printReceiptEnabled = true;
     let paymentMethod = '';
     let unsubscribeOrder = null;
+    let productSalesCache = {}; // Ürün satış sayıları için cache
+    let salesDataLoaded = false; // Satış verilerinin yüklenip yüklenmediği
+    let productsLoading = false; // Ürünlerin yüklenip yüklenmediği
+    let loadingProgress = 0; // Yükleme ilerlemesi
+    let productCache = {}; // Ürün detayları için cache
+    let categoryCache = {}; // Kategori verileri için cache
+    let stockCache = {}; // Stok verileri için cache
+    let cacheTimestamp = {}; // Cache zaman damgaları
+    let CACHE_DURATION = 5 * 60 * 1000; // 5 dakika cache süresi
+    let currentTheme = 'light'; // Mevcut tema
 
+        // Cache yönetim fonksiyonları
+    function isCacheValid(cacheKey) {
+      const timestamp = cacheTimestamp[cacheKey];
+      if (!timestamp) return false;
+      return (Date.now() - timestamp) < CACHE_DURATION;
+    }
+    
+    function setCache(cacheKey, data) {
+      productCache[cacheKey] = data;
+      cacheTimestamp[cacheKey] = Date.now();
+    }
+    
+    function getCache(cacheKey) {
+      if (isCacheValid(cacheKey)) {
+        return productCache[cacheKey];
+      }
+      return null;
+    }
+    
+    function clearExpiredCache() {
+      const now = Date.now();
+      Object.keys(cacheTimestamp).forEach(key => {
+        if ((now - cacheTimestamp[key]) > CACHE_DURATION) {
+          delete productCache[key];
+          delete cacheTimestamp[key];
+        }
+      });
+    }
+    
+    // Theme yönetim fonksiyonları
+    function setTheme(theme) {
+      currentTheme = theme;
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('theme', theme);
+      
+      // Theme toggle butonunu güncelle
+      const themeToggle = document.getElementById('themeToggle');
+      if (themeToggle) {
+        if (theme === 'dark') {
+          themeToggle.innerHTML = '<i class="fas fa-sun"></i> Light Mode';
+          themeToggle.setAttribute('data-theme', 'dark');
+        } else {
+          themeToggle.innerHTML = '<i class="fas fa-moon"></i> Dark Mode';
+          themeToggle.removeAttribute('data-theme');
+        }
+      }
+      
+      console.log(`Tema değiştirildi: ${theme}`);
+    }
+    
+    function toggleTheme() {
+      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+      setTheme(newTheme);
+    }
+    
+    function loadTheme() {
+      const savedTheme = localStorage.getItem('theme') || 'light';
+      setTheme(savedTheme);
+    }
+    
     // Modal yönetimi
-  function openModal(modalId) {
-      console.log('Modal açılıyor:', modalId);
+    function openModal(modalId) {
       
       // Önce tüm modalları kapat
       document.querySelectorAll('.modal').forEach(modal => {
@@ -1502,8 +1734,15 @@
         event.currentTarget.classList.add('selected');
       }
       
-      // Fiyat güncelleme
-      const product = productSpecs[selectedProduct];
+      // Fiyat güncelleme - önce cache'den dene
+      let product = getCache(`product_${selectedProduct}`);
+      if (!product) {
+        product = productSpecs[selectedProduct];
+        if (product) {
+          setCache(`product_${selectedProduct}`, product);
+        }
+      }
+      
       if (product && product.sizes && product.sizes[size]) {
         const price = product.sizes[size].price.toFixed(2);
         document.querySelector('.size-btn.selected .size-price').textContent = `${price}₺`;
@@ -1643,6 +1882,11 @@
           .filter(cat => cat.parent)
           .sort((a, b) => (a.order || 0) - (b.order || 0));
 
+        // Kategorileri cache'e ekle
+        setCache('mainCategories', mainCategories);
+        setCache('subCategories', subCategories);
+        console.log('Kategoriler cache\'e eklendi');
+
         mainCategories.forEach((mainCat, index) => {
           const btn = document.createElement('button');
           btn.className = 'main-category-btn';
@@ -1665,8 +1909,12 @@
           
           container.appendChild(btn);
           
+          // İlk kategoriyi otomatik olarak seç ve ürünleri göster
           if (index === 0) {
-            showCategoryContent(mainCat, subCategories);
+            // Kısa bir gecikme ile ilk kategoriyi seç (DOM hazır olduktan sonra)
+            setTimeout(() => {
+              showCategoryContent(mainCat, subCategories);
+            }, 100);
           }
         });
 
@@ -1712,6 +1960,7 @@
           selectSubCategory(firstSubBtn.dataset.slug);
         }
       } else {
+        // Ürünleri direkt listele (loading olmadan)
         listProducts(mainCat.slug);
       }
     }
@@ -1727,9 +1976,58 @@
         activeBtn.classList.add("active");
       }
       
+      // Ürünleri direkt listele (loading olmadan)
       listProducts(slug);
     }
 
+    // Ürün yükleme göstergesi
+    function showProductsLoading(category) {
+      const productListDiv = document.getElementById("kahveListesi");
+      productListDiv.innerHTML = `
+        <div class="products-loading">
+          <div class="loading-text">
+            <i class="fas fa-spinner fa-spin"></i> Ürünler yükleniyor...
+          </div>
+          <div class="loading-details">
+            ${category} kategorisindeki ürünler hazırlanıyor
+          </div>
+          <div class="loading-progress">
+            <div class="loading-progress-bar" id="loadingProgressBar"></div>
+          </div>
+          <div style="font-size: 12px; color: #999;">
+            Lütfen bekleyin...
+          </div>
+        </div>
+      `;
+      
+      // Progress bar animasyonu
+      const progressBar = document.getElementById('loadingProgressBar');
+      if (progressBar) {
+        let progress = 0;
+        const interval = setInterval(() => {
+          progress += Math.random() * 15;
+          if (progress >= 90) {
+            progress = 90;
+            clearInterval(interval);
+          }
+          progressBar.style.width = progress + '%';
+        }, 200);
+      }
+    }
+    
+    // Skeleton loading göster
+    function showSkeletonLoading() {
+      const productListDiv = document.getElementById("kahveListesi");
+      let skeletonHTML = '';
+      
+      // 6 adet skeleton ürün kartı oluştur
+      for (let i = 0; i < 6; i++) {
+        skeletonHTML += '<div class="skeleton-product"></div>';
+      }
+      
+      productListDiv.innerHTML = skeletonHTML;
+    }
+    
     // Ürünleri listele
     function listProducts(category) {
       const productListDiv = document.getElementById("kahveListesi");
@@ -1741,15 +2039,33 @@
         return;
       }
       
-      const sortedProducts = [...productMenu[category]].sort((a, b) => 
-        (a.order || 0) - (b.order || 0)
-      );
+      let sortedProducts = [...productMenu[category]];
+      
+      // Eğer satış verileri yüklendiyse, satış sayılarına göre sırala
+      if (salesDataLoaded && Object.keys(productSalesCache).length > 0) {
+        sortedProducts.sort((a, b) => {
+          const salesA = productSalesCache[a.ad] || 0;
+          const salesB = productSalesCache[b.ad] || 0;
+          
+          // Önce satış sayısına göre azalan sıralama
+          if (salesB !== salesA) {
+            return salesB - salesA;
+          }
+          
+          // Satış sayısı aynıysa order'a göre sırala
+          return (a.order || 0) - (b.order || 0);
+        });
+      } else {
+        // Satış verileri yoksa sadece order'a göre sırala
+        sortedProducts.sort((a, b) => (a.order || 0) - (b.order || 0));
+      }
 
       document.querySelectorAll(".coffee-option").forEach(opt => {
         opt.classList.remove("selected");
         opt.setAttribute("aria-pressed", "false");
       });
       
+      // Ürünleri direkt göster (loading gecikmesi olmadan)
       sortedProducts.forEach(product => {
         const div = createProductElement(product);
         productListDiv.appendChild(div);
@@ -1766,11 +2082,16 @@
       div.setAttribute("aria-pressed", "false");
 
       const price = product.price?.toFixed?.(2) || "0.00";
+      
+      // Satış sayısı bilgisini al
+      const salesCount = productSalesCache[product.ad] || 0;
+      const salesBadge = salesCount > 0 ? `<div class="sales-badge">${salesCount} satış</div>` : '';
 
       div.innerHTML = `
         <img src="${product.resim}" 
              alt="${product.ad}" 
              onerror="this.onerror=null; this.src='img/placeholder.jpg'" />
+        ${salesBadge}
         <p>${product.ad}</p>
         <div class="price">${price}₺</div>
       `;
@@ -1801,6 +2122,21 @@
       div.setAttribute("aria-pressed", "true");
       selectedProduct = productName;
       selectedSize = "";
+      
+      // Cache'den ürün bilgilerini al
+      const cachedProduct = getCache(`product_${productName}`);
+      if (cachedProduct) {
+        console.log('Ürün cache\'den alındı:', productName);
+        createSizeOptions(cachedProduct);
+      } else {
+        // Cache'de yoksa productSpecs'den al ve cache'le
+        const product = productSpecs[productName];
+        if (product) {
+          setCache(`product_${productName}`, product);
+          console.log('Ürün cache\'e eklendi:', productName);
+          createSizeOptions(product);
+        }
+      }
     }
 
     // Adet değiştirme
@@ -1969,7 +2305,7 @@
       }
     }
 
-    // Toplam satış adetlerini hesapla
+    // Toplam satış adetlerini hesapla ve cache'le
     async function updateSalesCounts() {
       const salesCountsDiv = document.getElementById('salesCounts');
       try {
@@ -2001,6 +2337,10 @@
             productCounts[item.product] += item.qty;
           });
         });
+
+        // Global cache'i güncelle
+        productSalesCache = productCounts;
+        salesDataLoaded = true;
 
         if (Object.keys(productCounts).length === 0) {
           salesCountsDiv.innerHTML = "<p>Bugün henüz satış yok.</p>";
@@ -2077,8 +2417,8 @@
       }
 
       const productListDiv = document.getElementById("kahveListesi");
-      productListDiv.innerHTML = "";
-
+      
+      // Arama sonuçlarını direkt göster (loading olmadan)
       let foundProducts = [];
       for (const category in productMenu) {
         const categoryProducts = productMenu[category].filter(product =>
@@ -2092,6 +2432,24 @@
         return;
       }
 
+      // Arama sonuçlarını da satış sayılarına göre sırala
+      if (salesDataLoaded && Object.keys(productSalesCache).length > 0) {
+        foundProducts.sort((a, b) => {
+          const salesA = productSalesCache[a.ad] || 0;
+          const salesB = productSalesCache[b.ad] || 0;
+          
+          // Önce satış sayısına göre azalan sıralama
+          if (salesB !== salesA) {
+            return salesB - salesA;
+          }
+          
+          // Satış sayısı aynıysa order'a göre sırala
+          return (a.order || 0) - (b.order || 0);
+        });
+      }
+
+      // Ürünleri direkt göster
+      productListDiv.innerHTML = "";
       foundProducts.forEach(product => {
         const div = createProductElement(product);
         productListDiv.appendChild(div);
@@ -2198,11 +2556,19 @@
     onSnapshot(collection(db, "sales"), () => {
       updateSalesDisplays();
       updateSalesCounts();
+      // Ürün listesini de güncelle (satış sayıları değiştiği için)
+      if (salesDataLoaded) {
+        refreshProductDisplay();
+      }
     });
 
     onSnapshot(collection(db, "refunds"), () => {
       updateSalesDisplays();
       updateSalesCounts();
+      // Ürün listesini de güncelle (satış sayıları değiştiği için)
+      if (salesDataLoaded) {
+        refreshProductDisplay();
+      }
     });
 
     let productsLoaded = false;
@@ -2215,6 +2581,9 @@
           await loadProducts();
           await loadCategories();
           productsLoaded = true;
+          
+          // Cache'den ürünler yüklendikten sonra UI'ı güncelle
+          await updateUIAfterCacheLoad();
         }
         
         // Diğer başlangıç verileri
@@ -2281,6 +2650,9 @@
               image: imagePath,
               price: Object.values(data.sizes)[0]?.price || 0
             };
+            
+            // Ürünü cache'e ekle
+            setCache(`product_${data.name}`, productSpecs[data.name]);
           } else {
             productMenu[category].push({
               ad: data.name,
@@ -2294,9 +2666,18 @@
               image: imagePath,
               price: data.price || 0
             };
+            
+            // Ürünü cache'e ekle
+            setCache(`product_${data.name}`, productSpecs[data.name]);
           }
         });
-        console.log("Ürünler yüklendi. Kategori sayısı:", Object.keys(productMenu).length);
+        
+        console.log("Ürünler yüklendi ve cache'e eklendi. Kategori sayısı:", Object.keys(productMenu).length);
+        
+        // Cache yüklendikten sonra UI'ı güncelle
+        if (Object.keys(productMenu).length > 0) {
+          console.log("Cache'den ürünler yüklendi, UI güncelleniyor...");
+        }
       } catch (err) {
         console.error("Ürün yükleme hatası:", err);
         throw err;
@@ -2308,6 +2689,8 @@
       try {
         const querySnapshot = await getDocs(collection(db, "stocks"));
         stockData = {};
+        stockCache = {}; // Stok cache'ini temizle
+        
         querySnapshot.forEach(doc => {
           const data = doc.data();
           const normalized = normalizeName(data.name);
@@ -2316,7 +2699,17 @@
             docId: doc.id,
             name: data.name
           };
+          
+          // Stok verilerini cache'e ekle
+          stockCache[normalized] = {
+            quantity: data.quantity,
+            docId: doc.id,
+            name: data.name
+          };
         });
+        
+        setCache('stockData', stockCache);
+        console.log('Stok verileri cache\'e eklendi');
       } catch (error) {
         console.error("Stok yüklenirken hata:", error);
       }
@@ -2837,6 +3230,19 @@
       // Arama input'una event listener ekle
       document.getElementById('productSearch').addEventListener('input', searchProducts);
       
+      // Theme'i yükle
+      loadTheme();
+      
+      // Cache temizleme işlemini periyodik olarak çalıştır
+      setInterval(clearExpiredCache, CACHE_DURATION);
+      
+      // Cache durumunu console'da göster (debug için)
+      setInterval(() => {
+        const cacheSize = Object.keys(productCache).length;
+        const stockCacheSize = Object.keys(stockCache).length;
+        console.log(`Cache Durumu - Ürünler: ${cacheSize}, Stok: ${stockCacheSize}`);
+      }, 30000); // 30 saniyede bir
+      
       // Kullanıcı giriş kontrolü
       //onAuthStateChanged(auth, async (user) => {
         //if (!user) {
@@ -2878,9 +3284,40 @@ await initializeData();   //giriş kontrolü kaldırıldı, veri yükleme direkt
           toggleBtn.classList.add('off');
         }
       }
+      
+      // Theme toggle butonuna event listener ekle
+      const themeToggle = document.getElementById('themeToggle');
+      if (themeToggle) {
+        themeToggle.addEventListener('click', toggleTheme);
+      }
+      
+      // Refresh butonuna event listener ekle
+      const refreshBtn = document.getElementById('refreshBtn');
+      if (refreshBtn) {
+        refreshBtn.addEventListener('click', async () => {
+          refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Güncelleniyor...';
+          refreshBtn.disabled = true;
+          
+          try {
+            await refreshProductDisplay();
+            refreshBtn.innerHTML = '<i class="fas fa-check"></i> Güncellendi!';
+            setTimeout(() => {
+              refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Sayfayı Yenile';
+              refreshBtn.disabled = false;
+            }, 2000);
+          } catch (error) {
+            console.error('Güncelleme hatası:', error);
+            refreshBtn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Hata!';
+            setTimeout(() => {
+              refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Sayfayı Yenile';
+              refreshBtn.disabled = false;
+            }, 3000);
+          }
+        });
+      }
     });
 
-    // Global fonksiyonlar
+        // Global fonksiyonlar
  window.changeQty = changeQty;
     window.addToOrder = addToOrder;
     window.removeFromOrder = removeFromOrder;
@@ -2895,7 +3332,69 @@ await initializeData();   //giriş kontrolü kaldırıldı, veri yükleme direkt
     window.selectSize = selectSize;
     window.completeOrder = completeOrder;
     window.confirmOrder = confirmOrder;
-    window.closeModal = closeModal; 
+    window.closeModal = closeModal;
+    window.refreshProductDisplay = refreshProductDisplay;
+    window.showProductsLoading = showProductsLoading;
+    window.showSkeletonLoading = showSkeletonLoading;
+    window.clearExpiredCache = clearExpiredCache;
+    window.getCache = getCache;
+    window.setCache = setCache;
+    window.setTheme = setTheme;
+    window.toggleTheme = toggleTheme;
+    window.loadTheme = loadTheme;
+    window.updateUIAfterCacheLoad = updateUIAfterCacheLoad;
+
+    // Cache'den ürünler yüklendikten sonra UI'ı güncelle
+    async function updateUIAfterCacheLoad() {
+      try {
+        // Skeleton loading'i kaldır
+        const productListDiv = document.getElementById("kahveListesi");
+        if (productListDiv && productListDiv.querySelector('.skeleton-product')) {
+          productListDiv.innerHTML = "";
+        }
+        
+        // Cache'den ürünler yüklendiyse ilk kategoriyi otomatik seç
+        if (Object.keys(productMenu).length > 0) {
+          const firstMainBtn = document.querySelector('.main-category-btn');
+          if (firstMainBtn && !firstMainBtn.classList.contains('active')) {
+            console.log('İlk kategori otomatik seçiliyor...');
+            firstMainBtn.click(); // İlk kategoriyi otomatik seç
+          }
+        }
+        
+        console.log('UI cache yüklemesi sonrası güncellendi');
+      } catch (error) {
+        console.error('UI güncelleme hatası:', error);
+      }
+    }
+    
+    // Satış verilerini güncelle ve ürün listesini yenile
+    async function refreshProductDisplay() {
+      await updateSalesCounts();
+      
+      // Aktif kategoriyi yeniden yükle
+      const activeMainBtn = document.querySelector('.main-category-btn.active');
+      if (activeMainBtn) {
+        const mainCatId = activeMainBtn.dataset.id;
+        const mainCatSlug = activeMainBtn.dataset.slug;
+        const mainCat = { id: mainCatId, slug: mainCatSlug };
+        
+        // Alt kategorileri yeniden yükle
+        const contentArea = document.getElementById('categoryContent');
+        if (contentArea.classList.contains('active')) {
+          const activeSubBtn = contentArea.querySelector('.subcategory-btn.active');
+          if (activeSubBtn) {
+            selectSubCategory(activeSubBtn.dataset.slug);
+          } else {
+            listProducts(mainCatSlug);
+          }
+        } else {
+          listProducts(mainCatSlug);
+        }
+      }
+    }
+
+    // Global fonksiyonlar
   </script>
 </body>
 </html>
