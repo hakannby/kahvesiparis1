@@ -1417,6 +1417,27 @@
       font-size: 18px;
       font-weight: 600;
     }
+    
+    /* Sipariş işleme göstergesi */
+    #orderProcessingIndicator {
+      animation: pulse 2s infinite;
+      border: 2px solid var(--primary);
+    }
+    
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.7; }
+      100% { opacity: 1; }
+    }
+    
+    /* İşlem sırasında butonları devre dışı bırak */
+    .confirm-payment-btn:disabled,
+    .confirm-payment-btn:disabled:hover {
+      background: var(--gray-200) !important;
+      color: var(--gray-100) !important;
+      cursor: not-allowed !important;
+      transform: none !important;
+    }
 
 .modal-content input[type="text"]:focus, 
 .modal-content textarea:focus,
@@ -2293,9 +2314,13 @@
         <button class="modal-btn btn-primary confirm-payment-btn" id="confirmPaymentBtn" onclick="confirmPaymentWithMethod()" disabled>
           <i class="fas fa-check"></i> Siparişi Onayla
         </button>
-        <button class="modal-btn btn-cancel" onclick="closeModal('paymentModal')">
+        <button class="modal-btn btn-cancel" onclick="closeModal('paymentModal')" id="cancelPaymentBtn">
           <i class="fas fa-times"></i> İptal
         </button>
+        <div id="orderProcessingIndicator" style="display: none; text-align: center; margin-top: 15px; padding: 15px; background: var(--primary-light); color: white; border-radius: var(--radius);">
+          <i class="fas fa-spinner fa-spin"></i>
+          <span>Sipariş işleniyor, lütfen bekleyin...</span>
+        </div>
       </div>
     </div>
   </div>
@@ -2361,6 +2386,8 @@
     let printReceiptEnabled = true;
     let paymentMethod = '';
     let unsubscribeOrder = null;
+    let isOrderProcessing = false; // Sipariş işlemi devam ediyor mu?
+    let processedOrderIds = new Set(); // İşlenen sipariş ID'leri
 
     // Modal yönetimi
   function openModal(modalId) {
@@ -2419,6 +2446,11 @@
     document.addEventListener('click', (e) => {
       // Dışarı tıklayarak kapatma
       if (e.target.classList.contains('modal')) {
+        // Eğer sipariş işleniyorsa modal'ı kapatmaya izin verme
+        if (isOrderProcessing) {
+          e.preventDefault();
+          return;
+        }
         e.target.style.display = 'none';
         document.body.style.overflow = '';
       }
@@ -2427,6 +2459,11 @@
     // ESC tuşu ile kapatma
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
+        // Eğer sipariş işleniyorsa modal'ı kapatmaya izin verme
+        if (isOrderProcessing) {
+          e.preventDefault();
+          return;
+        }
         document.querySelectorAll('.modal').forEach(modal => {
           modal.style.display = 'none';
         });
@@ -3462,11 +3499,30 @@
         lastVisibleSale = querySnapshot.docs[querySnapshot.docs.length-1];
 
         let tbodyContent = "";
+        let seenOrders = new Set(); // Aynı timestamp'teki siparişleri takip et
         
         querySnapshot.forEach(doc => {
           const data = doc.data();
           const isRefunded = refundedOrderIds.includes(doc.id);
           const isCanceled = canceledOrderIds.includes(doc.id);
+          
+          // Timestamp kontrolü - aynı timestamp'te birden fazla sipariş varsa sadece birini göster
+          let orderKey = '';
+          if (data.timestamp && typeof data.timestamp.toDate === 'function') {
+            orderKey = data.timestamp.toDate().getTime().toString() + '_' + data.total + '_' + data.items.length;
+          } else if (typeof data.timestamp === "string") {
+            orderKey = new Date(data.timestamp).getTime().toString() + '_' + data.total + '_' + data.items.length;
+          }
+          
+          // Eğer aynı key'e sahip sipariş zaten görüntülendiyse, bu siparişi atla
+          if (orderKey && seenOrders.has(orderKey)) {
+            console.log('Çift sipariş filtrelendi:', doc.id, orderKey);
+            return;
+          }
+          
+          if (orderKey) {
+            seenOrders.add(orderKey);
+          }
           
           let date = "Tarih bilgisi yok";
           if (data.timestamp && typeof data.timestamp.toDate === 'function') {
@@ -3731,11 +3787,44 @@
     };
 
     window.completeOrder = async function(paymentMethod) {
+      // Çift sipariş önleme kontrolü
+      if (isOrderProcessing) {
+        alert("Sipariş işlemi devam ediyor. Lütfen bekleyin...");
+        return;
+      }
+      
       try {
+        // İşlem durumunu kilitle
+        isOrderProcessing = true;
+        
+        // UI'da işlem durumunu göster
+        const confirmBtn = document.getElementById('confirmPaymentBtn');
+        const cancelBtn = document.getElementById('cancelPaymentBtn');
+        const processingIndicator = document.getElementById('orderProcessingIndicator');
+        
+        if (confirmBtn) {
+          confirmBtn.disabled = true;
+          confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> İşleniyor...';
+        }
+        
+        if (cancelBtn) {
+          cancelBtn.disabled = true;
+        }
+        
+        if (processingIndicator) {
+          processingIndicator.style.display = 'block';
+        }
+        
         // Önce onay sorusunu göster
         const confirmed = confirm(`${calculateTotal().toFixed(2)}₺ tutarındaki siparişi onaylıyor musunuz?\n\nÖdeme yöntemi: ${getPaymentMethodName(paymentMethod)}`);
         
         if (!confirmed) {
+          // İşlem durumunu sıfırla
+          isOrderProcessing = false;
+          if (confirmBtn) {
+            confirmBtn.disabled = false;
+            confirmBtn.innerHTML = '<i class="fas fa-check"></i> Siparişi Onayla';
+          }
           return; // Kullanıcı iptal etti
         }
 
@@ -3805,6 +3894,10 @@
           isGift: paymentMethod === 'gift'
         });
 
+        // İşlenen sipariş ID'sini kaydet
+        processedOrderIds.add(newOrderRef.id);
+        console.log('Yeni sipariş oluşturuldu:', newOrderRef.id);
+
         if (printReceiptEnabled) {
           await printReceipt(
             newOrderRef.id,
@@ -3854,6 +3947,23 @@
       } catch (err) {
         console.error("Sipariş tamamlama hatası:", err);
         alert(err.message || "Sipariş tamamlanırken hata oluştu.");
+      } finally {
+        // İşlem durumunu sıfırla
+        isOrderProcessing = false;
+        
+        // UI elementlerini sıfırla
+        if (confirmBtn) {
+          confirmBtn.disabled = false;
+          confirmBtn.innerHTML = '<i class="fas fa-check"></i> Siparişi Onayla';
+        }
+        
+        if (cancelBtn) {
+          cancelBtn.disabled = false;
+        }
+        
+        if (processingIndicator) {
+          processingIndicator.style.display = 'none';
+        }
       }
     };
 
