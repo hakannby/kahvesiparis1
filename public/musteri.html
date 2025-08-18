@@ -3,12 +3,27 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sipariş Takip</title>
+  <title>Sipariş Takip - LUMA Coffee Co.</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="icon" href="data:;base64,iVBORw0KGgo=">
   <style>
     :root {
+      --primary: #94B7BB;
+      --primary-light: #A0D1CA;
+      --primary-accent: #ABC7CA;
+      --primary-dark: #7FA9AE;
+      --accent: #64CCC9;
       --background-opacity: 0.55;
+      --white: #ffffff;
+      --light: #f8fafc;
+      --gray-100: #f1f5f9;
+      --gray-200: #e2e8f0;
+      --dark: #1e293b;
+      --success: #10b981;
+      --shadow: 0 4px 12px rgba(148, 183, 187, 0.15);
+      --shadow-hover: 0 8px 25px rgba(148, 183, 187, 0.25);
+      --radius: 16px;
+      --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     }
     
     * {
@@ -24,10 +39,10 @@
     }
     
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       height: 100vh;
       padding: 0;
-      background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+      background: linear-gradient(135deg, var(--gray-100) 0%, var(--gray-200) 100%);
       position: relative;
     }
     
@@ -39,38 +54,66 @@
       display: flex;
       flex-direction: column;
       z-index: 10;
+      backdrop-filter: blur(10px);
     }
     
     header {
-      background: linear-gradient(135deg, #128da8 0%, #0a5c70 100%);
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
       color: white;
-      padding: 20px 30px;
+      padding: 25px 30px;
       text-align: center;
       position: relative;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      box-shadow: var(--shadow);
       flex-shrink: 0;
       z-index: 20;
+      border-radius: 0 0 var(--radius) var(--radius);
+    }
+    
+    .logo-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 10px;
+    }
+    
+    .logo {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: var(--white);
+      padding: 8px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      transition: var(--transition);
+    }
+    
+    .logo:hover {
+      transform: scale(1.05);
+      box-shadow: var(--shadow-hover);
     }
     
     header h1 {
-      font-size: 32px;
+      font-size: 36px;
       margin-bottom: 5px;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 12px;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-      font-weight: 700;
+      gap: 15px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+      font-weight: 800;
+      color: var(--white);
     }
     
     .subtitle {
       font-size: 18px;
-      opacity: 0.9;
+      opacity: 0.95;
       margin-top: 5px;
+      font-weight: 500;
+      color: var(--light);
     }
     
     .order-details {
-      padding: 20px 30px;
+      padding: 25px 30px;
       flex-grow: 1;
       overflow-y: auto;
       position: relative;
@@ -80,138 +123,157 @@
     .order-section h2 {
       display: flex;
       align-items: center;
-      gap: 10px;
-      color: #0a4694;
-      padding-bottom: 15px;
-      margin-bottom: 20px;
-      border-bottom: 3px solid #f0f5ff;
-      font-size: 24px;
+      gap: 12px;
+      color: var(--primary-dark);
+      padding-bottom: 18px;
+      margin-bottom: 25px;
+      border-bottom: 3px solid var(--primary-accent);
+      font-size: 26px;
       font-weight: 700;
     }
     
     .customer-name {
       text-align: center;
-      font-size: 22px;
+      font-size: 24px;
       font-weight: 600;
-      color: #0a4694;
-      padding: 15px;
-      background: rgba(10, 70, 148, 0.05);
-      border-radius: 10px;
-      margin-bottom: 20px;
+      color: var(--primary-dark);
+      padding: 20px;
+      background: linear-gradient(135deg, var(--primary-light) 0%, var(--accent) 100%);
+      border-radius: var(--radius);
+      margin-bottom: 25px;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
-      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+      gap: 12px;
+      box-shadow: var(--shadow);
+      color: var(--white);
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
     
     .order-table {
       width: 100%;
       border-collapse: separate;
-      border-spacing: 0 12px;
-      margin-top: 10px;
+      border-spacing: 0 15px;
+      margin-top: 15px;
       table-layout: fixed;
     }
     
     .order-table th {
       text-align: left;
-      padding: 12px 15px;
-      background: #f1f8ff;
-      color: #0a4694;
+      padding: 18px 20px;
+      background: linear-gradient(135deg, var(--primary-light) 0%, var(--accent) 100%);
+      color: var(--white);
       font-weight: 700;
       font-size: 18px;
+      border-radius: var(--radius) var(--radius) 0 0;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
     }
     
     .order-table td {
-      padding: 15px;
-      background: #f9fbfd;
-      border-left: 5px solid #4a89dc;
+      padding: 20px;
+      background: var(--white);
+      border-left: 5px solid var(--primary);
       font-size: 18px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+      box-shadow: var(--shadow);
       vertical-align: top;
+      border-radius: 0 0 var(--radius) var(--radius);
+      transition: var(--transition);
+    }
+    
+    .order-table tr:hover td {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-hover);
     }
     
     .item-image {
       width: 90px;
       height: 70px;
-      border-radius: 8px;
+      border-radius: 12px;
       object-fit: cover;
-      border: 1px solid #e0e6ed;
-      background: #fff;
+      border: 2px solid var(--primary-accent);
+      background: var(--white);
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 22px;
-      color: #4adcd2;
+      color: var(--primary);
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(148, 183, 187, 0.2);
     }
     
     .item-info {
-      padding-left: 15px;
+      padding-left: 20px;
       word-break: break-word;
     }
     
     .item-name {
       font-weight: 700;
-      color: #222;
-      font-size: 19px;
-      margin-bottom: 5px;
+      color: var(--dark);
+      font-size: 20px;
+      margin-bottom: 8px;
     }
     
     .unit-price {
-      color: #666;
+      color: var(--primary-dark);
       font-size: 16px;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
+      font-weight: 500;
     }
     
     .item-note {
       font-style: italic;
-      color: #e67e22;
-      padding: 6px 10px;
-      background: rgba(230, 126, 34, 0.1);
-      border-radius: 5px;
+      color: var(--accent);
+      padding: 8px 12px;
+      background: linear-gradient(135deg, var(--primary-light) 0%, var(--accent) 100%);
+      border-radius: 8px;
       display: inline-block;
       font-size: 15px;
-      margin-top: 5px;
+      margin-top: 8px;
+      color: var(--white);
+      font-weight: 500;
     }
     
     .item-price {
       font-weight: bold;
-      color: #27ae60;
-      font-size: 19px;
+      color: var(--success);
+      font-size: 20px;
       text-align: right;
       white-space: nowrap;
     }
     
     .total-section {
-      background: linear-gradient(135deg, #f1f8ff 0%, #e3f2fd 100%);
-      padding: 20px 25px;
-      border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      padding: 25px 30px;
+      border-radius: var(--radius);
       text-align: right;
-      font-size: 24px;
+      font-size: 26px;
       font-weight: bold;
-      margin-top: 15px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-      border: 1px solid rgba(74, 137, 220, 0.2);
+      margin-top: 20px;
+      box-shadow: var(--shadow-hover);
+      border: 2px solid var(--primary-accent);
+      color: var(--white);
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
     }
     
     .total-section span {
-      color: #27ae60;
-      font-size: 28px;
-      text-shadow: 0 2px 4px rgba(39, 174, 96, 0.2);
+      color: var(--white);
+      font-size: 32px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      font-weight: 800;
     }
     
     .notification {
       position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: #5ce193;
-      color: #333;
-      padding: 15px 25px;
-      border-radius: 10px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      bottom: 25px;
+      right: 25px;
+      background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+      color: var(--white);
+      padding: 18px 28px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-hover);
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
       transform: translateY(120px);
       opacity: 0;
       transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -253,18 +315,22 @@
       position: relative;
       z-index: 2;
       text-align: center;
-      color: white;
-      background: rgba(0, 0, 0, 0.6);
-      padding: 25px;
-      border-radius: 15px;
+      color: var(--white);
+      background: linear-gradient(135deg, rgba(148, 183, 187, 0.9) 0%, rgba(127, 169, 174, 0.9) 100%);
+      padding: 30px;
+      border-radius: var(--radius);
       max-width: 90%;
-      margin-top: 20px;
+      margin-top: 25px;
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      box-shadow: var(--shadow-hover);
     }
     
     .waiting-message i {
-      font-size: 42px;
-      margin-bottom: 15px;
-      color: #fff;
+      font-size: 48px;
+      margin-bottom: 20px;
+      color: var(--white);
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     }
     
     .video-container {
@@ -293,102 +359,107 @@
     
     @media (max-width: 768px) {
       header {
-        padding: 15px 10px;
+        padding: 20px 15px;
+      }
+      
+      .logo {
+        width: 50px;
+        height: 50px;
       }
       
       header h1 {
-        font-size: 26px;
+        font-size: 28px;
       }
       
       .subtitle {
-        font-size: 15px;
+        font-size: 16px;
       }
       
       .order-details {
-        padding: 15px 10px;
+        padding: 20px 15px;
       }
       
       .order-table th,
       .order-table td {
-        padding: 12px;
-        font-size: 15px;
-      }
-      
-      .item-image {
-        width: 55px;
-        height: 55px;
-      }
-      
-      .item-name {
-        font-size: 17px;
-      }
-      
-      .total-section {
-        font-size: 20px;
-        padding: 15px 20px;
-      }
-      
-      .total-section span {
-        font-size: 24px;
-      }
-      
-      .customer-name {
-        font-size: 20px;
-        padding: 12px;
-      }
-      
-      .order-section h2 {
-        font-size: 22px;
-      }
-      
-      /* Mobilde sütun genişlikleri */
-      .image-col {
-        width: 70px;
-      }
-      
-      .price-col {
-        width: 100px;
-      }
-
-      .waiting-message {
         padding: 15px;
         font-size: 16px;
       }
       
+      .item-image {
+        width: 60px;
+        height: 60px;
+      }
+      
+      .item-name {
+        font-size: 18px;
+      }
+      
+      .total-section {
+        font-size: 22px;
+        padding: 20px 25px;
+      }
+      
+      .total-section span {
+        font-size: 28px;
+      }
+      
+      .customer-name {
+        font-size: 22px;
+        padding: 18px;
+      }
+      
+      .order-section h2 {
+        font-size: 24px;
+      }
+      
+      /* Mobilde sütun genişlikleri */
+      .image-col {
+        width: 80px;
+      }
+      
+      .price-col {
+        width: 110px;
+      }
+
+      .waiting-message {
+        padding: 20px;
+        font-size: 16px;
+      }
+      
       .waiting-message i {
-        font-size: 32px;
+        font-size: 36px;
       }
 
       .waiting-state header {
-    display: none !important;
-  }
-  
-  .waiting-state .container {
-    background: transparent !important;
-  }
-  
-  .waiting-state .order-details {
-    padding: 0 !important;
-  }
-  
-  .waiting-message {
-    background: rgba(0, 0, 0, 0.3) !important; /* Daha saydam arkaplan */
-    backdrop-filter: blur(5px); /* Hafif blur efekti */
-  }
-  
-  .video-container {
-    z-index: 0 !important;
-  }
-
-
-
+        display: none !important;
+      }
+      
+      .waiting-state .container {
+        background: transparent !important;
+      }
+      
+      .waiting-state .order-details {
+        padding: 0 !important;
+      }
+      
+      .waiting-message {
+        background: linear-gradient(135deg, rgba(148, 183, 187, 0.8) 0%, rgba(127, 169, 174, 0.8) 100%) !important;
+        backdrop-filter: blur(10px);
+      }
+      
+      .video-container {
+        z-index: 0 !important;
+      }
     }
   </style>
 </head>
 <body>
   <div class="container">
     <header>
-      <h1><i class="fas fa-mug-hot"></i> LUMA Coffee Co.</h1>
+      <div class="logo-container">
+        <img src="img/lumaLogo.png" alt="LUMA Coffee Co." class="logo">
+        <h1>LUMA Coffee Co.</h1>
+      </div>
       <div class="subtitle">Hoşgeldiniz</div>
     </header>
     
@@ -409,7 +480,7 @@
             <div class="waiting-message" id="waitingMessage">
               <i class="fas fa-coffee"></i>
               <div>Henüz siparişiniz bulunmuyor</div>
-              <div class="subtitle" style="margin-top: 12px; font-size: 16px;">
+              <div class="subtitle" style="margin-top: 15px; font-size: 16px; opacity: 0.9;">
                 Siparişiniz alındığında burada görünecektir
               </div>
             </div>
@@ -632,6 +703,34 @@
       
       orderItemsBodyEl.innerHTML = itemsHTML;
       totalAmountEl.textContent = `${total.toFixed(2)}₺`;
+      
+      // Eğer toplam tutar 0 TL ise açılış ekranına geri dön
+      if (total === 0) {
+        returnToOpeningScreen();
+      }
+    }
+    
+    // Açılış ekranına geri dön
+    function returnToOpeningScreen() {
+      // Bekleme durumunu aktif et
+      document.body.classList.add('waiting-state');
+      isWaitingState = true;
+      
+      // Sipariş özetini gizle
+      orderSummaryEl.style.display = 'none';
+      customerNameEl.style.display = 'none';
+      
+      // Açılış ekranını göster
+      orderItemsEl.style.display = 'block';
+      waitingMessageEl.style.display = 'block';
+      
+      // Video oynat
+      playVideo();
+      
+      // Bildirim göster
+      showNotification('Sipariş tamamlandı! Yeni sipariş bekleniyor...');
+      
+      console.log('Açılış ekranına geri dönüldü');
     }
 
     // Bildirim göster
